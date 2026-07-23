@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Nuance . A Case Study</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Lato:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --obsidian:#262624;
+    --obsidian-2:#1a1917;
+    --amber:#c9956a;
+    --amber-soft:#d9b190;
+    --caramel:#9a5e2f;
+    --well-red:#a32d2d;
+    --linen:#f1e5da;
+    --cream:#e1c5ad;
+    --ink:#2a231d;
+    --line: rgba(241,229,218,0.14);
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0; padding:0; width:100%; height:100%;
+    background:var(--obsidian);
+    font-family:'Lato',sans-serif;
+    overflow:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  .deck{ position:relative; width:100vw; height:100vh; overflow:hidden; }
+
+  .slide{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column;
+    justify-content:center;
+    padding: 6vh 8vw;
+    opacity:0; visibility:hidden;
+    transform: translateY(18px) scale(0.99);
+    transition: opacity .6s cubic-bezier(.22,.8,.3,1), transform .6s cubic-bezier(.22,.8,.3,1), visibility 0s linear .6s;
+    background: var(--obsidian);
+    color: var(--linen);
+  }
+  .slide.active{
+    opacity:1; visibility:visible;
+    transform: translateY(0) scale(1);
+    transition: opacity .6s cubic-bezier(.22,.8,.3,1), transform .6s cubic-bezier(.22,.8,.3,1), visibility 0s linear 0s;
+    z-index:2;
+  }
+  .slide.light{ background: var(--linen); color: var(--ink); }
+  .slide.dark2{ background: var(--obsidian-2); color: var(--linen); }
+
+  .blob{ position:absolute; border-radius:50%; opacity:.9; pointer-events:none; }
+
+  .eyebrow{
+    font-family:'Lato',sans-serif; font-weight:700; letter-spacing:.22em;
+    text-transform:uppercase; font-size:12.5px; color:var(--amber); margin-bottom:18px;
+  }
+  .light .eyebrow{ color:var(--caramel); }
+  h1,h2,h3{ font-family:'Playfair Display', serif; margin:0; }
+  em{ color:var(--amber); font-style:italic; }
+  .light em{ color:var(--caramel); }
+
+  .meta-row{ display:flex; gap:48px; margin-top:44px; flex-wrap:wrap; }
+  .meta-row .item{ min-width:140px; }
+  .meta-label{
+    font-size:11px; letter-spacing:.15em; text-transform:uppercase;
+    color:var(--amber-soft); font-weight:700; margin-bottom:6px;
+  }
+  .light .meta-label{ color:var(--caramel); }
+  .meta-value{ font-size:15px; opacity:.9; }
+
+  .counter{
+    position:fixed; top:34px; right:44px; z-index:20;
+    font-family:'Lato',sans-serif; font-size:12px; letter-spacing:.15em;
+    color:var(--linen); opacity:.55; mix-blend-mode:difference;
+  }
+  .brandmark{
+    position:fixed; bottom:34px; left:44px; z-index:20;
+    font-family:'Playfair Display', serif; font-style:italic; font-size:14px;
+    color:var(--linen); opacity:.55; mix-blend-mode:difference;
+  }
+  .nav-arrow{
+    position:fixed; top:50%; transform:translateY(-50%);
+    width:52px; height:52px; border-radius:50%;
+    background: rgba(241,229,218,0.08);
+    border:1px solid var(--line);
+    color:var(--linen);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; z-index:25; font-size:18px;
+    transition: background .2s, transform .2s;
+    backdrop-filter: blur(6px);
+  }
+  .nav-arrow:hover{ background: var(--amber); color:var(--obsidian); transform:translateY(-50%) scale(1.06); }
+  #prevBtn{ left:34px; } #nextBtn{ right:34px; }
+
+  .dots{ position:fixed; bottom:34px; left:50%; transform:translateX(-50%); display:flex; gap:10px; z-index:25; }
+  .dot{ width:9px; height:9px; border-radius:50%; background: rgba(241,229,218,.28); cursor:pointer; transition: all .3s; border:1px solid transparent; }
+  .dot.active{ background:var(--amber); transform:scale(1.25); }
+
+  .progress-line{ position:fixed; top:0; left:0; height:3px; background:var(--amber); z-index:30; transition: width .5s cubic-bezier(.22,.8,.3,1); }
+
+  .quote-card{ background: rgba(241,229,218,0.05); border-top:3px solid var(--amber); padding:26px 22px; border-radius:2px; max-width:280px; }
+  .light .quote-card{ background: rgba(38,38,36,0.04); }
+  .quote-card .qmark{ color:var(--amber); font-family:'Playfair Display',serif; font-size:34px; font-style:italic; line-height:.4; }
+  .quote-card h3{ font-size:22px; line-height:1.3; font-style:italic; font-weight:500; margin:14px 0 16px; }
+  .quote-card .tag{ font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--amber); font-weight:700; }
+  .quote-card p{ font-size:13px; line-height:1.6; opacity:.75; margin-top:8px; }
+
+  .pill{ display:inline-flex; align-items:center; padding:8px 18px; border-radius:22px; border:1px solid var(--line); font-size:13px; margin-right:10px; margin-bottom:10px; color:var(--linen); }
+  .light .pill{ border-color: rgba(38,38,36,.18); color:var(--ink); }
+
+  .two-col{ display:flex; gap:64px; align-items:center; }
+  .two-col .col{ flex:1; }
+  .grid-cards{ display:flex; gap:20px; flex-wrap:wrap; margin-top:34px; }
+
+  .stat-grid{ display:flex; gap:0; margin-top:50px; flex-wrap:wrap; }
+  .stat-block{ flex:1; min-width:170px; padding:0 32px 0 0; margin-right:32px; border-right:1px solid var(--line); }
+  .light .stat-block{ border-right-color: rgba(38,38,36,.15); }
+  .stat-block:last-child{ border-right:none; margin-right:0; padding-right:0; }
+  .stat-num{ font-family:'Playfair Display',serif; font-size:54px; color:var(--amber); line-height:1; }
+  .light .stat-num{ color:var(--caramel); }
+  .dark2 .stat-num{ color:var(--amber); }
+  .stat-label{ font-size:13px; opacity:.75; margin-top:12px; line-height:1.5; max-width:200px; }
+
+  .phone-placeholder{
+    width:230px; height:460px; border-radius:26px;
+    background: rgba(241,229,218,0.06);
+    border:1.5px dashed rgba(241,229,218,0.35);
+    display:flex; align-items:center; justify-content:center;
+    flex-direction:column; gap:10px;
+    box-shadow: 0 30px 60px rgba(0,0,0,.25);
+    flex-shrink:0;
+  }
+  .light .phone-placeholder{ background: rgba(38,38,36,0.04); border-color: rgba(38,38,36,0.25); }
+  .dark2 .phone-placeholder{ background: rgba(241,229,218,0.05); border-color: rgba(241,229,218,0.3); }
+
+  .image-placeholder{
+    border-radius:10px;
+    background: rgba(241,229,218,0.06);
+    border:1.5px dashed rgba(241,229,218,0.35);
+    display:flex; align-items:center; justify-content:center;
+    flex-direction:column; gap:10px;
+  }
+  .light .image-placeholder{ background: rgba(38,38,36,0.04); border-color: rgba(38,38,36,0.25); }
+  .dark2 .image-placeholder{ background: rgba(241,229,218,0.05); border-color: rgba(241,229,218,0.3); }
+  .ph-label{ font-family:'Lato',sans-serif; font-weight:700; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; opacity:.4; }
+
+  .btn-demo{ background:var(--obsidian); color:var(--linen); text-align:center; padding:10px 20px; border-radius:20px; font-size:12px; font-weight:700; display:inline-block; }
+  .chip{ display:inline-block; font-size:10px; padding:5px 10px; border-radius:14px; border:1px solid #ddd0c2; margin:3px 4px 3px 0; }
+  .chip.on{ background:var(--obsidian); color:var(--linen); border-color:var(--obsidian); }
+
+  /* ---------- gothic portfolio bookends ---------- */
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,500&family=Cinzel:wght@500;600&display=swap');
+
+  .slide.portal{
+    background: radial-gradient(ellipse at 50% 30%, #241d17 0%, #100c09 78%);
+    color: var(--linen);
+    align-items:center; text-align:center;
+    justify-content:center;
+  }
+  .portal-eyebrow{
+    font-family:'Cinzel',serif; font-weight:600; letter-spacing:.32em; text-transform:uppercase;
+    font-size:12px; color:var(--amber); margin-bottom:22px;
+  }
+  .portal-title{
+    font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:500;
+    font-size:56px; line-height:1.15; max-width:820px;
+  }
+  .portal-body{
+    font-family:'Cormorant Garamond',serif; font-size:19px; line-height:1.75; opacity:.8;
+    max-width:600px; margin-top:26px;
+  }
+  .portal-btn{
+    font-family:'Cinzel',serif; letter-spacing:.14em; font-size:13px; text-transform:uppercase;
+    background: transparent; color: var(--amber); border:1px solid var(--amber);
+    padding:16px 40px; border-radius:2px; margin-top:44px;
+    cursor:pointer; transition: all .3s; text-decoration:none; display:inline-block;
+  }
+  .portal-btn:hover{ background: var(--amber); color:#1a1512; box-shadow: 0 0 30px rgba(201,149,106,.4); }
+
+  .relic{
+    width:110px; height:110px; margin-bottom:28px;
+    display:flex; align-items:center; justify-content:center;
+    border-radius:50%;
+    background: radial-gradient(circle at 40% 35%, rgba(201,149,106,.85), rgba(154,94,47,.2) 60%, transparent 76%);
+  }
+  .relic svg{ width:52px; height:52px; }
+  .reward-tag{
+    font-family:'Cinzel',serif; letter-spacing:.3em; text-transform:uppercase;
+    font-size:11px; color:var(--amber-soft); opacity:.8; margin-bottom:16px;
+  }
+  .reward-name{ font-family:'Cormorant Garamond',serif; font-style:italic; font-size:38px; margin-top:2px; }
+  .reward-desc{
+    font-family:'Cormorant Garamond',serif; font-size:18px; line-height:1.7; opacity:.75;
+    max-width:460px; margin-top:20px;
+  }
+
+  .mirror-frame{
+    width:120px; height:150px;
+    display:flex; flex-direction:column; align-items:center;
+  }
+  .mirror-glass{
+    width:110px; height:140px;
+    border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;
+    background: radial-gradient(ellipse at 35% 30%, rgba(241,229,218,.5), rgba(201,149,106,.08) 70%);
+    border: 3px solid var(--amber);
+    box-shadow: 0 0 40px rgba(201,149,106,.25), inset 0 0 30px rgba(0,0,0,.35);
+    position:relative;
+  }
+  .mirror-glass::after{
+    content:'';
+    position:absolute; left:50%; bottom:-46px; transform:translateX(-50%);
+    width:8px; height:50px; border-radius:4px;
+    background: var(--amber);
+    opacity:.85;
+  }
+
+  .portal-content{ transition: opacity .4s ease; }
+  .mirror-frame{ transition: transform .9s cubic-bezier(.6,0,.85,0); }
+  .mirror-glass{ transition: opacity .9s ease .1s; }
+
+  .zooming .portal-content{ opacity:0; pointer-events:none; }
+  .zooming .mirror-frame{ transform: scale(15); }
+  .zooming .mirror-glass{ opacity:0; }
+  .zooming .portal-eyebrow{ opacity:0; transition: opacity .3s ease; }
+
+  .flash-overlay{
+    position:fixed; inset:0; background:var(--cream); opacity:0; pointer-events:none; z-index:50;
+  }
+  .flash-overlay.flash-in{ opacity:1; transition: opacity .5s ease-in; }
+  .flash-overlay.flash-out{ opacity:0; transition: opacity .6s ease-out; }
+
+  @media (prefers-reduced-motion: reduce){
+    .mirror-frame, .mirror-glass, .portal-content, .flash-overlay{ transition: none !important; }
+  }
+
+  /* The case study reads as one continuous story on scroll. */
+  html{ scroll-behavior:smooth; }
+  body{ overflow-x:hidden; overflow-y:auto; }
+  .deck{ width:100%; height:auto; overflow:visible; }
+  .slide,
+  .slide.active{
+    position:relative; inset:auto; min-height:0; height:auto;
+    opacity:1; visibility:visible; transform:none; z-index:auto;
+    transition:none; max-width:1180px; margin:0 auto;
+    padding:clamp(88px, 11vw, 150px) clamp(24px, 8vw, 96px);
+    border-top:1px solid rgba(241,229,218,.08);
+  }
+  .slide:first-child{ border-top:none; }
+  .slide.light,
+  .slide.dark2,
+  .slide.portal{ background:var(--obsidian); color:var(--linen); }
+  .slide.light .eyebrow,
+  .slide.light .meta-label{ color:var(--amber); }
+  .slide.light em{ color:var(--amber); }
+  .slide.light .pill{ border-color:var(--line); color:var(--linen); }
+  .slide .blob{ opacity:.08 !important; filter:blur(10px); }
+  .slide.portal{ align-items:center; text-align:center; justify-content:center; }
+  .slide.portal:first-child{ overflow:hidden; }
+  .portal .mirror-frame,
+  .portal .relic{ display:flex; }
+  .portal .mirror-frame{
+    margin-bottom:24px; position:relative; z-index:2;
+    transform:scale(var(--mirror-scale, 1));
+    opacity:var(--mirror-opacity, 1);
+    transform-origin:center center;
+    transition:transform .16s cubic-bezier(.22,.8,.3,1), opacity .16s linear;
+    will-change:transform, opacity;
+  }
+  .portal-content{ max-width:780px; }
+  .portal-title{ font-size:clamp(42px, 6vw, 76px); line-height:1.05; }
+  .portal-body{ font-family:'Lato',sans-serif; font-size:18px; line-height:1.7; margin-top:22px; }
+  .portal-btn{ margin-top:30px; padding:13px 24px; }
+  .reward-name{ font-size:clamp(42px, 6vw, 72px); line-height:1.05; }
+  .reward-desc{ font-family:'Lato',sans-serif; font-size:16px; line-height:1.7; margin-top:22px; }
+  .slide.portal:last-child{ min-height:0; }
+  .slide h1[style*="font-size:88px"]{ font-size:clamp(56px, 8vw, 88px) !important; line-height:.98 !important; }
+  .slide h1[style*="font-size:72px"]{ font-size:clamp(50px, 7vw, 72px) !important; }
+  .slide h2[style]{ line-height:1.15; }
+  .counter{ mix-blend-mode:normal; color:var(--linen); opacity:.7; }
+  .brandmark{ mix-blend-mode:normal; }
+  .nav-arrow, .dots{ display:none; }
+  .progress-line{ position:fixed; }
+
+  .portfolio-nav{
+    position:fixed; top:22px; left:50%; transform:translateX(-50%);
+    z-index:40; display:flex; align-items:center; gap:32px;
+    padding:11px 14px 11px 26px;
+    background:rgba(26,25,23,.72); backdrop-filter:blur(20px);
+    border:1px solid rgba(201,149,106,.2); border-radius:100px;
+  }
+  .portfolio-nav .nav-home,
+  .portfolio-nav a{
+    font-family:'Lato',sans-serif; text-decoration:none; white-space:nowrap;
+  }
+  .portfolio-nav .nav-home{
+    color:var(--amber); font-size:10px; font-weight:700; letter-spacing:.18em;
+  }
+  .portfolio-nav .nav-divider{ width:1px; height:14px; background:rgba(201,149,106,.25); }
+  .portfolio-nav ul{ list-style:none; display:flex; gap:24px; margin:0; padding:0; }
+  .portfolio-nav ul a{
+    color:var(--amber-soft); font-size:9px; font-weight:700;
+    letter-spacing:.2em; text-transform:uppercase; transition:color .2s;
+  }
+  .portfolio-nav ul a:hover{ color:var(--linen); }
+  .portfolio-nav .nav-contact{
+    color:var(--obsidian-2); background:var(--amber); padding:9px 18px;
+    border-radius:100px; font-size:9px; font-weight:700;
+    letter-spacing:.18em; text-transform:uppercase; transition:transform .2s, box-shadow .2s;
+  }
+  .portfolio-nav .nav-contact:hover{ transform:scale(1.04); box-shadow:0 4px 18px rgba(201,149,106,.35); }
+
+  @media (max-width: 700px){
+    .slide{ padding:82px 7vw; }
+    .two-col{ flex-direction:column; gap:40px; align-items:stretch; }
+    .two-col .col{ max-width:none !important; }
+    .grid-cards{ justify-content:flex-start !important; }
+    .stat-block{ min-width:45%; margin-bottom:32px; }
+    .counter{ top:22px; right:22px; }
+    .brandmark{ bottom:22px; left:22px; }
+    .portfolio-nav{ gap:14px; padding:9px 10px 9px 18px; }
+    .portfolio-nav ul{ gap:14px; }
+    .portfolio-nav ul a{ font-size:8px; }
+    .portfolio-nav .nav-contact{ padding:8px 12px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="portfolio-nav" aria-label="Portfolio navigation">
+  <a class="nav-home" href="index.html">Alisa</a>
+  <div class="nav-divider" aria-hidden="true"></div>
+  <ul>
+    <li><a href="index.html#p4">Work</a></li>
+    <li><a href="index.html#p3">About</a></li>
+    <li><a href="index.html#p6">Resume</a></li>
+  </ul>
+  <a class="nav-contact" href="index.html#p7">Contact</a>
+</nav>
+
+<div class="progress-line" id="progressLine"></div>
+<div class="counter" id="counter">01 / 16</div>
+<div class="brandmark"><em>nuance.</em></div>
+
+<div class="deck" id="deck">
+
+  <!-- 1. THE DOORWAY -->
+  <section class="slide portal active" data-title="The Doorway">
+    <div class="portal-eyebrow">Look Closer · Nuance UX / UI Case Study</div>
+    <div class="mirror-frame">
+      <div class="mirror-glass" id="mirrorGlass"></div>
+    </div>
+    <div class="portal-content" id="portalContent">
+      <h1 class="portal-title" style="margin-top:10px;">Look into the mirror.</h1>
+      <p class="portal-body">
+        The reflection is right. It's the shade that never is.
+        Nuance is a mobile beauty app designed to make product discovery feel more certain
+        through personalised shade matching, routine compatibility, and unsponsored reviews.
+      </p>
+      <div class="portal-btn" id="stepInsideBtn">Step Through the Glass &#8594;</div>
+    </div>
+  </section>
+
+  <!-- 2. COVER -->
+  <section class="slide" data-title="Cover">
+    <div class="blob" style="width:520px;height:520px; background:var(--caramel); opacity:.35; top:-160px; right:-100px;"></div>
+    <div class="eyebrow">UX / UI Case Study · Mobile App · 2026</div>
+    <h1 style="font-size:88px; line-height:1;">nuance<br><span style="color:var(--amber);">Beauty</span></h1>
+    <p style="max-width:620px; font-size:17px; line-height:1.7; opacity:.85; margin-top:28px;">
+      Nuance is a mobile beauty app designed to simplify how people find and manage makeup products,
+      combining personalised shade matching, routine compatibility checking, and unsponsored reviews
+      into one cohesive experience.
+    </p>
+    <div style="margin-top:26px;">
+      <span class="pill">Product Design</span>
+      <span class="pill">UX Research</span>
+      <span class="pill">Beauty Tech</span>
+    </div>
+    <div class="meta-row">
+      <div class="item"><div class="meta-label">Role</div><div class="meta-value">UX / UI Designer</div></div>
+      <div class="item"><div class="meta-label">Duration</div><div class="meta-value">12 weeks</div></div>
+      <div class="item"><div class="meta-label">Platform</div><div class="meta-value">iOS Mobile</div></div>
+      <div class="item"><div class="meta-label">Tools</div><div class="meta-value">Figma, Figboard</div></div>
+    </div>
+  </section>
+
+  <!-- 3. THE PROBLEM -->
+  <section class="slide light" data-title="The Problem">
+    <div class="blob" style="width:420px;height:420px; background:var(--cream); opacity:.5; bottom:-140px; right:10%;"></div>
+    <div class="two-col">
+      <div class="col">
+        <div class="eyebrow">Where This Starts</div>
+        <h2 style="font-size:52px;">Finding a <em>Product</em></h2>
+        <ul style="margin-top:26px; padding-left:20px; line-height:2.1; font-size:15px;">
+          <li>Sponsors</li>
+          <li>Incompatible products</li>
+          <li>Wrong color match</li>
+          <li>Skin filters</li>
+        </ul>
+        <p style="font-size:16px; line-height:1.7; max-width:480px; margin-top:22px;">
+          All these issues make it harder to find the perfect product.
+          No one likes wasting time, money, and patience.
+        </p>
+        <div class="quote-card" style="max-width:340px; border-color:var(--caramel); margin-top:26px;">
+          <div class="qmark">"</div>
+          <h3>If it takes too long, I give up.</h3>
+          <div class="tag">Stacy Keech</div>
+        </div>
+      </div>
+      <div class="col" style="display:flex; justify-content:center;">
+        <div class="image-placeholder" style="width:320px; height:400px;">
+          <div class="ph-label">Her image here</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. WHAT THEY TOLD US -->
+  <section class="slide" data-title="What They Told Us">
+    <div class="blob" style="width:460px;height:460px; background:var(--caramel); opacity:.25; top:-140px; left:40%;"></div>
+    <div style="text-align:center; margin-bottom:10px;">
+      <div class="eyebrow" style="letter-spacing:.2em;">Research Findings · User Interviews</div>
+      <h2 style="font-size:46px;">What they <em>told us.</em></h2>
+      <p style="opacity:.7; font-size:14px; margin-top:10px;">Across 24 interviews, five patterns surfaced again and again.</p>
+    </div>
+    <div class="grid-cards" style="justify-content:center; margin-top:30px;">
+      <div class="quote-card"><div class="qmark">"</div><h3 style="font-size:18px;">I never trust sponsored posts.</h3><div class="tag">Trust</div><p>Users sought organic reviews over paid partnerships.</p></div>
+      <div class="quote-card"><div class="qmark">"</div><h3 style="font-size:18px;">I look for people with my skin type.</h3><div class="tag">Identity</div><p>Representation mattered deeply in reviews.</p></div>
+      <div class="quote-card" style="border-color:var(--well-red);"><div class="qmark">"</div><h3 style="font-size:18px;">If it takes too long, I give up.</h3><div class="tag" style="color:var(--well-red);">Most Common</div><p>Overwhelm was the biggest barrier to purchase.</p></div>
+      <div class="quote-card"><div class="qmark">"</div><h3 style="font-size:18px;">Shades never match in real life.</h3><div class="tag">Accuracy</div><p>Shade mismatch was the most common wasted purchase.</p></div>
+      <div class="quote-card"><div class="qmark">"</div><h3 style="font-size:18px;">I check many reviews before buying.</h3><div class="tag">Patience</div><p>Users cross-referenced 2-3 sources for confidence.</p></div>
+    </div>
+  </section>
+
+  <!-- 5. BY THE NUMBERS -->
+  <section class="slide dark2" data-title="By the Numbers">
+    <div class="blob" style="width:400px;height:400px; background:var(--well-red); opacity:.12; bottom:-140px; left:60%;"></div>
+    <div class="eyebrow">Research Findings · Quantified</div>
+    <h2 style="font-size:46px; max-width:760px;">What the interviews <em>added up</em> to.</h2>
+    <p style="opacity:.7; font-size:14px; margin-top:10px; max-width:560px;">Putting numbers behind the same 24-person research round.</p>
+    <div class="stat-grid">
+      <div class="stat-block">
+        <div class="stat-num">24</div>
+        <div class="stat-label">Participants interviewed, ages 18-27</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-num">68%</div>
+        <div class="stat-label">Had returned or wasted a product from a bad shade match</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-num">3.2</div>
+        <div class="stat-label">Average sources checked before buying, no single app covered it</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-num">76%</div>
+        <div class="stat-label">Wanted reviews from people who shared their skin tone</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-num">41%</div>
+        <div class="stat-label">Said sponsored posts made them trust a product less, not more</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. PERSONA -->
+  <section class="slide dark2" data-title="Persona">
+    <div class="blob" style="width:360px;height:360px; background:var(--well-red); opacity:.18; top:-80px; left:20%;"></div>
+    <div class="eyebrow">The Person At The Centre Of Everything</div>
+    <div class="two-col" style="align-items:flex-start;">
+      <div class="col" style="max-width:260px;">
+        <h2 style="font-size:44px;">Stacy<br>Keech</h2>
+        <p style="opacity:.7; font-size:13px; letter-spacing:.05em; margin-top:10px;">22 . Student . Atlanta, GA</p>
+        <div style="margin-top:26px;">
+          <span class="pill">Drugstore</span><br>
+          <span class="pill">Intermediate</span><br>
+          <span class="pill">iOS User</span>
+        </div>
+        <div class="image-placeholder" style="width:100%; height:220px; margin-top:26px;">
+          <div class="ph-label">Her image here</div>
+        </div>
+      </div>
+      <div class="col">
+        <p style="font-size:20px; line-height:1.6; font-family:'Playfair Display',serif; max-width:600px;">
+          Stacy wasn't invented. She's a composite of 24 research participants, young adults making
+          purchasing decisions in a system designed to move inventory, not help them <em>feel confident.</em>
+        </p>
+        <div style="display:flex; gap:28px; margin-top:32px; flex-wrap:wrap;">
+          <div style="max-width:230px;">
+            <div class="meta-label">What she says she wants</div>
+            <p style="font-size:13px; opacity:.8; line-height:1.6;">"Better shade matching. More reviews from people who look like me."</p>
+          </div>
+          <div style="max-width:230px;">
+            <div class="meta-label">What she actually needs</div>
+            <p style="font-size:13px; opacity:.8; line-height:1.6;">Confidence. A signal that says <em>this one is right for you.</em></p>
+          </div>
+          <div style="max-width:230px;">
+            <div class="meta-label">The gap we had to close</div>
+            <p style="font-size:13px; opacity:.8; line-height:1.6;">More information was making her <em>more</em> anxious, not less.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. HOW MIGHT WE -->
+  <section class="slide light" data-title="How Might We">
+    <div class="blob" style="width:400px;height:400px; background:var(--cream); opacity:.5; bottom:-120px; left:-100px;"></div>
+    <div class="eyebrow">How Might We Statement</div>
+    <h2 style="font-size:52px; max-width:900px; line-height:1.3;">
+      How might we help <em>Stacy</em> discover affordable makeup in a way that feels reliable instead of risky?
+    </h2>
+  </section>
+
+  <!-- 8. LOFI TO HIFI -->
+  <section class="slide" data-title="Lofi to Hifi">
+    <div class="eyebrow">Refining The Experience</div>
+    <h2 style="font-size:46px;">Lofi to <em>Hifi</em></h2>
+    <div style="display:flex; align-items:center; gap:40px; margin-top:50px; flex-wrap:wrap;">
+      <div class="phone-placeholder" style="width:190px; height:360px;">
+        <div class="ph-label">Lofi screen</div>
+      </div>
+      <div style="font-size:30px; color:var(--amber);">&#8594;</div>
+      <div class="phone-placeholder" style="width:190px; height:360px;">
+        <div class="ph-label">Hifi screen</div>
+      </div>
+      <p style="max-width:280px; font-size:14px; opacity:.75; line-height:1.7;">
+        Grayscale wireframes became warm, specific screens once real content, shade badges,
+        and compatibility states were layered in.
+      </p>
+    </div>
+  </section>
+
+  <!-- 9. DESIGN SYSTEM: TYPE & COLOR -->
+  <section class="slide light" data-title="Design System - Type & Color">
+    <div class="eyebrow">Design System</div>
+    <h2 style="font-size:52px;">Typography &amp; <em>color</em></h2>
+    <div class="two-col" style="margin-top:44px; align-items:flex-start;">
+      <div class="col" style="max-width:280px;">
+        <div style="font-family:'Playfair Display',serif; font-weight:700; font-size:34px;">Aa</div>
+        <div class="meta-label" style="margin-top:6px;">Playfair Display</div>
+        <p style="font-size:13px; opacity:.7;">Headers, brand name, feature callouts. Serif elegance for a premium feel.</p>
+        <div style="font-family:'Lato',sans-serif; font-size:30px; margin-top:20px;">Aa</div>
+        <div class="meta-label" style="margin-top:6px;">Lato</div>
+        <p style="font-size:13px; opacity:.7;">Body copy, labels, buttons, and app UI.</p>
+      </div>
+      <div class="col">
+        <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:16px; max-width:560px;">
+          <div><div style="background:#262624; height:70px; border-radius:6px;"></div><div style="font-size:12px; margin-top:6px;">#262624<br><span style="opacity:.6;">Obsidian</span></div></div>
+          <div><div style="background:#C9956A; height:70px; border-radius:6px;"></div><div style="font-size:12px; margin-top:6px;">#C9956A<br><span style="opacity:.6;">Amber</span></div></div>
+          <div><div style="background:#9A5E2F; height:70px; border-radius:6px;"></div><div style="font-size:12px; margin-top:6px;">#9A5E2F<br><span style="opacity:.6;">Caramel</span></div></div>
+          <div><div style="background:#A32D2D; height:70px; border-radius:6px;"></div><div style="font-size:12px; margin-top:6px;">#A32D2D<br><span style="opacity:.6;">Well Red</span></div></div>
+          <div><div style="background:#F1E5DA; height:70px; border-radius:6px; border:1px solid #ddd;"></div><div style="font-size:12px; margin-top:6px;">#F1E5DA<br><span style="opacity:.6;">Linen</span></div></div>
+          <div><div style="background:#E1C5AD; height:70px; border-radius:6px;"></div><div style="font-size:12px; margin-top:6px;">#E1C5AD<br><span style="opacity:.6;">Cream</span></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10. DESIGN SYSTEM: BUTTONS & UI -->
+  <section class="slide light" data-title="Design System - Buttons & UI">
+    <div class="eyebrow">Design System</div>
+    <h2 style="font-size:52px;">Buttons &amp; <em>ui</em></h2>
+    <div style="display:flex; gap:60px; margin-top:40px; flex-wrap:wrap;">
+      <div>
+        <div class="meta-label">Buttons</div>
+        <div class="btn-demo" style="width:200px; margin-top:10px;">Continue &#8594;</div>
+        <div style="display:flex; gap:10px; margin-top:10px;">
+          <div style="border:1px solid #ccc; padding:9px 16px; border-radius:20px; font-size:12px;">Cancel</div>
+          <div class="btn-demo">Show 42 results</div>
+        </div>
+      </div>
+      <div>
+        <div class="meta-label">Pills &amp; Tags</div>
+        <div style="margin-top:10px;"><span class="chip">Primer</span><span class="chip on">Concealer</span><span class="chip">Lipstick</span></div>
+        <div style="margin-top:10px;"><span class="chip" style="border-color:var(--amber); color:var(--caramel);">Unsponsored</span><span class="chip on" style="background:var(--well-red); border-color:var(--well-red);">Most Common</span></div>
+      </div>
+      <div>
+        <div class="meta-label">Cards</div>
+        <div style="border:1px solid #eee; border-radius:8px; padding:12px 16px; width:200px; margin-top:10px; background:#fff;">
+          <div style="font-size:13px; font-weight:700;">Dior Forever Skin</div>
+          <div style="font-size:11px; opacity:.6;">4.9 . 284 reviews</div>
+          <div style="font-size:13px; margin-top:4px;">$52</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11. PROTOTYPE 01 -->
+  <section class="slide" data-title="Prototype 01">
+    <div class="blob" style="width:480px;height:480px; background:var(--caramel); opacity:.28; top:-140px; left:-100px;"></div>
+    <div class="two-col">
+      <div class="col" style="max-width:420px;">
+        <div class="eyebrow">Prototype 01 · Nuance · 2026</div>
+        <h2 style="font-size:44px; line-height:1.15;">Find products that <em>actually</em> work for you.</h2>
+        <p style="opacity:.75; font-size:14px; margin-top:16px; line-height:1.7;">Filter by shade, values, and skin type. Products ranked by routine compatibility. Real unsponsored reviews only.</p>
+        <ul style="list-style:none; padding:0; margin-top:22px; font-size:14px; line-height:2;">
+          <li>&bull; <b>Swatch-matched results</b>, only shows shades that work for your skin tone</li>
+          <li>&bull; <b>Values filter</b>, vegan, cruelty-free, fragrance-free and more</li>
+          <li>&bull; <b>Routine compatibility ranking</b></li>
+          <li>&bull; <b>Verified vs. in-app reviews</b></li>
+        </ul>
+      </div>
+      <div class="col" style="display:flex; justify-content:center;">
+        <div class="phone-placeholder"><div class="ph-label">Prototype screen</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 12. PROTOTYPE 02 -->
+  <section class="slide dark2" data-title="Prototype 02">
+    <div class="blob" style="width:420px;height:420px; background:var(--amber); opacity:.15; bottom:-140px; right:-80px;"></div>
+    <div class="two-col">
+      <div class="col" style="max-width:420px;">
+        <div class="eyebrow">Prototype 02 · Nuance · 2025</div>
+        <h2 style="font-size:44px; line-height:1.15;">Your routines, <em>perfected.</em></h2>
+        <p style="opacity:.75; font-size:14px; margin-top:16px; line-height:1.7;">Browse your routines, check compatibility, fix conflicts, and add products, all in one place.</p>
+        <ul style="list-style:none; padding:0; margin-top:22px; font-size:14px; line-height:2;">
+          <li>&bull; Browse all your routines</li>
+          <li>&bull; Tap to see what's compatible</li>
+          <li>&bull; Fix conflicts with one tap</li>
+          <li>&bull; Add products to any step</li>
+        </ul>
+      </div>
+      <div class="col" style="display:flex; justify-content:center;">
+        <div class="phone-placeholder"><div class="ph-label">Prototype screen</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 13. PROTOTYPE 03 -->
+  <section class="slide" data-title="Prototype 03">
+    <div class="blob" style="width:460px;height:460px; background:var(--caramel); opacity:.25; top:-120px; right:0;"></div>
+    <div class="two-col">
+      <div class="col" style="max-width:420px;">
+        <div class="eyebrow">Prototype 03 · Nuance · 2026</div>
+        <h2 style="font-size:44px; line-height:1.15;">Find your <em>perfect</em> match.</h2>
+        <p style="opacity:.75; font-size:14px; margin-top:16px; line-height:1.7;">A guided quiz that learns your skin tone, budget, finish preference, and matches your existing shade across brands.</p>
+        <ul style="list-style:none; padding:0; margin-top:22px; font-size:14px; line-height:2;">
+          <li>&bull; Skin tone quiz, undertone, depth, swatch</li>
+          <li>&bull; Budget + finish preference</li>
+          <li>&bull; Shade cross-matching across brands</li>
+          <li>&bull; Personalised, ranked results</li>
+        </ul>
+      </div>
+      <div class="col" style="display:flex; justify-content:center;">
+        <div class="phone-placeholder"><div class="ph-label">Prototype screen</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 14. WHAT'S NEXT -->
+  <section class="slide light" data-title="What's Next">
+    <div class="eyebrow">What Is Next?</div>
+    <h2 style="font-size:48px; max-width:820px;">What <em>features</em> we want to include</h2>
+    <ul style="margin-top:34px; padding-left:20px; font-size:17px; line-height:2.3; max-width:640px;">
+      <li>Add a video tutorial on how to use the product</li>
+      <li>Add a description of what the item does (effects like blurring, etc.)</li>
+      <li>Show ingredients and their effects</li>
+      <li>Show how it looks on the face in different lightings without filters</li>
+    </ul>
+  </section>
+
+  <!-- 15. THANK YOU -->
+  <section class="slide" data-title="Thank You">
+    <div class="blob" style="width:420px;height:420px; background:var(--caramel); opacity:.3; top:-140px; right:-100px;"></div>
+    <div class="blob" style="width:340px;height:340px; background:var(--amber); opacity:.15; bottom:-120px; right:14%;"></div>
+    <div class="eyebrow">Conclusion</div>
+    <h1 style="font-size:72px;">Thank <em>you</em></h1>
+    <p style="font-size:26px; font-family:'Playfair Display',serif; margin-top:26px; opacity:.9;">
+      Makeup should be easy.<br>Not a guessing game.
+    </p>
+    <div style="width:60px; height:2px; background:var(--amber); margin:40px 0 18px;"></div>
+    <div style="font-weight:700; letter-spacing:.06em;">ALISA UTESHEVA</div>
+    <div style="opacity:.7; font-size:14px;">UX Designer</div>
+  </section>
+
+  <!-- 16. THE REWARD -->
+  <section class="slide portal" data-title="The Reward">
+    <div class="reward-tag">&#10022; Item Acquired · Conclusion &#10022;</div>
+    <div class="relic">
+      <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="32" cy="26" rx="16" ry="20" fill="#f1e5da" opacity="0.85"/>
+        <ellipse cx="32" cy="26" rx="16" ry="20" stroke="#c9956a" stroke-width="2"/>
+        <rect x="29" y="44" width="6" height="16" rx="3" fill="#c9956a"/>
+        <ellipse cx="32" cy="22" rx="6" ry="8" fill="#ffffff" opacity="0.4"/>
+      </svg>
+    </div>
+    <div class="reward-name">The Hand Mirror, Acquired</div>
+    <p class="reward-desc">
+      A small proof that a room once full of guesswork can be made to feel certain again.
+      Nuance brings the signals people need into one calmer, more transparent product experience.
+    </p>
+    <a class="portal-btn" href="index.html#p4" id="acceptBtn">Return to the work &#8594;</a>
+  </section>
+
+</div>
+
+<div class="flash-overlay" id="flashOverlay"></div>
+<div class="nav-arrow" id="prevBtn">&#8592;</div>
+<div class="nav-arrow" id="nextBtn">&#8594;</div>
+<div class="dots" id="dots"></div>
+
+<script>
+  const slides = [...document.querySelectorAll('.slide')];
+  const total = slides.length;
+  const counter = document.getElementById('counter');
+  const progressLine = document.getElementById('progressLine');
+  const stepInsideBtn = document.getElementById('stepInsideBtn');
+  const doorwaySlide = document.querySelector('[data-title="The Doorway"]');
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function pad(number){ return number < 10 ? '0' + number : number; }
+
+  function updateProgress(){
+    const scrollContainer = document.body.scrollHeight > document.documentElement.scrollHeight ? document.body : document.documentElement;
+    const scrollTop = scrollContainer.scrollTop;
+    const scrollable = scrollContainer.scrollHeight - window.innerHeight;
+    const percentage = scrollable > 0 ? (scrollTop / scrollable) * 100 : 0;
+    const current = slides.reduce((closestIndex, slide, index) => {
+      const distance = Math.abs(slide.getBoundingClientRect().top - window.innerHeight * .35);
+      const closestDistance = Math.abs(slides[closestIndex].getBoundingClientRect().top - window.innerHeight * .35);
+      return distance < closestDistance ? index : closestIndex;
+    }, 0);
+    counter.textContent = pad(current + 1) + ' / ' + pad(total);
+    progressLine.style.width = percentage + '%';
+  }
+
+  function scrollToSlide(slide){
+    slide.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+  }
+
+  function updateMirror(){
+    const opening = slides[0];
+    const mirror = opening.querySelector('.mirror-frame');
+    const zoomDistance = opening.offsetHeight * .38;
+    const openingProgress = Math.min(1, Math.max(0, -opening.getBoundingClientRect().top / zoomDistance));
+    const scale = 1 + openingProgress * 8;
+    const opacity = 1 - openingProgress;
+    mirror.style.transform = 'scale(' + scale + ')';
+    mirror.style.opacity = opacity;
+  }
+
+  if(stepInsideBtn && doorwaySlide){
+    stepInsideBtn.addEventListener('click', ()=> scrollToSlide(slides[1]));
+  }
+
+  window.addEventListener('scroll', updateProgress, { passive:true });
+  document.body.addEventListener('scroll', updateProgress, { passive:true });
+  window.addEventListener('resize', updateProgress);
+  window.addEventListener('scroll', updateMirror, { passive:true });
+  document.body.addEventListener('scroll', updateMirror, { passive:true });
+  window.addEventListener('resize', updateMirror);
+  updateProgress();
+  updateMirror();
+</script>
+</body>
+</html>

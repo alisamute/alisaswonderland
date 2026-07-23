@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>About . Alisa Utesheva</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Cinzel+Decorative:wght@700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=EB+Garamond:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --void: rgb(7,9,8);
+    --chamber: rgb(17,27,34);
+    --gold: rgb(212,168,60);
+    --bone: rgb(200,191,168);
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0; padding:0; width:100%;
+    background:var(--void);
+    color:var(--bone);
+    font-family:'EB Garamond', serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{ color:inherit; text-decoration:none; }
+
+  /* ---------- Text styles (from Framer project) ---------- */
+  .style-label{
+    font-family:'Cinzel', serif; font-weight:600; font-size:13px;
+    line-height:1.5em; letter-spacing:.3em; text-transform:uppercase;
+    color:var(--gold); margin:0 0 40px;
+  }
+  .style-title{
+    font-family:'Cinzel Decorative', serif; font-weight:900; font-size:64px;
+    line-height:1em; letter-spacing:-0.01em; color:var(--bone); margin:0;
+  }
+  .style-body{
+    font-family:'EB Garamond', serif; font-size:18px; line-height:2em;
+    letter-spacing:.01em; color:var(--bone); opacity:.85; margin:0 0 20px;
+  }
+  .style-story{
+    font-family:'Cormorant Garamond', serif; font-style:italic; font-weight:300;
+    font-size:16px; line-height:1.85em; letter-spacing:.02em; text-align:center;
+  }
+
+  /* ---------- Navigation ---------- */
+  nav{
+    position:fixed; top:22px; left:50%; transform:translateX(-50%);
+    z-index:100; display:flex; align-items:center; gap:32px;
+    padding:11px 14px 11px 26px;
+    background:rgba(7,9,8,.72); backdrop-filter:blur(20px);
+    border:1px solid rgba(212,168,60,.18); border-radius:100px;
+  }
+  nav .nav-home{
+    font-family:'Cinzel', serif; font-size:10px; letter-spacing:.18em;
+    color:var(--gold); white-space:nowrap;
+  }
+  nav .nav-divider{ width:1px; height:14px; background:rgba(212,168,60,.2); }
+  nav .links{ display:flex; gap:24px; list-style:none; margin:0; padding:0; }
+  nav .links a{
+    font-family:'Cinzel', serif; font-size:9px; letter-spacing:.2em;
+    text-transform:uppercase; color:var(--bone); opacity:.75; transition:color .2s, opacity .2s;
+  }
+  nav .links a:hover{ opacity:1; color:var(--gold); }
+  nav .nav-contact{
+    font-family:'Cinzel', serif; font-size:9px; letter-spacing:.18em;
+    text-transform:uppercase; color:var(--void); background:var(--gold);
+    padding:9px 18px; border-radius:100px;
+    transition:transform .2s, box-shadow .2s;
+  }
+  nav .nav-contact:hover{ transform:scale(1.04); box-shadow:0 4px 18px rgba(212,168,60,.4); }
+
+  /* ---------- Layout helpers ---------- */
+  .section{
+    width:100%; max-width:1100px; margin:0 auto;
+    padding:132px 48px; display:flex; flex-direction:column;
+    align-items:center; gap:48px;
+    background:transparent !important;
+  }
+  .section + .section{ border-top:1px solid rgba(212,168,60,.08); }
+  .hero{
+    max-width:1100px; margin:0 auto; background:transparent;
+  }
+  .section-intro{ max-width:760px; display:flex; flex-direction:column; align-items:center; gap:16px; text-align:center; }
+  .section-intro .style-label{ margin-bottom:0; }
+  .section-intro .style-title{ font-size:40px; }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    background:var(--void);
+    display:flex; gap:90px; align-items:center; justify-content:center;
+    padding:100px 48px; min-height:80vh;
+  }
+  .hero .portrait{
+    width:380px; height:480px; background:var(--chamber); border-radius:2px;
+    border:1.5px solid var(--gold);
+  }
+  .hero .copy{ width:619px; max-width:100%; }
+  .hero .style-title{ font-size:56px; margin-bottom:24px; }
+
+  /* ---------- Practice grid ---------- */
+  .practice-grid{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:16px;
+    width:100%; max-width:1104px;
+  }
+  .practice-card{
+    background:var(--void); border-radius:4px; padding:28px;
+    display:flex; flex-direction:column; gap:12px;
+    border:1px solid rgba(212,168,60,.35);
+  }
+  .practice-card .icon{
+    width:22px; height:22px; border:1.5px solid var(--gold); border-radius:50%;
+    display:flex; align-items:center; justify-content:center; margin-bottom:4px;
+  }
+  .practice-card .icon svg{ width:11px; height:11px; }
+  .practice-card h3{
+    font-family:'Cormorant Garamond', serif; font-weight:400; font-size:20px;
+    margin:0; color:var(--bone);
+  }
+  .practice-card p{ font-size:14.5px; line-height:1.7; opacity:.7; margin:0; }
+
+  /* ---------- Skill tags ---------- */
+  .skill-tags{ display:flex; flex-wrap:wrap; gap:12px; justify-content:center; max-width:900px; }
+  .skill-tag{
+    background:var(--void); border-radius:100px; padding:12px 18px;
+    font-family:'Cinzel', serif; font-size:13px; color:var(--bone);
+    border:1px solid rgba(212,168,60,.5);
+  }
+
+  /* ---------- Timeline ---------- */
+  .timeline{ width:760px; max-width:100%; }
+  .timeline-entry{
+    display:flex; gap:32px; padding:24px 0 24px 28px;
+    border-left:1.5px solid var(--gold);
+  }
+  .timeline-entry .tag{
+    width:160px; flex-shrink:0; font-family:'Cinzel', serif; font-weight:600; font-size:13px; color:var(--gold);
+  }
+  .timeline-entry .entry-content h3{
+    font-family:'Cormorant Garamond', serif; font-weight:400; font-size:20px;
+    margin:0 0 8px; color:var(--bone);
+  }
+  .timeline-entry .entry-content p{ font-size:15px; line-height:1.7; opacity:.8; margin:0; }
+
+  /* ---------- Fun facts ---------- */
+  .fun-facts{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; width:100%; max-width:1000px; }
+  .fun-fact{
+    background:var(--void); border-radius:4px; padding:28px; min-height:210px;
+    display:flex; flex-direction:column; gap:16px;
+    border:1px solid rgba(212,168,60,.35);
+  }
+  .fun-fact h3{
+    font-family:'Cormorant Garamond', serif; font-weight:400; font-size:19px; margin:0;
+  }
+  .fun-fact p{ font-size:14.5px; line-height:1.7; opacity:.75; margin:0; }
+
+  /* ---------- Principles / working belief ---------- */
+  .principles{ padding:140px 48px; gap:24px; }
+  .principles .quote{
+    font-family:'Cormorant Garamond', serif; font-weight:300; font-size:38px;
+    max-width:820px; text-align:center; color:var(--bone); margin:0;
+  }
+  .principles p.style-body{ max-width:620px; text-align:center; }
+
+  /* ---------- Contact ---------- */
+  .contact-btn{
+    display:inline-flex; align-items:center; gap:10px;
+    background:var(--gold); color:var(--void);
+    font-family:'Cinzel', serif; font-weight:600; font-size:14px;
+    padding:16px 32px; border-radius:100px;
+    transition: transform .2s ease, box-shadow .2s ease;
+  }
+  .contact-btn:hover{ transform:translateY(-2px); box-shadow:0 12px 30px rgba(212,168,60,.35); }
+
+  @media (max-width: 900px){
+    nav{ gap:14px; padding:9px 10px 9px 18px; }
+    nav .links{ gap:14px; }
+    nav .links a{ font-size:8px; }
+    nav .nav-contact{ padding:8px 12px; }
+    .hero{ flex-direction:column; text-align:center; padding:80px 24px; }
+    .practice-grid, .fun-facts{ grid-template-columns:1fr; }
+    .section{ padding:88px 24px; }
+    .style-title{ font-size:34px; }
+    .hero .style-title{ font-size:38px; }
+    .timeline-entry{ flex-direction:column; gap:12px; }
+  }
+</style>
+</head>
+<body>
+
+  <nav aria-label="Portfolio navigation">
+    <a class="nav-home" href="index.html">Alisa</a>
+    <div class="nav-divider" aria-hidden="true"></div>
+    <div class="links">
+      <a href="index.html#p4">Work</a>
+      <a href="index.html#p3">About</a>
+      <a href="index.html#p6">Resume</a>
+    </div>
+    <a class="nav-contact" href="index.html#p7">Contact</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="portrait"></div>
+    <div class="copy">
+      <div class="style-label">ALISA UTESHEVA</div>
+      <h1 class="style-title">The Designer Behind the Door</h1>
+      <p class="style-body">A UX designer drawn to the quiet moment when an unfamiliar problem begins to feel like a place you can enter.</p>
+      <p class="style-body">This is a placeholder for the personal story, the craft, curiosities, and convictions that shape every room I build.</p>
+    </div>
+  </section>
+
+  <!-- MY STORY -->
+  <section class="section" style="background:var(--void); text-align:center;">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgb(212,168,60)" stroke-width="1.5" style="opacity:.8;">
+      <path d="M12 2l2.4 7.4H22l-6 4.4 2.3 7.2L12 16.6l-6.3 4.4L8 13.8 2 9.4h7.6z" stroke-linejoin="round"/>
+    </svg>
+    <div class="style-label">My story</div>
+    <h2 class="style-title" style="max-width:760px;">How I found my way into UX.</h2>
+    <p class="style-body" style="max-width:640px; text-align:left;">
+      In middle school, I was assigned to build a website for a class project. Around me, the
+      assignment was met with the usual groans&mdash;too much work, too little fun. But I loved it.
+      I loved deciding where things belonged, watching a page take shape, and finding that a screen
+      could hold an idea in a way that felt entirely my own.
+    </p>
+    <p class="style-body" style="max-width:640px; text-align:left;">
+      Soon, that class became the one I looked forward to most, the reason I was excited to go to
+      school. While everyone else was counting down until the project was over, I was already
+      wondering what I could make next. That small beginning was what pulled me toward design in
+      the first place.
+    </p>
+  </section>
+
+  <!-- DESIGN PHILOSOPHY -->
+  <section class="section" style="background:var(--chamber);">
+    <div class="section-intro">
+      <div class="style-label">Design philosophy</div>
+      <h2 class="style-title">The principles behind the details.</h2>
+    </div>
+    <div class="practice-grid">
+      <div class="practice-card">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="rgb(212,168,60)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M16 8l-3 5-5 3 3-5z"/></svg></div>
+        <h3>Start with attention</h3>
+        <p>Placeholder text about looking closely before deciding what needs to change.</p>
+      </div>
+      <div class="practice-card">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="rgb(212,168,60)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M16 8l-3 5-5 3 3-5z"/></svg></div>
+        <h3>Make clarity felt</h3>
+        <p>Placeholder text about turning complexity into a path that feels calm and legible.</p>
+      </div>
+      <div class="practice-card">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="rgb(212,168,60)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M16 8l-3 5-5 3 3-5z"/></svg></div>
+        <h3>Honor the small things</h3>
+        <p>Placeholder text about the micro-decisions that make an experience feel considered.</p>
+      </div>
+      <div class="practice-card">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="rgb(212,168,60)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M16 8l-3 5-5 3 3-5z"/></svg></div>
+        <h3>Leave room for wonder</h3>
+        <p>Placeholder text about building useful systems with warmth, character, and space to breathe.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SKILLS & TOOLS -->
+  <section class="section" style="background:var(--chamber);">
+    <div class="section-intro">
+      <div class="style-label">Skills &amp; tools</div>
+      <h2 class="style-title">A small kit for making sense of big things.</h2>
+    </div>
+    <div class="skill-tags">
+      <div class="skill-tag">User Research</div>
+      <div class="skill-tag">Prototyping</div>
+      <div class="skill-tag">Figma</div>
+      <div class="skill-tag">Journey Mapping</div>
+      <div class="skill-tag">Usability Testing</div>
+      <div class="skill-tag">Design Systems</div>
+      <div class="skill-tag">Framer</div>
+      <div class="skill-tag">Workshops</div>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE TIMELINE -->
+  <section class="section" style="background:var(--void);">
+    <div class="section-intro">
+      <div class="style-label">Experience timeline</div>
+      <h2 class="style-title">A few rooms I've worked in.</h2>
+    </div>
+    <div class="timeline">
+      <div class="timeline-entry">
+        <div class="tag">School project</div>
+        <div class="entry-content">
+          <h3>Mindscoop, in collaboration with CBS</h3>
+          <p>A collaborative school project exploring how thoughtful digital experiences can make complex ideas feel clearer, more human, and easier to navigate.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OUTSIDE OF WORK -->
+  <section class="section" style="background:var(--chamber);">
+    <div class="section-intro">
+      <div class="style-label">Outside of work</div>
+      <h2 class="style-title">The things that keep the lamp lit.</h2>
+    </div>
+    <div class="fun-facts">
+      <div class="fun-fact">
+        <h3>A tiny obsession</h3>
+        <p>Placeholder fun fact about a favorite ritual, collection, or very specific curiosity.</p>
+      </div>
+      <div class="fun-fact">
+        <h3>Current rabbit hole</h3>
+        <p>Placeholder fun fact about something wonderfully niche being explored right now.</p>
+      </div>
+      <div class="fun-fact">
+        <h3>The reset button</h3>
+        <p>Placeholder fun fact about how Alisa refills the creative cup away from the screen.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- A WORKING BELIEF -->
+  <section class="section principles" style="background:var(--void);">
+    <div class="style-label">A working belief</div>
+    <p class="quote">Make the difficult feel welcoming.</p>
+    <p class="style-body">Placeholder copy for the values that guide the work: clarity without coldness, detail without noise, and systems that leave space for people.</p>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="section" style="background:var(--chamber);">
+    <div class="style-label">Start a conversation</div>
+    <h2 class="style-title" style="max-width:760px; text-align:center;">Let's talk about what's next.</h2>
+    <a href="mailto:hello@alisautesheva.com" class="contact-btn">Let's Talk</a>
+  </section>
+
+</body>
+</html>

@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alisa in Wonderland</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Cinzel:wght@400;500;600&family=Spectral:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --void:#060809;--stone:#0c0f14;--ash:#272f40;--smoke:#4a5364;
+  --bone:#bbb3a2;--parch:#d8d1bf;--ivory:#ece6d8;
+  --flame:#c08828;--gold:#d6a23c;--gold-l:#ecca72;--ember:#8a5a14;--rust:#583812;
+  --moon:#7e96b6;
+  --ease:cubic-bezier(0.32,0.72,0,1);
+}
+html{scroll-behavior:smooth;}
+body{background:var(--void);color:var(--bone);font-family:'Spectral',serif;overflow-x:hidden;cursor:none;font-weight:300;}
+::selection{background:rgba(214,162,60,0.25);color:var(--ivory);}
+ 
+/* GRAIN */
+.grain{position:fixed;inset:0;pointer-events:none;z-index:60;opacity:0;animation:gi 1.2s ease forwards .5s;}
+.grain::before{content:'';position:absolute;inset:-100%;width:300%;height:300%;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");animation:gs .45s steps(3) infinite;}
+@keyframes gi{to{opacity:1;}}
+@keyframes gs{0%{transform:translate(0,0);}33%{transform:translate(-2px,1px);}66%{transform:translate(1px,-2px);}100%{transform:translate(-1px,2px);}}
+ 
+/* CURSOR */
+#c{width:6px;height:6px;background:var(--gold);border-radius:50%;position:fixed;pointer-events:none;z-index:70;transform:translate(-50%,-50%);box-shadow:0 0 6px var(--gold),0 0 18px rgba(214,162,60,.5),0 0 44px rgba(192,136,40,.18);}
+#cr{width:22px;height:22px;border:1px solid rgba(214,162,60,.22);border-radius:50%;position:fixed;pointer-events:none;z-index:69;transform:translate(-50%,-50%);transition:left .1s,top .1s,width .3s var(--ease),height .3s var(--ease),border-color .3s;}
+ 
+/* LOADING */
+#curtain{position:fixed;inset:0;z-index:80;background:var(--void);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px;animation:clift 1s var(--ease) forwards 3.2s;}
+.cu-t{font-family:'Cormorant Garamond',serif;font-size:clamp(30px,4vw,52px);font-weight:300;font-style:italic;color:var(--gold);opacity:0;animation:fi 1.4s ease forwards .3s;}
+.cu-l{width:48px;height:1px;background:linear-gradient(to right,transparent,var(--flame),transparent);opacity:0;animation:fi 1s ease forwards .8s;}
+.cu-s{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.55em;text-transform:uppercase;color:var(--smoke);opacity:0;animation:fi 1s ease forwards 1.1s;}
+@keyframes clift{0%{opacity:1;pointer-events:all;}100%{opacity:0;pointer-events:none;}}
+@keyframes fi{to{opacity:1;}}
+ 
+/* NAV ISLAND */
+nav{position:fixed;top:22px;left:50%;transform:translateX(-50%);z-index:55;display:flex;align-items:center;gap:32px;padding:11px 14px 11px 26px;background:rgba(12,15,20,0.55);backdrop-filter:blur(20px);border:1px solid rgba(214,162,60,.12);border-radius:100px;opacity:0;animation:navin 1s var(--ease) forwards 3.5s;}
+@keyframes navin{from{opacity:0;transform:translateX(-50%) translateY(-12px);}to{opacity:1;transform:translateX(-50%) translateY(0);}}
+.nl{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.18em;color:var(--gold);text-decoration:none;cursor:none;white-space:nowrap;}
+.nsep{width:1px;height:14px;background:rgba(214,162,60,.15);}
+.nr{list-style:none;display:flex;gap:24px;}
+.nr a{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--smoke);text-decoration:none;cursor:none;transition:color .4s var(--ease);}
+.nr a:hover{color:var(--parch);}
+.nr-cta{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--void)!important;background:var(--gold);padding:9px 18px;border-radius:100px;cursor:none;transition:transform .3s var(--ease),box-shadow .3s;}
+.nr-cta:hover{transform:scale(1.04);box-shadow:0 4px 18px rgba(192,136,40,.4);}
+ 
+.panel{min-height:100vh;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+ 
+/* ════ HERO — THE CHAMBER ════ */
+#p1{min-height:100vh;}
+.chamber-wrap{position:absolute;inset:0;z-index:0;}
+.chamber{position:absolute;inset:0;width:100%;height:100%;
+  animation:chamber-in 2.5s var(--ease) forwards;transform:scale(1.08);opacity:0;}
+@keyframes chamber-in{to{transform:scale(1);opacity:1;}}
+ 
+/* animated candle flames over the sconces */
+.flame{position:absolute;width:14px;height:26px;border-radius:50% 50% 40% 40%;
+  background:radial-gradient(ellipse at 50% 80%,#fff3d6 0%,#ffbf5e 25%,var(--flame) 55%,var(--rust) 82%,transparent 100%);
+  box-shadow:0 0 18px var(--flame),0 0 44px rgba(192,136,40,.5);
+  animation:flick 1.6s ease-in-out infinite alternate;z-index:2;}
+.flame.l{left:11.4%;top:33%;}
+.flame.r{right:11.4%;top:33%;}
+@keyframes flick{0%{transform:scaleY(1) scaleX(1) rotate(-2deg);opacity:.9;}50%{transform:scaleY(1.12) scaleX(.92) rotate(2deg);opacity:1;}100%{transform:scaleY(.95) scaleX(1.05) rotate(-1deg);opacity:.95;}}
+ 
+/* floating dust in moonlight */
+.dust{position:absolute;inset:0;z-index:3;pointer-events:none;overflow:hidden;}
+.dust i{position:absolute;width:2px;height:2px;background:rgba(190,200,220,.6);border-radius:50%;opacity:0;animation:float linear infinite;}
+@keyframes float{0%{opacity:0;transform:translateY(20px);}20%{opacity:.5;}80%{opacity:.2;}100%{opacity:0;transform:translateY(-90vh) translateX(40px);}}
+ 
+/* hero text */
+.hero-c{position:relative;z-index:10;text-align:center;}
+.h-eye{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.5em;text-transform:uppercase;color:var(--flame);margin-bottom:26px;opacity:0;animation:rise 1s ease forwards 3.4s;}
+.h-t{font-family:'Cormorant Garamond',serif;font-size:clamp(56px,9.5vw,140px);font-weight:300;line-height:.86;color:var(--ivory);text-shadow:0 4px 50px rgba(0,0,0,.8),0 0 90px rgba(192,136,40,.15);opacity:0;animation:rise 1.5s var(--ease) forwards 3.5s;}
+.h-t em{font-style:italic;color:var(--gold-l);text-shadow:0 0 44px rgba(214,162,60,.4),0 4px 30px rgba(0,0,0,.8);}
+.h-s{font-family:'Cormorant Garamond',serif;font-size:clamp(15px,1.7vw,22px);font-weight:300;font-style:italic;color:rgba(220,210,190,.5);letter-spacing:.12em;margin-top:18px;text-shadow:0 2px 16px rgba(0,0,0,.8);opacity:0;animation:rise 1s ease forwards 3.9s;}
+.h-d{display:flex;justify-content:center;margin-top:28px;opacity:0;animation:rise 1s ease forwards 4.1s;}
+.h-d i{width:5px;height:5px;background:var(--flame);transform:rotate(45deg);box-shadow:0 0 8px var(--flame);}
+.scue{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:7px;z-index:10;opacity:0;animation:rise 1s ease forwards 4.6s;}
+.scue span{font-family:'Cinzel',serif;font-size:7px;letter-spacing:.55em;color:rgba(190,200,220,.4);text-transform:uppercase;}
+.scue div{width:1px;height:34px;background:linear-gradient(to bottom,rgba(190,200,220,.4),transparent);animation:sp 3s ease-in-out infinite;}
+@keyframes sp{0%,100%{opacity:.2;transform:scaleY(.7);}50%{opacity:.6;transform:scaleY(1);}}
+@keyframes rise{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+ 
+/* ════ P2 FALL ════ */
+#p2{min-height:90vh;background:linear-gradient(180deg,var(--void),#0a0d12 50%,var(--void));flex-direction:column;text-align:center;padding:0 8vw;}
+.fall{font-family:'Cormorant Garamond',serif;font-size:clamp(22px,3vw,40px);font-weight:300;font-style:italic;line-height:1.85;color:var(--ivory);max-width:720px;}
+.fall .dim{color:rgba(187,179,162,.28);}
+.fall .glow{color:var(--gold);text-shadow:0 0 22px rgba(192,136,40,.25);font-style:normal;}
+.fbreak{width:1px;height:90px;background:linear-gradient(to bottom,transparent,rgba(192,136,40,.3),transparent);margin:46px auto;}
+ 
+/* ════ P3 ABOUT — chamber alcove bg ════ */
+#p3{min-height:95vh;background:radial-gradient(ellipse 70% 90% at 15% 50%,rgba(192,136,40,0.07) 0%,transparent 55%),radial-gradient(ellipse 60% 80% at 80% 60%,rgba(39,47,64,0.3) 0%,transparent 55%),linear-gradient(180deg,var(--void),#0a0e14,var(--void));}
+.p3candle{position:absolute;left:-4%;top:12%;width:520px;height:640px;background:radial-gradient(ellipse,rgba(192,136,40,.18) 0%,transparent 60%);animation:cb 6s ease-in-out infinite alternate;pointer-events:none;}
+@keyframes cb{0%{opacity:.6;transform:scale(1);}100%{opacity:1;transform:scale(1.1);}}
+.p3g{position:relative;z-index:10;display:grid;grid-template-columns:400px 1fr;gap:90px;align-items:center;max-width:1080px;width:100%;padding:0 8vw;}
+.p3f{position:relative;}
+.p3o{padding:4px;background:linear-gradient(160deg,var(--gold),var(--ember),var(--rust),var(--ember),var(--gold));box-shadow:0 30px 80px rgba(0,0,0,.6);}
+.p3img{width:100%;display:block;filter:brightness(.78) contrast(1.12) saturate(.62) sepia(.16);}
+.p3light{position:absolute;inset:4px;background:linear-gradient(115deg,rgba(192,136,40,.26) 0%,rgba(192,136,40,.06) 35%,transparent 55%),linear-gradient(250deg,rgba(39,47,64,.4) 0%,transparent 40%),linear-gradient(to top,rgba(6,8,9,.6) 0%,transparent 42%);z-index:1;pointer-events:none;}
+.p3ib{position:absolute;inset:15px;border:1px solid rgba(214,162,60,.16);z-index:2;pointer-events:none;}
+.p3glow{position:absolute;bottom:-30px;left:50%;transform:translateX(-50%);width:72%;height:42px;background:radial-gradient(ellipse,rgba(192,136,40,.3) 0%,transparent 70%);filter:blur(13px);}
+.co{position:absolute;z-index:3;}.co svg{width:100%;height:100%;}
+.co-tl{top:-7px;left:-7px;width:22px;height:22px;}.co-tr{top:-7px;right:-7px;width:22px;height:22px;transform:scaleX(-1);}.co-bl{bottom:-7px;left:-7px;width:22px;height:22px;transform:scaleY(-1);}.co-br{bottom:-7px;right:-7px;width:22px;height:22px;transform:scale(-1);}
+.p3name{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:var(--smoke);margin-bottom:6px;}
+.p3role{font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic;color:var(--smoke);margin-bottom:30px;}
+.p3h{font-family:'Cormorant Garamond',serif;font-size:clamp(26px,3.6vw,46px);font-weight:300;color:var(--ivory);line-height:1.25;margin-bottom:30px;}
+.p3h em{font-style:italic;color:var(--gold);}
+.p3p{font-family:'Spectral',serif;font-size:clamp(15px,1.2vw,17px);font-weight:300;line-height:2.15;color:var(--bone);margin-bottom:18px;}
+.p3p em{color:var(--gold-l);font-style:italic;}
+ 
+/* ════ P4 SHELF — alcove in stone ════ */
+#p4{min-height:100vh;flex-direction:column;padding:100px 6vw;
+  background:
+    radial-gradient(ellipse 50% 60% at 50% 38%,rgba(192,136,40,0.08) 0%,transparent 55%),
+    linear-gradient(180deg,var(--void),#090c12 35%,#0b0f15 60%,var(--void));}
+.p4h{text-align:center;margin-bottom:90px;}
+.p4l{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.45em;text-transform:uppercase;color:var(--flame);margin-bottom:14px;}
+.p4t{font-family:'Cormorant Garamond',serif;font-size:clamp(30px,4.5vw,56px);font-weight:300;color:var(--ivory);margin-bottom:10px;}
+.p4t em{font-style:italic;color:var(--gold);}
+.p4s{font-family:'Spectral',serif;font-size:15px;font-style:italic;color:var(--smoke);font-weight:300;}
+.shelf{position:relative;max-width:1000px;width:100%;margin:0 auto;}
+/* stone alcove arch behind shelf */
+.alcove{position:absolute;top:-50px;left:50%;transform:translateX(-50%);width:90%;height:340px;
+  border:1px solid rgba(150,160,180,0.06);border-bottom:none;border-radius:50% 50% 0 0/30% 30% 0 0;
+  background:radial-gradient(ellipse at 50% 30%,rgba(192,136,40,0.05) 0%,transparent 60%);pointer-events:none;}
+.shelf-candle{position:absolute;left:-40px;top:-30px;width:320px;height:360px;background:radial-gradient(ellipse,rgba(192,136,40,.14) 0%,transparent 60%);animation:cb 4.5s ease-in-out infinite alternate;pointer-events:none;}
+.shelf-candle.r{left:auto;right:-40px;animation-duration:5.5s;}
+.shelf-row{display:flex;justify-content:space-around;align-items:flex-end;padding:0 30px;position:relative;z-index:2;}
+.obj{display:flex;flex-direction:column;align-items:center;position:relative;cursor:none;text-decoration:none;width:22%;transition:transform .6s var(--ease);}
+.obj:hover{transform:translateY(-16px);}
+.obj-art{width:100px;height:130px;position:relative;filter:drop-shadow(0 14px 22px rgba(0,0,0,.7));transition:filter .5s var(--ease);}
+.obj:hover .obj-art{filter:drop-shadow(0 14px 22px rgba(0,0,0,.7)) drop-shadow(0 0 26px rgba(214,162,60,.55));}
+.obj-svg{width:100%;height:100%;}
+.obj-halo{position:absolute;top:20px;left:50%;transform:translateX(-50%) scale(.6);width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(192,136,40,.18) 0%,transparent 65%);opacity:0;transition:opacity .5s,transform .6s var(--ease);pointer-events:none;}
+.obj:hover .obj-halo{opacity:1;transform:translateX(-50%) scale(1);}
+.obj-meta{text-align:center;margin-top:22px;}
+.obj-name{font-family:'Cormorant Garamond',serif;font-size:clamp(17px,1.6vw,22px);font-weight:400;color:var(--ivory);transition:color .4s var(--ease);}
+.obj:hover .obj-name{color:var(--gold-l);}
+.obj-type{font-family:'Cinzel',serif;font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--smoke);margin-top:6px;}
+.obj-drink{font-family:'Cormorant Garamond',serif;font-size:13px;font-style:italic;color:var(--flame);margin-top:10px;height:16px;opacity:0;transform:translateY(-4px);transition:opacity .4s var(--ease),transform .4s var(--ease);}
+.obj:hover .obj-drink{opacity:1;transform:translateY(0);}
+.plank{position:relative;margin-top:-2px;height:18px;width:100%;background:linear-gradient(to bottom,#2c2012 0%,#20160b 40%,#150f08 100%);border-top:1px solid rgba(214,162,60,.25);box-shadow:0 6px 26px rgba(0,0,0,.7),inset 0 1px 0 rgba(214,162,60,.1);}
+.plank::before,.plank::after{content:'';position:absolute;top:18px;width:2px;height:46px;background:linear-gradient(to bottom,rgba(214,162,60,.2),transparent);}
+.plank::before{left:16%;}.plank::after{right:16%;}
+ 
+/* ════ P5 quote ════ */
+#p5{min-height:62vh;background:var(--void);flex-direction:column;text-align:center;padding:80px 8vw;}
+.p5q{font-family:'Cormorant Garamond',serif;font-size:clamp(24px,3.2vw,42px);font-weight:300;font-style:italic;line-height:1.75;color:var(--ivory);max-width:760px;}
+.p5q em{color:var(--gold);font-style:normal;text-shadow:0 0 22px rgba(192,136,40,.2);}
+.p5a{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.4em;text-transform:uppercase;color:var(--flame);margin-top:30px;}
+.p5sk{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:54px;max-width:620px;}
+.sk{font-family:'Cinzel',serif;font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--smoke);border:1px solid rgba(74,83,100,.25);padding:8px 17px;cursor:none;border-radius:100px;transition:border-color .4s var(--ease),color .4s var(--ease),background .4s var(--ease);}
+.sk:hover{border-color:rgba(192,136,40,.4);color:var(--parch);background:rgba(192,136,40,.05);}
+ 
+#p6{min-height:52vh;background:linear-gradient(180deg,var(--void),#0a0d12);flex-direction:column;text-align:center;}
+#p7{min-height:62vh;background:linear-gradient(180deg,#0a0d12,var(--void));flex-direction:column;text-align:center;}
+.ct{font-family:'Cormorant Garamond',serif;font-size:clamp(24px,3.2vw,38px);font-weight:300;color:var(--ivory);margin-bottom:20px;}
+.ct em{font-style:italic;color:var(--gold);}
+.cp{font-family:'Spectral',serif;font-size:15px;font-weight:300;font-style:italic;line-height:2;color:var(--smoke);margin-bottom:44px;max-width:440px;}
+.cp em{color:var(--bone);font-style:normal;}
+.cta{display:inline-flex;align-items:center;gap:14px;font-family:'Cinzel',serif;font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--void);font-weight:600;background:var(--gold);padding:8px 8px 8px 28px;border-radius:100px;cursor:none;text-decoration:none;transition:transform .3s var(--ease),box-shadow .4s;}
+.cta:hover{transform:scale(1.03);box-shadow:0 6px 30px rgba(192,136,40,.45);}
+.cta-ico{width:34px;height:34px;border-radius:50%;background:rgba(6,8,9,.15);display:flex;align-items:center;justify-content:center;font-size:13px;transition:transform .3s var(--ease);}
+.cta:hover .cta-ico{transform:translate(2px,-2px);}
+.soc{display:flex;justify-content:center;gap:38px;flex-wrap:wrap;margin-top:38px;}
+.soc a{font-family:'Cinzel',serif;font-size:8px;letter-spacing:.3em;text-transform:uppercase;color:var(--smoke);text-decoration:none;cursor:none;transition:color .4s var(--ease);}
+.soc a:hover{color:var(--gold);}
+footer{padding:22px 8vw;border-top:1px solid rgba(192,136,40,.05);display:flex;justify-content:space-between;align-items:center;}
+footer span{font-family:'Cinzel',serif;font-size:7px;letter-spacing:.2em;text-transform:uppercase;color:rgba(74,83,100,.3);}
+.fm{font-size:9px;color:rgba(192,136,40,.15);letter-spacing:.15em;}
+ 
+.rv{opacity:0;transform:translateY(28px);filter:blur(6px);transition:opacity 1.1s var(--ease),transform 1.1s var(--ease),filter 1.1s var(--ease);}
+.rv.on{opacity:1;transform:translateY(0);filter:blur(0);}
+.rv.d1{transition-delay:.15s;}.rv.d2{transition-delay:.3s;}.rv.d3{transition-delay:.45s;}.rv.d4{transition-delay:.6s;}
+ 
+@media(max-width:900px){
+  nav{gap:14px;padding:9px 10px 9px 18px;}.nr{gap:14px;}.nr a{font-size:8px;}
+  .panel{padding:70px 24px !important;}
+  .p3g{grid-template-columns:1fr;gap:44px;}.p3f{max-width:300px;margin:0 auto;}
+  .shelf-row{flex-wrap:wrap;gap:44px;justify-content:center;}.obj{width:42%;}
+  .plank,.alcove{display:none;}
+}
+</style></head><body>
+ 
+<div class="grain"></div>
+<div id="c"></div><div id="cr"></div>
+ 
+<svg width="0" height="0" style="position:absolute;"><defs>
+<linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+<stop offset="0%" stop-color="#ecca72"/><stop offset="50%" stop-color="#d6a23c"/><stop offset="100%" stop-color="#8a5a14"/>
+</linearGradient></defs></svg>
+ 
+<div id="curtain">
+  <span class="cu-t">Alisa in Wonderland</span><div class="cu-l"></div><span class="cu-s">A UX Portfolio</span>
+</div>
+ 
+<nav>
+  <a href="#p1" class="nl">Alisa</a><div class="nsep"></div>
+  <ul class="nr"><li><a href="#p4">Work</a></li><li><a href="#p3">About</a></li><li><a href="#p6">Resume</a></li></ul>
+  <a href="#p7" class="nr-cta">Contact</a>
+</nav>
+ 
+<!-- HERO CHAMBER -->
+<div class="panel" id="p1">
+  <div class="chamber-wrap">
+    <svg class="chamber" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <!-- cold night sky through window -->
+  <radialGradient id="moon" cx="50%" cy="35%" r="65%">
+    <stop offset="0%" stop-color="#5a7090"/>
+    <stop offset="35%" stop-color="#33455e"/>
+    <stop offset="100%" stop-color="#16202e"/>
+  </radialGradient>
+  <!-- back wall -->
+  <linearGradient id="backwall" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#10141c"/>
+    <stop offset="55%" stop-color="#0c1016"/>
+    <stop offset="100%" stop-color="#070a0e"/>
+  </linearGradient>
+  <!-- side wall left -->
+  <linearGradient id="wallL" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%" stop-color="#05070a"/>
+    <stop offset="100%" stop-color="#0f141d"/>
+  </linearGradient>
+  <linearGradient id="wallR" x1="1" y1="0" x2="0" y2="0">
+    <stop offset="0%" stop-color="#05070a"/>
+    <stop offset="100%" stop-color="#0f141d"/>
+  </linearGradient>
+  <!-- floor -->
+  <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#0c1016"/>
+    <stop offset="100%" stop-color="#04060a"/>
+  </linearGradient>
+  <!-- moonlight ray -->
+  <linearGradient id="ray" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="rgba(120,150,190,0.18)"/>
+    <stop offset="100%" stop-color="rgba(120,150,190,0)"/>
+  </linearGradient>
+  <!-- warm candle glow -->
+  <radialGradient id="warm" cx="50%" cy="50%" r="50%">
+    <stop offset="0%" stop-color="rgba(200,140,50,0.4)"/>
+    <stop offset="60%" stop-color="rgba(200,140,50,0.08)"/>
+    <stop offset="100%" stop-color="rgba(200,140,50,0)"/>
+  </radialGradient>
+  <pattern id="stones" width="120" height="60" patternUnits="userSpaceOnUse">
+    <rect width="120" height="60" fill="none"/>
+    <path d="M0 0H120M0 30H120M0 60H120M40 0V30M80 0V30M0 30V60M120 30V60M60 30V60" stroke="rgba(150,160,180,0.04)" stroke-width="1"/>
+  </pattern>
+</defs>
+ 
+<!-- BACK WALL -->
+<rect x="0" y="0" width="1440" height="640" fill="url(#backwall)"/>
+<rect x="0" y="0" width="1440" height="640" fill="url(#stones)"/>
+ 
+<!-- SIDE WALLS in perspective -->
+<polygon points="0,0 320,120 320,560 0,640" fill="url(#wallL)"/>
+<polygon points="1440,0 1120,120 1120,560 1440,640" fill="url(#wallR)"/>
+<!-- pillar edges -->
+<line x1="320" y1="120" x2="320" y2="560" stroke="rgba(180,150,90,0.08)" stroke-width="2"/>
+<line x1="1120" y1="120" x2="1120" y2="560" stroke="rgba(180,150,90,0.08)" stroke-width="2"/>
+ 
+<!-- GOTHIC WINDOW (center back) -->
+<g>
+  <!-- pointed arch outer stone frame -->
+  <path d="M560 540 L560 230 Q560 90 720 70 Q880 90 880 230 L880 540 Z"
+        fill="#0a0e14" stroke="rgba(150,160,180,0.12)" stroke-width="6"/>
+  <!-- glass / sky -->
+  <path d="M576 528 L576 234 Q576 104 720 86 Q864 104 864 234 L864 528 Z" fill="url(#moon)"/>
+  <!-- moon -->
+  <circle cx="700" cy="200" r="44" fill="#9fb4cf" opacity="0.85"/>
+  <circle cx="685" cy="188" r="44" fill="#33455e" opacity="0.5"/>
+  <!-- mullions -->
+  <line x1="720" y1="86" x2="720" y2="528" stroke="rgba(20,28,40,0.9)" stroke-width="8"/>
+  <line x1="576" y1="300" x2="864" y2="300" stroke="rgba(20,28,40,0.9)" stroke-width="8"/>
+  <line x1="576" y1="410" x2="864" y2="410" stroke="rgba(20,28,40,0.9)" stroke-width="8"/>
+  <line x1="648" y1="120" x2="648" y2="528" stroke="rgba(20,28,40,0.7)" stroke-width="5"/>
+  <line x1="792" y1="120" x2="792" y2="528" stroke="rgba(20,28,40,0.7)" stroke-width="5"/>
+</g>
+ 
+<!-- MOONLIGHT RAYS streaming down from window -->
+<polygon points="576,300 864,300 1000,860 440,860" fill="url(#ray)" opacity="0.7"/>
+<polygon points="640,300 800,300 880,860 560,860" fill="url(#ray)" opacity="0.5"/>
+ 
+<!-- FLOOR -->
+<polygon points="0,640 1440,640 1440,900 0,900" fill="url(#floor)"/>
+<!-- floor perspective tiles -->
+<g stroke="rgba(150,160,180,0.05)" stroke-width="1.5" fill="none">
+  <line x1="0" y1="700" x2="1440" y2="700"/>
+  <line x1="0" y1="780" x2="1440" y2="780"/>
+  <line x1="320" y1="640" x2="120" y2="900"/>
+  <line x1="560" y1="640" x2="480" y2="900"/>
+  <line x1="720" y1="640" x2="720" y2="900"/>
+  <line x1="880" y1="640" x2="960" y2="900"/>
+  <line x1="1120" y1="640" x2="1320" y2="900"/>
+</g>
+ 
+<!-- WALL SCONCES (brackets) — flames added via CSS overlay -->
+<g stroke="rgba(180,150,90,0.3)" stroke-width="3" fill="rgba(30,22,12,0.6)">
+  <path d="M180 320 q-30 10 -30 40 l0 30 l16 0 l0 -30 q0 -16 14 -22 Z"/>
+  <path d="M1260 320 q30 10 30 40 l0 30 l-16 0 l0 -30 q0 -16 -14 -22 Z"/>
+</g>
+ 
+<!-- candle warm glows -->
+<circle cx="168" cy="330" r="140" fill="url(#warm)"/>
+<circle cx="1272" cy="330" r="140" fill="url(#warm)"/>
+ 
+<!-- atmospheric depth vignette -->
+<rect x="0" y="0" width="1440" height="900" fill="url(#vig)"/>
+<radialGradient id="vig" cx="50%" cy="45%" r="75%">
+  <stop offset="0%" stop-color="rgba(0,0,0,0)"/>
+  <stop offset="70%" stop-color="rgba(0,0,0,0.15)"/>
+  <stop offset="100%" stop-color="rgba(5,7,10,0.85)"/>
+</radialGradient>
+</svg>
+    <div class="flame l"></div>
+    <div class="flame r"></div>
+    <div class="dust" id="dust"></div>
+  </div>
+  <div class="hero-c">
+    <p class="h-eye">UX Designer</p>
+    <h1 class="h-t"><em>Alisa</em><br>in Wonderland</h1>
+    <p class="h-s">Alisa</p>
+    <div class="h-d"><i></i></div>
+  </div>
+  <div class="scue"><span>Fall</span><div></div></div>
+</div>
+ 
+<div class="panel" id="p2">
+  <div style="display:flex;flex-direction:column;align-items:center;">
+    <p class="fall rv"><span class="dim">She was named after a girl<br>who fell down a rabbit hole.</span></p>
+    <div class="fbreak rv d1"></div>
+    <p class="fall rv d2">She didn't fall into a book.<br>She fell into <span class="glow">design.</span></p>
+    <div class="fbreak rv d3"></div>
+    <p class="fall rv d4"><span class="dim">Every project became a room.<br>She never left until it was</span> <span class="glow">beautiful.</span></p>
+  </div>
+</div>
+ 
+<div class="panel" id="p3">
+  <div class="p3candle"></div>
+  <div class="p3g">
+    <div class="p3f rv">
+      <div class="p3o"><img src="ALISA_PHOTO_PLACEHOLDER" alt="Alisa Utesheva" class="p3img"></div>
+      <div class="p3light"></div><div class="p3ib"></div>
+      <div class="co co-tl"><svg viewBox="0 0 22 22" fill="none" stroke="rgba(214,162,60,.6)" stroke-width="1"><path d="M2 20V7a5 5 0 0 1 5-5h13"/></svg></div>
+      <div class="co co-tr"><svg viewBox="0 0 22 22" fill="none" stroke="rgba(214,162,60,.6)" stroke-width="1"><path d="M2 20V7a5 5 0 0 1 5-5h13"/></svg></div>
+      <div class="co co-bl"><svg viewBox="0 0 22 22" fill="none" stroke="rgba(214,162,60,.6)" stroke-width="1"><path d="M2 20V7a5 5 0 0 1 5-5h13"/></svg></div>
+      <div class="co co-br"><svg viewBox="0 0 22 22" fill="none" stroke="rgba(214,162,60,.6)" stroke-width="1"><path d="M2 20V7a5 5 0 0 1 5-5h13"/></svg></div>
+      <div class="p3glow"></div>
+    </div>
+    <div class="rv d2">
+      <p class="p3name">Alisa Utesheva</p><p class="p3role">UX Designer</p>
+      <h2 class="p3h">Named after her.<br><em>Alice, in Russian.</em></h2>
+      <p class="p3p">I fall into problems and don't surface until the world I've built inside them makes complete, <em>beautiful sense.</em></p>
+      <p class="p3p">My process is my wonderland — research, iteration, obsession. Every interface I touch is a room I refuse to leave unfinished.</p>
+    </div>
+  </div>
+</div>
+ 
+<div class="panel" id="p4">
+  <div class="p4h rv"><p class="p4l">✦ Case Studies</p><h2 class="p4t">The <em>Shelf</em></h2><p class="p4s">Four problems. Four rooms. Four things she left behind.</p></div>
+  <div class="shelf rv d1">
+    <div class="alcove"></div>
+    <div class="shelf-candle"></div><div class="shelf-candle r"></div>
+    <div class="shelf-row">
+      <a href="#" class="obj"><div class="obj-art"><div class="obj-halo"></div><svg viewBox="0 0 100 130" fill="none" xmlns="http://www.w3.org/2000/svg" class="obj-svg">
+<g stroke="url(#goldGrad)" stroke-width="1.1" fill="none" stroke-linecap="round" stroke-linejoin="round">
+<path d="M50 22 C38 20 30 28 31 39 C32 50 42 54 50 52"/>
+<path d="M50 22 C62 20 70 28 69 39 C68 50 58 54 50 52"/>
+<path d="M31 39 C24 44 24 56 33 60 C40 63 47 58 49 51"/>
+<path d="M69 39 C76 44 76 56 67 60 C60 63 53 58 51 51"/>
+<path d="M50 30 C44 30 40 35 42 41 C44 47 52 47 54 42 C56 37 54 31 50 30Z"/>
+<path d="M44 41 C42 46 45 51 50 51 C55 51 58 46 56 41"/>
+<path d="M46 36 C48 34 52 34 54 36"/>
+<path d="M40 58 C44 64 56 64 60 58"/>
+<path d="M50 52 L50 60"/>
+<path d="M50 60 C49 75 51 90 50 110"/>
+<path d="M50 74 C40 70 32 73 28 80 C36 84 46 82 50 76"/>
+<path d="M50 88 C60 84 68 87 72 94 C64 98 54 96 50 90"/>
+<path d="M50 82 L45 80"/>
+<path d="M50 98 L55 96"/>
+</g>
+</svg></div><div class="obj-meta"><div class="obj-name">Nuance</div><div class="obj-type">Makeup App</div><div class="obj-drink">"Smell me"</div></div></a>
+      <a href="#" class="obj"><div class="obj-art"><div class="obj-halo"></div><svg viewBox="0 0 100 130" fill="none" xmlns="http://www.w3.org/2000/svg" class="obj-svg">
+<g stroke="url(#goldGrad)" stroke-width="1.1" fill="none" stroke-linecap="round" stroke-linejoin="round">
+<path d="M44 18 L56 18 L56 28 L44 28 Z"/>
+<path d="M46 14 L54 14 L54 18 L46 18 Z"/>
+<path d="M45 28 L45 40 L55 40 L55 28"/>
+<path d="M45 40 C30 46 24 64 24 80 C24 100 36 112 50 112 C64 112 76 100 76 80 C76 64 70 46 55 40"/>
+<path d="M28 76 C36 82 44 80 50 78 C58 75 66 80 72 76" opacity="0.9"/>
+<path d="M30 86 C38 90 46 87 52 85 C60 82 66 86 70 84" opacity="0.7"/>
+<circle cx="42" cy="92" r="2.5"/>
+<circle cx="55" cy="98" r="2"/>
+<circle cx="48" cy="103" r="1.5"/>
+<path d="M36 56 C33 64 33 74 35 82" opacity="0.5"/>
+<path d="M40 64 L60 64 M40 64 C39 70 39 74 40 78 L60 78 C61 74 61 70 60 64" opacity="0.6"/>
+<path d="M46 71 L54 71" opacity="0.6"/>
+</g>
+</svg></div><div class="obj-meta"><div class="obj-name">Spotify Redesign</div><div class="obj-type">Music Platform</div><div class="obj-drink">"Drink me"</div></div></a>
+      <a href="#" class="obj"><div class="obj-art"><div class="obj-halo"></div><svg viewBox="0 0 100 130" fill="none" xmlns="http://www.w3.org/2000/svg" class="obj-svg">
+<g stroke="url(#goldGrad)" stroke-width="1.1" fill="none" stroke-linecap="round" stroke-linejoin="round">
+<circle cx="50" cy="36" r="18"/>
+<circle cx="50" cy="36" r="9"/>
+<path d="M50 18 C46 12 54 12 50 18"/>
+<path d="M32 36 C26 32 26 40 32 36"/>
+<path d="M68 36 C74 32 74 40 68 36"/>
+<path d="M37 23 L42 28 M63 23 L58 28 M37 49 L42 44 M63 49 L58 44" opacity="0.7"/>
+<path d="M50 54 L50 108"/>
+<path d="M46 60 L54 60"/>
+<circle cx="50" cy="66" r="3"/>
+<path d="M50 96 L62 96 L62 102 L56 102 L56 108 L50 108"/>
+<path d="M50 88 L58 88 L58 93 L50 93"/>
+</g>
+</svg></div><div class="obj-meta"><div class="obj-name">Reboot</div><div class="obj-type">Pinterest for Gamers</div><div class="obj-drink">"Take me"</div></div></a>
+      <a href="#" class="obj"><div class="obj-art"><div class="obj-halo"></div><svg viewBox="0 0 100 130" fill="none" xmlns="http://www.w3.org/2000/svg" class="obj-svg">
+<g stroke="url(#goldGrad)" stroke-width="1.1" fill="none" stroke-linecap="round" stroke-linejoin="round">
+<ellipse cx="50" cy="65" rx="22" ry="20"/>
+<path d="M28 65 C20 58 14 60 10 56 C16 62 14 68 16 74 C22 70 26 70 28 65"/>
+<path d="M28 65 L20 62 M28 65 L21 70" opacity="0.7"/>
+<path d="M72 65 C80 58 86 60 90 56 C84 62 86 68 84 74 C78 70 74 70 72 65"/>
+<path d="M72 65 L80 62 M72 65 L79 70" opacity="0.7"/>
+<path d="M50 50 C58 52 60 62 54 68 C48 74 38 70 40 62 C42 56 48 56 50 60" opacity="0.8"/>
+<path d="M42 54 C38 58 37 64 39 70" opacity="0.5"/>
+<path d="M30 58 L33 65 L30 72 M70 58 L67 65 L70 72" opacity="0.6"/>
+</g>
+</svg></div><div class="obj-meta"><div class="obj-name">Flosser</div><div class="obj-type">Flossing App</div><div class="obj-drink">"Try me"</div></div></a>
+    </div>
+    <div class="plank"></div>
+  </div>
+</div>
+ 
+<div class="panel" id="p5">
+  <div style="display:flex;flex-direction:column;align-items:center;">
+    <p class="p5q rv">"The ideas I get for my UX are me in my wonderland.<br><em>This is where I go.</em>"</p>
+    <p class="p5a rv d1">— Alisa Utesheva</p>
+    <div class="p5sk rv d2"><span class="sk">User Research</span><span class="sk">Interaction Design</span><span class="sk">Figma</span><span class="sk">Framer</span><span class="sk">Prototyping</span><span class="sk">Design Systems</span><span class="sk">Usability Testing</span><span class="sk">Visual Design</span></div>
+  </div>
+</div>
+ 
+<div class="panel" id="p6">
+  <div style="display:flex;flex-direction:column;align-items:center;">
+    <h2 class="ct rv">Resume</h2><p class="cp rv d1">A record of every room I've been in and every world I've built.</p>
+    <a href="#" class="cta rv d2">Download<span class="cta-ico">↓</span></a>
+  </div>
+</div>
+ 
+<div class="panel" id="p7">
+  <div style="display:flex;flex-direction:column;align-items:center;">
+    <h2 class="ct rv">Let's <em>build a world.</em></h2>
+    <p class="cp rv d1">Available for contracts, collaborations, and problems that keep me up at night. The harder the maze, the more I want in.</p>
+    <a href="mailto:hello@alisautesheva.com" class="cta rv d2">Send a Letter<span class="cta-ico">↗</span></a>
+    <div class="soc rv d3"><a href="#">LinkedIn</a><a href="#">Dribbble</a><a href="#">Read.cv</a></div>
+  </div>
+</div>
+ 
+<footer><span>© MMXXVI · Alisa Utesheva</span><span class="fm">✦ А Л И С А ✦</span><span>Alisa in Wonderland</span></footer>
+ 
+<script>
+const c=document.getElementById("c"),cr=document.getElementById("cr");
+let mx=innerWidth/2,my=innerHeight/2,rxx=mx,ryy=my;
+addEventListener("mousemove",e=>{mx=e.clientX;my=e.clientY;});
+(function loop(){c.style.left=mx+"px";c.style.top=my+"px";rxx+=(mx-rxx)*.13;ryy+=(my-ryy)*.13;cr.style.left=rxx+"px";cr.style.top=ryy+"px";requestAnimationFrame(loop);})();
+document.querySelectorAll("a,button,.obj,.sk").forEach(el=>{
+  el.addEventListener("mouseenter",()=>{c.style.transform="translate(-50%,-50%) scale(3)";cr.style.width="46px";cr.style.height="46px";cr.style.borderColor="rgba(192,136,40,.5)";});
+  el.addEventListener("mouseleave",()=>{c.style.transform="translate(-50%,-50%) scale(1)";cr.style.width="22px";cr.style.height="22px";cr.style.borderColor="rgba(214,162,60,.22)";});
+});
+const dEl=document.getElementById("dust");
+for(let i=0;i<26;i++){const d=document.createElement("i");d.style.left=(30+Math.random()*40)+"%";d.style.top=(Math.random()*100)+"%";d.style.animationDuration=(Math.random()*14+10)+"s";d.style.animationDelay=(Math.random()*12)+"s";dEl.appendChild(d);}
+const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("on");obs.unobserve(e.target);}});},{threshold:0.12});
+document.querySelectorAll(".rv").forEach(e=>obs.observe(e));
+</script>
+</body></html>
