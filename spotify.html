@@ -1,0 +1,1529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Spotify Redesign · UX Case Study · Alisa Utesheva</title>
+<meta name="description" content="A Spotify home screen redesign giving users control over what they see, by Alisa Utesheva.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%2232%22%20fill%3D%22%23070908%22/%3E%3Ctext%20x%3D%2232%22%20y%3D%2244%22%20font-family%3D%22Georgia%2Cserif%22%20font-size%3D%2234%22%20font-weight%3D%22700%22%20fill%3D%22%23D4A83C%22%20text-anchor%3D%22middle%22%3EA%3C/text%3E%3C/svg%3E">
+<meta property="og:title" content="Spotify Redesign · UX Case Study · Alisa Utesheva">
+<meta property="og:description" content="A Spotify home screen redesign giving users control over what they see, by Alisa Utesheva.">
+<meta property="og:type" content="website">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,500&family=Cinzel:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --void:#FFFFFF;
+    --panel:#F6F6F6;
+    --panel-2:#F0F0F0;
+    --green:#1ED760;
+    --green-deep:#168F44;
+    --ink:#191919;
+    --muted:#5B5B5B;
+    --line: rgba(25,25,25,0.10);
+
+    --p-void:#070908;
+    --p-gold:#D4A83C;
+    --p-bone:#C8BFA8;
+  }
+  *{box-sizing:border-box;}
+  html,body{ margin:0; padding:0; width:100%; background:var(--void); color:var(--ink); font-family:'Inter',sans-serif; -webkit-font-smoothing:antialiased; }
+  html{ scroll-behavior:smooth; scroll-snap-type:y mandatory; }
+  body{ overflow-x:hidden; }
+  a{ color:inherit; }
+  button{ font-family:inherit; cursor:pointer; }
+
+  .deck{ width:100%; }
+
+  .slide-shell{
+    width:100%; min-height:100vh;
+    display:flex; align-items:center; justify-content:center;
+    scroll-snap-align:start; scroll-snap-stop:always;
+    border-top:1px solid var(--line);
+    background:var(--void);
+    /* The decorative .blob circles sit past the slide's edge, so below ~1160px
+       the Cover blob pushed the whole page into a horizontal scrollbar. clip
+       (not hidden) contains it without creating a scroll container, which
+       would have broken scroll-snap. */
+    overflow:clip;
+  }
+  .slide-shell.panel{ background:var(--panel); }
+  .slide-shell:first-child{ border-top:none; }
+
+  .slide{
+    position:relative; max-width:1140px; width:100%; margin:0 auto;
+    padding:clamp(48px,8vw,90px) clamp(24px,7vw,90px);
+    display:flex; flex-direction:column; justify-content:center;
+    color:var(--ink);
+  }
+  .blob{ position:absolute; border-radius:50%; opacity:.14; filter:blur(60px); pointer-events:none; z-index:0; }
+  .slide > *:not(.blob){ position:relative; z-index:1; }
+
+  .eyebrow{
+    font-family:'Poppins',sans-serif; font-weight:600; letter-spacing:.18em;
+    text-transform:uppercase; font-size:12px; margin-bottom:14px; color:var(--green-deep);
+  }
+  h1,h2,h3{ font-family:'Poppins',sans-serif; font-weight:600; margin:0; line-height:1.15; }
+  em{ font-style:normal; color:var(--green-deep); }
+
+  .meta-row{ display:flex; gap:40px; margin-top:32px; flex-wrap:wrap; }
+  .meta-label{ font-family:'Poppins',sans-serif; font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--green-deep); font-weight:600; margin-bottom:5px; }
+  .meta-value{ font-size:14px; opacity:.85; }
+
+  .counter{ position:fixed; top:30px; right:40px; z-index:20; font-family:'Poppins',sans-serif; font-size:11px; letter-spacing:.14em; color:var(--ink); opacity:.5; }
+  .brandmark{ position:fixed; bottom:30px; left:40px; z-index:20; font-family:'Poppins',sans-serif; font-weight:600; font-size:12px; color:var(--ink); opacity:.72; }
+  .progress-line{ position:fixed; top:0; left:0; height:3px; background:var(--green); z-index:30; transition: width .5s cubic-bezier(.22,.8,.3,1); }
+
+  .pill{ display:inline-flex; align-items:center; padding:6px 15px; border-radius:20px; border:1px solid var(--line); font-size:12px; font-family:'Poppins',sans-serif; }
+  .pill.grad{ border:none; background:var(--green); color:#0a0a0a; font-weight:700; }
+
+  .two-col{ display:flex; gap:56px; align-items:center; }
+  .two-col.top{ align-items:flex-start; }
+  .two-col .col{ flex:1; min-width:0; }
+
+  ul.tight{ list-style:none; padding:0; margin:16px 0 0; }
+  ul.tight li{ padding-left:18px; position:relative; margin-bottom:10px; font-size:14px; line-height:1.55; color:var(--muted); }
+  ul.tight li::before{ content:''; position:absolute; left:0; top:7px; width:5px; height:5px; border-radius:50%; background:var(--green); }
+  p.lead{ font-size:15px; line-height:1.6; color:var(--muted); max-width:560px; margin:0; }
+
+  .card{ background:var(--panel-2); border:1px solid var(--line); border-radius:10px; padding:20px 22px; }
+  .card .tag{ font-family:'Poppins',sans-serif; font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--green-deep); font-weight:600; margin-bottom:8px; }
+  .card h4{ font-family:'Poppins',sans-serif; font-weight:600; font-size:15px; margin:0 0 6px; }
+  .card p{ font-size:12.5px; line-height:1.55; color:var(--muted); margin:0; }
+  .grid-3{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:20px; }
+  .grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:20px; }
+
+
+  /* ---------- dark shells ----------
+     The deck is about a dark-mode-first product: the screenshots are 53-79%
+     near-black, so on a white slide each phone reads as a foreign rectangle
+     pasted onto the page. Product-facing slides get a dark ground so the
+     screens sit in the page instead of on it, and the album art becomes the
+     only real colour in frame. Reading-heavy slides (research, testing,
+     the decisions table) stay light, where long text is easier to read.
+
+     This re-points the variables rather than restyling components, so
+     anything added to a dark slide later inherits the right palette. */
+  .slide-shell.dark{
+    --void:#0B0B0B;
+    --panel:#0B0B0B;
+    --panel-2:#1A1A1A;
+    --ink:#F2F2F2;
+    --muted:#A6A6A6;
+    --line:rgba(255,255,255,.13);
+    /* --green-deep is a 4.5:1 green picked for white; on black it goes muddy.
+       Dark slides use the bright brand green for the same accent role. */
+    --green-deep:#1ED760;
+    background:var(--void);
+    border-top-color:rgba(255,255,255,.09);
+  }
+  /* The fixed chrome sits above whatever slide is in view, so it has to follow
+     the slide under it rather than the page. JS sets .on-dark while a dark
+     shell is the current slide. */
+  body.on-dark .counter,
+  body.on-dark .brandmark{ color:#F2F2F2; }
+  .counter,.brandmark{ transition:color .35s ease; }
+
+
+  /* Between 780 and 1000px the three persona columns (photo, detail, quote)
+     are all still side by side, so the middle one gets squeezed until short
+     list items break for a single word. Drop the quote card underneath first,
+     which is the column that needs the width least. */
+  @media(min-width:781px) and (max-width:1000px){
+    section[data-title="Personas"] .two-col.top{ flex-wrap:wrap; row-gap:20px; }
+    section[data-title="Personas"] .two-col.top > .col:last-child{ flex:1 1 100% !important; }
+  }
+
+  /* ---------- widow control ----------
+     text-wrap does this at layout time, so it keeps working at every viewport
+     width instead of being pinned by hardcoded non-breaking spaces. `balance`
+     evens out the lines of short headings; `pretty` specifically stops a
+     paragraph or list item ending on a single-word line. Browsers without
+     support fall back to normal wrapping, so nothing breaks. */
+  h1,h2,h3,h4,.sp-head,.sg-head{ text-wrap:balance; }
+  p,li,.lead,.sp-lead,.sp-rule,.sp-a11y-note,.sp-caption,.cmp-note,
+  .sg-lead,.meta-value,.step p,.card p,.fd-key li,.sg-col li,.sg-rule span{
+    text-wrap:pretty;
+  }
+
+  /* ---------- mockup phone (Spotify-accurate) ---------- */
+  .mockup-phone{
+    width:132px; aspect-ratio:9/18.5; background:#000; border-radius:22px; border:1px solid rgba(255,255,255,.08);
+    padding:9px 7px; display:flex; flex-direction:column; gap:6px; flex-shrink:0; box-shadow:0 20px 40px rgba(0,0,0,.4);
+  }
+  .mockup-topbar{ display:flex; justify-content:space-between; align-items:center; padding:0 2px; }
+  .mockup-icon{ width:14px; height:14px; border-radius:50%; background:#232323; }
+  .mockup-toggle{ width:22px; height:12px; border-radius:8px; background:#232323; position:relative; }
+  .mockup-toggle::after{ content:''; position:absolute; width:9px; height:9px; border-radius:50%; background:var(--green); top:1.5px; right:1.5px; }
+  .mockup-tile{ border-radius:5px; min-height:22px; background:#1c1c1c; }
+  .mockup-tile.green-ring{ border:1.5px solid var(--green); }
+  .mockup-grid{ display:grid; grid-template-columns:1fr 1fr; gap:3px; flex:1; }
+  .mockup-row{ height:12px; border-radius:5px; background:#1c1c1c; display:flex; align-items:center; padding:0 4px; gap:4px; }
+  .mockup-row .dot{ width:6px; height:6px; border-radius:50%; background:var(--green); }
+  .mockup-list{ display:flex; flex-direction:column; gap:3px; flex:1; }
+  .mockup-bottomnav{ display:flex; justify-content:space-around; align-items:center; padding:2px 4px 0; }
+  .mockup-navicon{ width:9px; height:9px; border-radius:3px; background:rgba(242,242,242,.3); }
+
+  /* light-mode shell - same phone, same components, so the redesign's actual
+     toggle reads as a real feature rather than something only described in text */
+  .mockup-phone.light{ background:#fff; border-color:rgba(0,0,0,.1); box-shadow:0 20px 40px rgba(0,0,0,.14); }
+  .mockup-phone.light .mockup-icon,
+  .mockup-phone.light .mockup-toggle{ background:#E4E4E4; }
+  .mockup-phone.light .mockup-tile,
+  .mockup-phone.light .mockup-row{ background:#F1F1F1; }
+  .mockup-phone.light .mockup-navicon{ background:rgba(25,25,25,.28); }
+
+
+
+
+  /* ---------- final design: real screen + numbered callouts ---------- */
+  .fd-wrap{ display:flex; gap:clamp(24px,4vw,56px); align-items:center; justify-content:center; flex-wrap:wrap; }
+  .fd-stage{ position:relative; flex-shrink:0; width:clamp(210px,25vw,280px); }
+  .fd-shot{ width:100%; height:auto; display:block; border-radius:14px;
+    border:1px solid var(--line); box-shadow:0 30px 60px rgba(0,0,0,.22); }
+  .fd-pin{ position:absolute; transform:translate(-50%,-50%); z-index:2;
+    width:26px; height:26px; border-radius:50%; background:var(--green); color:#062; 
+    font-family:'Poppins',sans-serif; font-weight:700; font-size:11px;
+    display:flex; align-items:center; justify-content:center;
+    border:2px solid #fff; box-shadow:0 3px 10px rgba(0,0,0,.45); color:#0b3d1f; }
+
+  /* ---------- drag-to-compare (aligned pairs only) ---------- */
+  .cmp{ position:relative; width:100%; margin:0 auto; border-radius:14px; overflow:hidden;
+    border:1px solid var(--line); box-shadow:0 18px 40px rgba(0,0,0,.2);
+    touch-action:pan-y; user-select:none; cursor:ew-resize; }
+  .cmp img{ display:block; width:100%; height:auto; pointer-events:none; }
+  .cmp .cmp-top{ position:absolute; inset:0; overflow:hidden; width:50%; }
+  .cmp .cmp-top img{ position:absolute; top:0; left:0; max-width:none; }
+  .cmp-line{ position:absolute; top:0; bottom:0; left:50%; width:2px; background:var(--green);
+    transform:translateX(-1px); pointer-events:none; box-shadow:0 0 10px rgba(30,215,96,.7); }
+  .cmp-grip{ position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    width:34px; height:34px; border-radius:50%; background:var(--green); color:#08301a;
+    display:flex; align-items:center; justify-content:center; pointer-events:none;
+    box-shadow:0 3px 12px rgba(0,0,0,.5); font-size:13px; font-weight:700; }
+  .cmp-tag{ position:absolute; top:10px; z-index:3; font-family:'Poppins',sans-serif; font-weight:600;
+    font-size:9px; letter-spacing:.12em; text-transform:uppercase; color:#fff;
+    background:rgba(0,0,0,.66); padding:3px 8px; border-radius:100px; pointer-events:none; }
+  .cmp-tag.l{ left:8px; } .cmp-tag.r{ right:8px; }
+  .cmp:focus-visible{ outline:2px solid var(--green); outline-offset:3px; }
+  .cmp-note{ text-align:center; font-size:11.5px; color:var(--muted); margin:10px 0 0;
+    display:flex; align-items:center; justify-content:center; gap:6px; }
+
+  /* slider on one side, the reasoning on the other */
+  .cmp-split{ display:flex; align-items:center; gap:clamp(28px,5vw,64px);
+    width:100%; max-width:940px; margin:0 auto; }
+  .cmp-split .cmp-col{ flex:0 0 clamp(210px,25vw,282px); }
+  .cmp-split .cmp-body{ flex:1 1 300px; min-width:0; text-align:left; }
+  .cmp-split .cmp-body h2{ margin-bottom:8px; }
+  .cmp-split .cmp-body .lead{ margin-bottom:18px; }
+  .cmp-split .cmp-body .fd-key{ margin-top:0; }
+  @media (max-width:880px){
+    .cmp-split{ flex-direction:column; gap:26px; }
+    .cmp-split .cmp-col{ flex:0 0 auto; width:min(260px,64vw); }
+    .cmp-split .cmp-body{ flex:1 1 auto; width:100%; }
+  }
+
+  /* ---------- A/B icon toggle ---------- */
+  .ab-demo{ max-width:520px; margin:10px auto 0; }
+  .ab-switch{ display:flex; gap:6px; justify-content:center; margin-bottom:12px; }
+  .ab-btn{ background:transparent; border:1px solid var(--line); color:var(--ink); opacity:.55;
+    padding:7px 16px; border-radius:20px; font-family:'Poppins',sans-serif; font-size:12px;
+    font-weight:600; transition:all .2s; }
+  .ab-btn.active{ opacity:1; border-color:var(--green); color:var(--green-deep); background:rgba(30,215,96,.08); }
+  .ab-stage{ position:relative; border-radius:10px; overflow:hidden; border:1px solid var(--line);
+    box-shadow:0 16px 34px rgba(0,0,0,.2); }
+  .ab-stage::after{ content:''; position:absolute; top:0; bottom:0; right:0; width:24%;
+    background:linear-gradient(90deg,transparent,rgba(30,215,96,.10)); pointer-events:none; }
+  .ab-img{ display:block; width:100%; height:auto; }
+  .ab-img:not(.active){ position:absolute; inset:0; opacity:0; }
+  .ab-img.active{ position:relative; opacity:1; }
+  @media(prefers-reduced-motion:no-preference){ .ab-img{ transition:opacity .22s ease; } }
+  .fd-key-1{ grid-template-columns:1fr !important; max-width:400px !important; margin:0 !important; }
+  .fd-arrow{ display:flex; align-items:center; flex-shrink:0; opacity:.8; }
+  @media(max-width:700px){ .fd-arrow{ transform:rotate(90deg); } }
+  .fd-cap{ display:block; text-align:center; margin-top:10px; font-family:'Poppins',sans-serif;
+    font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--green-deep); font-weight:600; }
+  .fd-key{ list-style:none; margin:26px auto 0; padding:0; max-width:820px;
+    display:grid; grid-template-columns:1fr 1fr; gap:14px 30px; }
+  .fd-key li{ position:relative; padding-left:40px; margin-bottom:18px; font-size:13.5px; line-height:1.6; color:var(--muted); }
+  .fd-key li:last-child{ margin-bottom:0; }
+  .fd-key b{ color:var(--ink); font-family:'Poppins',sans-serif; font-weight:600; display:block; margin-bottom:2px; font-size:14px; }
+  .fd-n{ position:absolute; left:0; top:1px; width:26px; height:26px; border-radius:50%;
+    background:var(--green); color:#0b3d1f; font-family:'Poppins',sans-serif; font-weight:700; font-size:11px;
+    display:flex; align-items:center; justify-content:center; }
+  @media(max-width:820px){ .fd-key{ grid-template-columns:1fr; gap:12px; } }
+  @media(max-width:600px){
+    .fd-stage{ width:min(160px,42vw); }
+    .fd-key li{ padding-left:34px; font-size:12px; margin-bottom:13px; }
+    .fd-key b{ font-size:12.5px; }
+    .fd-n,.fd-pin{ width:22px; height:22px; font-size:9.5px; }
+  }
+
+  .g1{ background:linear-gradient(135deg,#8a3a1a,#c94a1a); }
+  .g2{ background:linear-gradient(135deg,#1a2a3a,#3a5a7a); }
+  .g3{ background:linear-gradient(135deg,#3a1a2a,#7a2a4a); }
+  .g4{ background:linear-gradient(135deg,#1a3a2a,#2a6a4a); }
+  .g5{ background:linear-gradient(135deg,#2a2a1a,#6a5a2a); }
+  .g6{ background:linear-gradient(135deg,#2a1a3a,#5a3a7a); }
+
+  /* ---------- persona tabs ---------- */
+  .tab-row{ display:flex; gap:10px; margin-bottom:26px; flex-wrap:wrap; }
+  /* the tabs look like static chips, so say plainly that they switch the panel */
+  .tab-hint{ font-family:'Poppins',sans-serif; font-size:11.5px; color:var(--muted); margin:0 0 12px; display:flex; align-items:center; gap:7px; }
+  .tab-hint svg{ width:13px; height:13px; flex-shrink:0; }
+  .tab-btn{ background:transparent; border:1px solid var(--line); color:var(--ink); opacity:.55; padding:9px 18px; border-radius:20px; font-family:'Poppins',sans-serif; font-size:12.5px; font-weight:600; transition:all .2s; }
+  .tab-btn.active{ opacity:1; border-color:var(--green); color:var(--green-deep); background:rgba(30,215,96,.08); }
+  .tab-panel{ display:none; }
+  .tab-panel.active{ display:block; }
+
+  /* ---------- frequency chart ---------- */
+  .chart{ margin-top:10px; }
+  .chart-row{ display:flex; align-items:center; gap:14px; margin-bottom:20px; }
+  .chart-label{ width:260px; font-size:13px; line-height:1.4; flex-shrink:0; color:var(--ink); }
+  .chart-track{ flex:1; height:26px; background:var(--panel-2); border-radius:6px; overflow:hidden; position:relative; }
+  .chart-fill{ height:100%; border-radius:6px; background:var(--green); display:flex; align-items:center; padding-left:10px; font-family:'Poppins',sans-serif; font-size:11px; font-weight:700; color:#0a0a0a; }
+
+  .step-tracker{ display:flex; gap:0; margin-top:26px; flex-wrap:wrap; }
+  .step{ flex:1; min-width:150px; padding:16px 16px 16px 0; position:relative; }
+  .step .num{ font-family:'Poppins',sans-serif; font-weight:700; font-size:20px; color:var(--green-deep); }
+  .step p{ font-size:12.5px; line-height:1.5; color:var(--muted); margin:6px 0 0; }
+  /* the connector arrow sat at right:-4px, i.e. past its own step and directly
+     on top of the next step's number, so it read as a smudge rather than a
+     link. the numerals already carry the sequence, so it is gone. */
+
+  .link{ color:var(--green-deep); font-weight:600; text-decoration:none; font-family:'Poppins',sans-serif; font-size:13px; }
+
+  .portfolio-nav{ position:fixed; top:22px; left:50%; transform:translateX(-50%); z-index:40; display:flex; align-items:center; gap:32px; padding:11px 19px 11px 26px; background:rgba(7,9,8,.72); backdrop-filter:blur(20px); border:1px solid rgba(212,168,60,.18); border-radius:100px; }
+  .portfolio-nav .nav-home,.portfolio-nav a{ font-family:'Cinzel',serif; text-decoration:none; white-space:nowrap; }
+  .portfolio-nav .nav-home{ color:var(--p-gold); font-size:13px; font-weight:700; letter-spacing:.14em; }
+  .portfolio-nav .nav-divider{ width:1px; height:14px; background:rgba(212,168,60,.2); }
+  .portfolio-nav ul{ list-style:none; display:flex; gap:24px; margin:0; padding:0; }
+  .portfolio-nav ul a{ color:var(--p-bone); opacity:.9; font-size:11.5px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; transition:color .2s,opacity .2s; }
+  .portfolio-nav ul a:hover{ opacity:1; color:var(--p-gold); }
+  .portfolio-nav .nav-contact{ color:var(--p-void); background:var(--p-gold); padding:9px 18px; border-radius:100px; font-size:11.5px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; transition:transform .2s,box-shadow .2s; }
+  .portfolio-nav .nav-contact:hover{ transform:scale(1.04); box-shadow:0 4px 18px rgba(212,168,60,.4); }
+
+  /* The pill is fixed + centred with no width cap, so as the window narrows the
+     logo slides off the left edge and Contact spills past the right - the same
+     failure the homepage nav had. Same ladder, adapted to .portfolio-nav. */
+  .portfolio-nav{ max-width:calc(100vw - 20px); }
+  .portfolio-nav .nav-home{ flex:0 1 auto; min-width:0; }
+  .portfolio-nav .nav-home img{ max-width:100%; object-fit:contain; object-position:left center; }
+  .portfolio-nav ul{ flex-shrink:0; }
+  .portfolio-nav .nav-divider{ flex-shrink:0; }
+  .portfolio-nav .nav-contact{ flex-shrink:0; }
+  .portfolio-nav .nav-home img{ height:26px; width:auto; display:block; }
+  @media(max-width:920px){
+    .portfolio-nav{ gap:12px; padding:8px 13px 8px 14px; }
+    .portfolio-nav ul{ gap:14px; }
+    .portfolio-nav ul a{ font-size:9px; letter-spacing:.09em; }
+    .portfolio-nav .nav-contact{ padding:8px 13px; font-size:9px; }
+  }
+  /* Résumé drops before the other two - Work/About/Résumé together stop fitting
+     the pill around here, and Work + About are what a visitor actually wants. */
+  @media(max-width:600px){
+    .portfolio-nav li.sec{ display:none; }
+  }
+  @media(max-width:560px){
+    .portfolio-nav{ top:12px; gap:8px; padding:7px 12px 7px 12px; }
+    .portfolio-nav ul{ gap:11px; }
+    .portfolio-nav .nav-contact{ padding:7px 11px; }
+    .portfolio-nav .nav-home img{ height:20px; }
+  }
+  @media(max-width:432px){
+    .portfolio-nav{ gap:5px; padding:6px 11px 6px 10px; }
+    .portfolio-nav .nav-divider{ display:none; }
+    .portfolio-nav ul{ gap:7px; }
+    .portfolio-nav .nav-contact{ padding:7px 9px; }
+  }
+  @media(max-width:390px){
+    .portfolio-nav{ gap:3px; padding:5px 10px 5px 8px; }
+    .portfolio-nav ul{ gap:5px; }
+    .portfolio-nav ul a{ font-size:8px; letter-spacing:.06em; }
+    .portfolio-nav .nav-contact{ padding:6px 9px; font-size:8px; letter-spacing:.06em; }
+    .portfolio-nav .nav-home img{ height:17px; }
+  }
+  @media(max-width:356px){
+    .portfolio-nav{ gap:6px; padding:4px 9px 4px 8px; }
+    .portfolio-nav ul{ gap:6px; }
+    .portfolio-nav ul a{ font-size:7.5px; letter-spacing:.05em; }
+    .portfolio-nav .nav-contact{ padding:5px 7px; font-size:7.5px; letter-spacing:.05em; }
+    .portfolio-nav .nav-home img{ height:14px; }
+  }
+  @media(max-width:325px){
+    .portfolio-nav{ gap:5px; padding:4px 9px 4px 7px; }
+    .portfolio-nav ul{ gap:5px; }
+    .portfolio-nav ul a{ font-size:7px; letter-spacing:.03em; }
+    .portfolio-nav .nav-contact{ padding:5px 6px; font-size:7px; letter-spacing:.03em; }
+    .portfolio-nav .nav-home img{ height:12px; }
+  }
+  /* narrower than any real device ships - brand + the one action that matters */
+  @media(max-width:310px){
+    .portfolio-nav ul{ display:none; }
+  }
+
+  @media (max-width:780px){
+    .two-col{ flex-direction:column; }
+    .two-col .col{ flex:1 1 auto !important; width:100%; }
+    .grid-3{ grid-template-columns:1fr; }
+    .grid-2{ grid-template-columns:1fr; }
+  }
+
+  /* Transitions match the homepage: a quiet fade-up as each section arrives.
+     Snapping now assists instead of trapping, so tall sections stay readable. */
+  .deck .slide-shell .slide{opacity:0;transform:translateY(22px);
+    transition:opacity .8s cubic-bezier(.16,.84,.44,1),transform .8s cubic-bezier(.16,.84,.44,1);}
+  .deck .slide-shell .slide.seen{opacity:1;transform:none;}
+  @media (max-height:820px),(pointer:coarse),(hover:none){
+    html{scroll-snap-type:none;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .deck .slide-shell .slide{opacity:1!important;transform:none!important;transition:none!important;}
+  }
+
+  /* ---- phone-width fit: slides were running taller than the viewport, so with
+     scroll-snap on the bottom of the content got cut off. Scale type, padding
+     and media down so each slide fits the screen. ---- */
+  @media (max-width:600px){
+    .slide{ padding:38px 20px; }
+    .slide h1{ font-size:clamp(30px,9vw,44px) !important; }
+    .slide h2{ font-size:clamp(20px,5.6vw,26px) !important; }
+    .slide h3{ font-size:clamp(17px,4.8vw,22px) !important; }
+    .eyebrow{ font-size:10px; margin-bottom:10px; }
+    .lead, p.lead{ font-size:13px !important; line-height:1.5 !important; }
+    ul.tight li{ font-size:12.5px; margin-bottom:7px; }
+    .card{ padding:13px 14px; }
+    .card h4{ font-size:13px; }
+    .card p{ font-size:11.5px; line-height:1.45; }
+    .grid-3, .grid-2{ gap:9px; margin-top:14px; }
+    .two-col{ gap:22px; }
+    .meta-row{ gap:18px; margin-top:20px; }
+    .mockup-phone{ width:104px; }
+    section[data-title="Persona"] img, section[data-title="Personas"] img{
+      max-height:50vh; width:auto !important; min-width:0 !important; margin:0 auto; display:block; }
+  }
+  @media (max-width:430px){
+    .slide{ padding:30px 16px; }
+    .slide h2{ font-size:clamp(18px,5.2vw,22px) !important; }
+    .lead, p.lead{ font-size:12.5px !important; }
+    .card{ padding:11px 12px; }
+    .card p{ font-size:11px; }
+    .mockup-phone{ width:92px; }
+  }
+
+
+  /* ---------- Moodboard: measured vs chosen ----------
+     Two bands, same four roles each, so the eye reads the mirror without
+     being told. Kept deliberately small - this slide hands over two numbers
+     and gets out of the way; the argument lives on Branding Guidelines. */
+  .sp{ width:100%; }
+  .sp-eyebrow{ font-family:'Poppins',sans-serif; font-weight:600; letter-spacing:.18em;
+    text-transform:uppercase; font-size:11px; margin-bottom:9px; color:#1DB954; }
+  .sp-head{ font-size:clamp(20px,2.4vw,28px); line-height:1.2; margin:0 0 8px; }
+  .sp-head em{ color:#1DB954; }
+  .sp-lead{ font-size:12.5px; line-height:1.6; color:var(--muted); margin:0 0 16px; max-width:640px; }
+
+  .sp-app{ display:grid; grid-template-columns:1fr 1fr; gap:clamp(12px,1.6vw,20px); }
+  .sp-band{ background:#111111; border:1px solid rgba(255,255,255,.09);
+    border-radius:14px; padding:14px clamp(12px,1.4vw,17px) 16px; }
+  /* the light band sits on its own ground so the two palettes are judged
+     against the surface each was actually designed for */
+  .sp-band-light{ background:#F3F3F3; border-color:rgba(0,0,0,.10); }
+
+  .sp-band-label{ display:flex; align-items:center; gap:7px; font-family:'Poppins',sans-serif;
+    font-weight:600; font-size:9.5px; letter-spacing:.15em; text-transform:uppercase;
+    color:#B3B3B3; margin-bottom:11px; }
+  .sp-band-light .sp-band-label{ color:#5B5B5B; }
+  .sp-tick{ width:7px; height:7px; border-radius:2px; background:#4A4A4A; flex:0 0 auto; }
+  .sp-tick.on{ background:#1DB954; }
+
+  .sp-row-4{ display:grid; grid-template-columns:repeat(4,1fr); gap:clamp(7px,.9vw,11px); }
+  .sp-card{ min-width:0; }
+  .sp-art{ height:66px; border-radius:6px; box-shadow:inset 0 0 0 1px rgba(255,255,255,.14),
+    0 5px 12px rgba(0,0,0,.4); margin-bottom:7px; }
+  .sp-band-light .sp-art{ box-shadow:inset 0 0 0 1px rgba(0,0,0,.13), 0 5px 12px rgba(0,0,0,.10); }
+  .sp-card b{ display:block; font-family:'Poppins',sans-serif; font-weight:600; font-size:10.5px;
+    color:#FFFFFF; line-height:1.3; }
+  .sp-card em{ display:block; font-style:normal; font-family:'Poppins',sans-serif; font-size:8.5px;
+    letter-spacing:.02em; color:#8A8A8A; margin-top:2px; }
+  .sp-band-light .sp-card b{ color:#191919; }
+  .sp-band-light .sp-card em{ color:#6B6B6B; }
+  /* the surface that holds over half its screen gets the affordance Spotify
+     gives a playing item - a green dot, nothing louder */
+  .sp-card-hero b{ display:flex; align-items:center; gap:5px; }
+  .sp-dot{ width:6px !important; height:6px; border-radius:50%; background:#1DB954;
+    flex:0 0 auto; margin:0 !important; }
+
+
+
+  /* contrast evidence - ratios computed from the swatches above, not estimated */
+  .sp-foot{ display:grid; grid-template-columns:.85fr 1.15fr; gap:clamp(16px,2.4vw,34px);
+    align-items:start; margin-top:15px; }
+  .sp-rule{ font-size:11.5px; line-height:1.55; color:var(--muted); margin:0;
+    padding-left:11px; border-left:2px solid #1DB954; }
+  .sp-rule b{ color:var(--ink); }
+
+  .sp-a11y-head{ font-family:'Poppins',sans-serif; font-weight:600; font-size:9.5px;
+    letter-spacing:.15em; text-transform:uppercase; color:#1DB954; margin-bottom:8px; }
+  .sp-a11y-grid{ display:grid; grid-template-columns:repeat(6,1fr); gap:8px; }
+  .sp-chk{ border-top:2px solid rgba(255,255,255,.20); padding-top:6px; min-width:0; }
+  .sp-chk b{ display:block; font-family:'Poppins',sans-serif; font-weight:700; font-size:15px;
+    color:var(--ink); line-height:1.1; }
+  .sp-chk span{ display:block; font-size:8.5px; line-height:1.3; color:#8A8A8A; margin-top:3px; }
+  /* passes, but with almost no headroom - worth marking so it doesn't get lightened later */
+  .sp-chk-edge{ border-top-color:#C9A227; }
+  .sp-chk-fail{ border-top-color:#C14231; }
+  .sp-chk-fail b{ color:#E07A6B; }
+
+  .sp-a11y-note{ font-size:10.5px; line-height:1.55; color:var(--muted); margin:10px 0 0; }
+  .sp-a11y-note b{ color:var(--ink); }
+
+  @media(max-width:1040px){
+    .sp-foot{ grid-template-columns:1fr; gap:14px; }
+  }
+  @media(max-width:560px){
+    .sp-a11y-grid{ grid-template-columns:repeat(3,1fr); row-gap:10px; }
+  }
+
+  @media(max-width:860px){
+    .sp-app{ grid-template-columns:1fr; }
+  }
+  @media(max-width:420px){
+    .sp-row-4{ grid-template-columns:repeat(2,1fr); row-gap:12px; }
+  }
+
+  /* ---------- Spotify branding guidelines (inherited vs added) ---------- */
+  .sg{ width:100%; }
+  .sg-head{ font-size:clamp(23px,3vw,33px); margin:0 0 8px; max-width:760px; }
+  .sg-head em{ color:var(--green-deep); }
+  .sg-lead{ max-width:700px; margin-bottom:20px; }
+  .sg-cols{ display:grid; grid-template-columns:1fr 1fr; gap:14px; align-items:start; }
+  .sg-col{ border:1px solid var(--line); border-radius:12px; padding:16px 18px; }
+  .sg-inherited{ background:var(--panel-2); }
+  .sg-added{ border-color:rgba(30,215,96,.35); }
+  .sg-col-head{ display:flex; align-items:center; gap:8px; font-family:'Poppins',sans-serif;
+    font-weight:600; font-size:10px; letter-spacing:.15em; text-transform:uppercase;
+    color:var(--muted); margin-bottom:12px; }
+  .sg-added .sg-col-head{ color:var(--green-deep); }
+  .sg-lock{ font-size:8px; opacity:.6; }
+  .sg-plus{ font-size:13px; font-weight:700; line-height:1; }
+  .sg-col ul{ list-style:none; margin:0; padding:0; }
+  .sg-col li{ font-size:12.5px; line-height:1.5; margin-bottom:10px; }
+  .sg-col li:last-child{ margin-bottom:0; }
+  .sg-col li b{ font-family:'Poppins',sans-serif; font-weight:600; }
+  .sg-col li span{ color:var(--muted); }
+
+  .sg-rules{ margin-top:18px; padding-top:16px; border-top:1px solid var(--line); }
+  .sg-rules-head{ font-family:'Poppins',sans-serif; font-weight:600; font-size:10px;
+    letter-spacing:.15em; text-transform:uppercase; color:var(--green-deep); margin-bottom:11px; }
+  .sg-rule-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+  .sg-rule{ padding-left:11px; border-left:2px solid var(--green); }
+  .sg-rule-no{ border-left-color:#C14231; }
+  .sg-rule b{ display:block; font-family:'Poppins',sans-serif; font-weight:600; font-size:12px;
+    line-height:1.35; margin-bottom:3px; }
+  .sg-rule span{ font-size:11px; line-height:1.45; color:var(--muted); }
+
+  @media(max-width:900px){
+    .sg-cols{ grid-template-columns:1fr; }
+    .sg-rule-grid{ grid-template-columns:1fr 1fr; }
+  }
+  @media(max-width:560px){
+    .sg-rule-grid{ grid-template-columns:1fr; }
+  }
+
+  /* Her dad reached the cover and did not realise the deck kept going, so the
+     first screen now says so out loud. It fades out on the first scroll. */
+  .slide-shell:first-child{ position:relative; }
+  .slide-shell:first-child > .slide{ padding-bottom:96px; }
+  .slide-shell > .scroll-cue{
+    position:fixed; left:50%; bottom:clamp(16px,3.2vh,32px); transform:translateX(-50%);
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+    font-family:'Poppins',sans-serif; font-size:10px; font-weight:700;
+    letter-spacing:.2em; text-transform:uppercase; white-space:nowrap;
+    color:var(--green-deep); opacity:.85; z-index:12; pointer-events:none;
+    /* a short phone can push cover content under the cue, so it carries a
+       soft halo of the cover's own background rather than a box */
+    padding:11px 26px 9px;
+    background:radial-gradient(ellipse closest-side, rgba(255,255,255,.94) 22%, transparent 76%);
+    transition:opacity .45s ease, transform .45s ease;
+  }
+  .slide-shell > .scroll-cue .cue-chev{ animation:cue-bob 2.1s ease-in-out infinite; }
+  .slide-shell > .scroll-cue.gone{ opacity:0; transform:translateX(-50%) translateY(10px); }
+  @keyframes cue-bob{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(5px); } }
+
+  /* Closing hand-off: back to the shelf, or straight into the next study. */
+  .cs-end{ display:flex; flex-wrap:wrap; gap:11px; margin-top:44px; }
+  .cs-end a{
+    display:inline-flex; align-items:center; gap:9px; padding:12px 21px;
+    border-radius:100px; border:1px solid var(--line); color:var(--ink);
+    text-decoration:none; font-family:'Poppins',sans-serif; font-size:11px; font-weight:700;
+    letter-spacing:.11em; text-transform:uppercase; line-height:1;
+    transition:background .25s, border-color .25s, transform .25s, color .25s;
+  }
+  .cs-end a:hover{ transform:translateY(-2px); border-color:var(--green-deep); background:rgba(30,215,96,.14); }
+  .cs-end a.next{ background:var(--green-deep); border-color:var(--green-deep); color:#0a0a0a; }
+  .cs-end a.next:hover{ background:var(--green-deep); opacity:.88; }
+  @media (prefers-reduced-motion: reduce){
+    .slide-shell > .scroll-cue .cue-chev{ animation:none; }
+    .cs-end a:hover{ transform:none; }
+  }
+  @media(max-width:560px){
+    .cs-end{ gap:9px; }
+    .cs-end a{ padding:11px 16px; font-size:10px; letter-spacing:.08em; }
+  }
+
+  /* Chapter rail. Sits on the slide's own left edge (JS measures it into
+     --rail-x) rather than floating in the page corner, and only appears once
+     the reader has left the cover. Hidden below 1240px, where the slide's
+     gutter is too narrow to hold a label without crossing the text. */
+  .chapters{
+    position:fixed; left:var(--rail-x, 40px); top:50%; transform:translateY(-50%);
+    z-index:22; display:none; flex-direction:column;
+    opacity:0; visibility:hidden;
+    transition:opacity .45s ease, visibility 0s linear .45s;
+  }
+  .chapters.on{ opacity:1; visibility:visible; transition:opacity .45s ease, visibility 0s linear 0s; }
+  .chapters a{
+    position:relative; display:block; padding:7px 0 7px 13px;
+    border-left:1px solid var(--line);
+    font-family:'Poppins',sans-serif; font-size:8px; font-weight:600; letter-spacing:.09em;
+    text-transform:uppercase; text-decoration:none; white-space:nowrap;
+    color:var(--ink); opacity:.6;
+    transition:opacity .25s ease, color .25s ease;
+  }
+  .chapters a:hover{ opacity:.85; }
+  .chapters a.active{ opacity:1; font-weight:800; color:#0E6B33; border-left-color:#0E6B33;
+    box-shadow:inset 2px 0 0 #0E6B33; }
+  .chapters a:focus-visible{ outline:2px solid var(--green-deep); outline-offset:2px; opacity:1; }
+  .chapters .ch-next{ margin-top:14px; padding-top:9px; padding-bottom:9px; color:var(--green-deep); opacity:.7; }
+  .chapters .ch-next:hover{ opacity:1; }
+  .chapters .ch-next b{ display:block; font-weight:800; letter-spacing:.07em; margin-top:3px; }
+  .chapters .ch-next span{ opacity:.6; font-weight:600; }
+  @media (min-width:1240px) and (min-height:620px){
+    .chapters{ display:flex; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .chapters{ transition:none; }
+  }
+
+  body.on-dark .chapters a{ color:#F2F2F2; border-left-color:rgba(255,255,255,.16); }
+  body.on-dark .chapters a.active{ color:#1ED760; border-left-color:#1ED760; box-shadow:inset 2px 0 0 #1ED760; }
+</style>
+</head>
+<body>
+
+  <nav class="portfolio-nav" aria-label="Portfolio navigation">
+    <a class="nav-home" href="homepage.html"><img src="img/logo.png" alt="Alisa"></a>
+    <div class="nav-divider" aria-hidden="true"></div>
+    <ul>
+      <li><a href="homepage.html#work">Work</a></li>
+      <li><a href="homepage.html#about">About</a></li>
+      <li class="sec"><a href="homepage.html#resume">Résumé</a></li>
+    </ul>
+    <a class="nav-contact" href="homepage.html#contact">Contact</a>
+  </nav>
+
+  <nav class="chapters" aria-label="Case study sections">
+      <a href="#" data-slide="1">Overview</a>
+      <a href="#" data-slide="5">Research</a>
+      <a href="#" data-slide="7">Persona</a>
+      <a href="#" data-slide="10">Design</a>
+      <a href="#" data-slide="13">Testing</a>
+      <a href="#" data-slide="16">Decisions</a>
+      <a href="#" data-slide="18">Prototype</a>
+      <a href="#" data-slide="20">Branding</a>
+      <a href="#" data-slide="21">Wrap Up</a>
+      <a class="ch-next" href="reboot.html"><span>Next</span><b>Reboot &rarr;</b></a>
+  </nav>
+
+
+  <div class="counter" id="counter">01 / 21</div>
+  <div class="brandmark">spotify.</div>
+  <div class="progress-line" id="progressLine" style="width:0%;"></div>
+
+  <div class="deck" id="deck">
+
+  <!-- 2. COVER -->
+  <div class="slide-shell">
+  <section class="slide" data-title="Cover">
+    <div class="blob" style="width:520px;height:520px; background:var(--green); top:-120px; right:-140px; opacity:.1;"></div>
+    <div class="two-col" style="align-items:center; gap:70px;">
+      <div class="col">
+        <div class="eyebrow">UX / UI Case Study &middot; Mobile App</div>
+        <h1 style="font-size:clamp(48px,7vw,82px); line-height:.96; margin-top:10px;">Spotify<br><em>Redesign</em></h1>
+        <p class="lead" style="margin-top:20px; max-width:440px;">Everyone uses Spotify differently, so why does everyone get the same home screen? A redesign that puts users in charge of what they see.</p>
+        <div style="display:flex; gap:32px; flex-wrap:wrap; margin-top:32px;">
+          <div><div class="meta-label">Role</div><div class="meta-value">UX / UI Designer</div></div>
+          <div><div class="meta-label">Platform</div><div class="meta-value">iOS Mobile</div></div>
+          <div><div class="meta-label">Tools</div><div class="meta-value">Figma, After Effects</div></div>
+        </div>
+      </div>
+      <div class="col" style="flex:0 0 260px; display:flex; justify-content:center;">
+        <div style="position:relative; width:220px; height:340px;">
+          <div style="position:absolute; top:0; left:14px; width:192px; height:64px; background:#fff; border:1px solid rgba(0,0,0,.08); border-radius:14px; box-shadow:0 12px 28px rgba(0,0,0,.08); transform:rotate(-4deg);"></div>
+          <div style="position:absolute; top:76px; left:0; width:220px; height:64px; background:var(--green); border-radius:14px; box-shadow:0 16px 32px rgba(29,215,96,.28); display:flex; align-items:center; justify-content:center; transform:rotate(2deg);">
+            <svg width="26" height="26" viewBox="0 0 26 26"><circle cx="13" cy="13" r="13" fill="#000"/><g stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"><path d="M7 10 Q13 6 19 10"/><path d="M8 14 Q13 11 18 14"/><path d="M10 18 Q13 16 16 18"/></g></svg>
+          </div>
+          <div style="position:absolute; top:156px; left:20px; width:186px; height:64px; background:#fff; border:1px solid rgba(0,0,0,.08); border-radius:14px; box-shadow:0 12px 28px rgba(0,0,0,.08); transform:rotate(-2deg);"></div>
+          <div style="position:absolute; top:232px; left:8px; width:200px; height:64px; background:#fff; border:1px solid rgba(0,0,0,.08); border-radius:14px; box-shadow:0 12px 28px rgba(0,0,0,.06); opacity:.5; transform:rotate(3deg);"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+    <div class="scroll-cue" id="scrollCue" aria-hidden="true">
+      <span>Scroll to continue</span>
+      <svg class="cue-chev" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.5v10"/><path d="M3.6 8.4 8 12.8l4.4-4.4"/></svg>
+    </div>
+  
+  </div>
+
+  <!-- 3. WHY I BUILT THIS -->
+  <div class="slide-shell panel">
+  <section class="slide panel" data-title="Why I Built This" style="align-items:center;">
+    <div class="eyebrow" style="text-align:center;">Personal Interest</div>
+    <div style="max-width:620px; display:flex; flex-direction:column; gap:18px; margin-top:8px; text-align:left;">
+      <p style="font-size:16px; line-height:1.7; margin:0;">I've used Spotify for years, but I don't listen to podcasts or audiobooks, so my home screen felt cluttered with recommendations I never touch.</p>
+      <p style="font-size:16px; line-height:1.7; margin:0;">A friend told me they listen to podcasts constantly, especially at the gym. Same app, completely different use.</p>
+      <p style="font-size:16px; line-height:1.7; margin:0; font-weight:600;">People already know what they like. The app should bend to&nbsp;that.</p>
+    </div>
+  </section>
+  </div>
+
+  <!-- 3b. HOW MIGHT WE -->
+  <div class="slide-shell dark">
+  <section class="slide" data-title="How Might We" style="align-items:center; text-align:center;">
+    <div class="eyebrow" style="color:var(--green);">How Might We</div>
+    <h2 style="font-family:'Poppins',sans-serif; font-weight:600; font-size:clamp(28px,4.2vw,46px); line-height:1.35; max-width:820px; color:#fff;">
+      Help Spotify users filter and organize their home screen so they can quickly find the content they care about?
+    </h2>
+  </section>
+  </div>
+
+  <!-- 3c. DESIGN PRINCIPLES -->
+  <div class="slide-shell panel">
+  <section class="slide panel" data-title="Design Principles">
+    <div class="eyebrow">What Guided Every Decision</div>
+    <h2 style="font-size:30px; max-width:640px; margin-bottom:30px;">Designing the redesign.</h2>
+    <div class="grid-2" style="max-width:820px; gap:16px;">
+      <div class="card">
+        <div class="tag" style="color:var(--green-deep);">01 &middot; Yours, Not Theirs</div>
+        <h4>Control over content</h4>
+        <p>The home screen should be a record of how someone listens. Right now it is a record of what the algorithm wants to promote.</p>
+      </div>
+      <div class="card">
+        <div class="tag" style="color:var(--green-deep);">02 &middot; Reversible by Design</div>
+        <h4>Nothing is permanent</h4>
+        <p>Hiding a section or switching modes should never feel risky to try.</p>
+      </div>
+      <div class="card">
+        <div class="tag" style="color:var(--green-deep);">03 &middot; Familiar First</div>
+        <h4>Change less than it feels like</h4>
+        <p>New customization should sit inside patterns people already know from using Spotify for years.</p>
+      </div>
+      <div class="card">
+        <div class="tag" style="color:var(--green-deep);">04 &middot; Test the Assumption</div>
+        <h4>Icons aren't obvious</h4>
+        <p>What feels intuitive to a designer isn't always intuitive to a tester, so nothing shipped unvalidated.</p>
+      </div>
+    </div>
+  </section>
+  </div>
+
+  <!-- 4. THE BIG IDEA -->
+  <div class="slide-shell dark">
+  <section class="slide" data-title="The Big Idea">
+    <div class="eyebrow">The Big Idea</div>
+    <h2 style="font-size:30px; max-width:680px;">A home screen that adapts to how you actually listen.</h2>
+    <div class="grid-3" style="max-width:820px;">
+      <div class="card"><div class="tag">Toggle</div><p>Turn podcasts, audiobooks, or any section on or off entirely.</p></div>
+      <div class="card"><div class="tag">Reorder</div><p>Drag sections up so what matters most shows up first.</p></div>
+      <div class="card"><div class="tag">Light Mode</div><p>A visual option for the people who just don't want dark mode.</p></div>
+    </div>
+    <div style="margin-top:32px; max-width:340px;">
+      <div class="meta-label" style="margin-bottom:10px;">Try it &middot; drag to reorder</div>
+      <div id="reorderDemo" style="display:flex; flex-direction:column; gap:8px; user-select:none;">
+        <div class="reorder-row" data-key="madeforyou" style="touch-action:none; cursor:grab; display:flex; align-items:center; gap:10px; background:#fff; border:1px solid rgba(0,0,0,.08); border-radius:10px; padding:12px 14px; box-shadow:0 2px 8px rgba(0,0,0,.04);">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8A8A8A" stroke-width="2"><circle cx="9" cy="6" r="1.3"/><circle cx="15" cy="6" r="1.3"/><circle cx="9" cy="12" r="1.3"/><circle cx="15" cy="12" r="1.3"/><circle cx="9" cy="18" r="1.3"/><circle cx="15" cy="18" r="1.3"/></svg>
+          <span style="font-size:13px; font-weight:600; color:#191919;">Made For You</span>
+        </div>
+        <div class="reorder-row" data-key="podcasts" style="touch-action:none; cursor:grab; display:flex; align-items:center; gap:10px; background:#fff; border:1px solid rgba(0,0,0,.08); border-radius:10px; padding:12px 14px; box-shadow:0 2px 8px rgba(0,0,0,.04);">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8A8A8A" stroke-width="2"><circle cx="9" cy="6" r="1.3"/><circle cx="15" cy="6" r="1.3"/><circle cx="9" cy="12" r="1.3"/><circle cx="15" cy="12" r="1.3"/><circle cx="9" cy="18" r="1.3"/><circle cx="15" cy="18" r="1.3"/></svg>
+          <span style="font-size:13px; font-weight:600; color:#191919;">Podcasts</span>
+        </div>
+        <div class="reorder-row" data-key="newreleases" style="touch-action:none; cursor:grab; display:flex; align-items:center; gap:10px; background:#fff; border:1px solid rgba(0,0,0,.08); border-radius:10px; padding:12px 14px; box-shadow:0 2px 8px rgba(0,0,0,.04);">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8A8A8A" stroke-width="2"><circle cx="9" cy="6" r="1.3"/><circle cx="15" cy="6" r="1.3"/><circle cx="9" cy="12" r="1.3"/><circle cx="15" cy="12" r="1.3"/><circle cx="9" cy="18" r="1.3"/><circle cx="15" cy="18" r="1.3"/></svg>
+          <span style="font-size:13px; font-weight:600; color:#191919;">New Releases</span>
+        </div>
+        <div class="reorder-row" data-key="recent" style="touch-action:none; cursor:grab; display:flex; align-items:center; gap:10px; background:#fff; border:1px solid rgba(0,0,0,.08); border-radius:10px; padding:12px 14px; box-shadow:0 2px 8px rgba(0,0,0,.04);">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8A8A8A" stroke-width="2"><circle cx="9" cy="6" r="1.3"/><circle cx="15" cy="6" r="1.3"/><circle cx="9" cy="12" r="1.3"/><circle cx="15" cy="12" r="1.3"/><circle cx="9" cy="18" r="1.3"/><circle cx="15" cy="18" r="1.3"/></svg>
+          <span style="font-size:13px; font-weight:600; color:#191919;">Recently Played</span>
+        </div>
+      </div>
+    </div>
+    <script>
+      (function(){
+        const container = document.getElementById('reorderDemo');
+        if(!container) return;
+        let dragEl = null, startY = 0, startTop = 0, rows = [];
+
+        function getRows(){ return Array.from(container.querySelectorAll('.reorder-row')); }
+
+        function onPointerDown(e){
+          e.stopPropagation();
+          dragEl = e.currentTarget;
+          dragEl.setPointerCapture(e.pointerId);
+          startY = e.clientY;
+          startTop = dragEl.offsetTop;
+          dragEl.style.position = 'relative';
+          dragEl.style.zIndex = 10;
+          dragEl.style.boxShadow = '0 8px 20px rgba(0,0,0,.15)';
+          dragEl.style.cursor = 'grabbing';
+          rows = getRows();
+        }
+        function onPointerMove(e){
+          if(!dragEl) return;
+          e.stopPropagation();
+          const dy = e.clientY - startY;
+          dragEl.style.top = dy + 'px';
+          const dragRect = dragEl.getBoundingClientRect();
+          const dragCenter = dragRect.top + dragRect.height/2;
+          for(const row of rows){
+            if(row === dragEl) continue;
+            const rect = row.getBoundingClientRect();
+            const rowCenter = rect.top + rect.height/2;
+            const dragIndex = rows.indexOf(dragEl);
+            const rowIndex = rows.indexOf(row);
+            if(dragIndex < rowIndex && dragCenter > rowCenter){
+              container.insertBefore(dragEl, row.nextElementSibling);
+              rows = getRows();
+              startTop = dragEl.offsetTop;
+              startY = e.clientY;
+              dragEl.style.top = '0px';
+              break;
+            } else if(dragIndex > rowIndex && dragCenter < rowCenter){
+              container.insertBefore(dragEl, row);
+              rows = getRows();
+              startTop = dragEl.offsetTop;
+              startY = e.clientY;
+              dragEl.style.top = '0px';
+              break;
+            }
+          }
+        }
+        function onPointerUp(e){
+          if(!dragEl) return;
+          e.stopPropagation();
+          dragEl.style.position = '';
+          dragEl.style.top = '';
+          dragEl.style.zIndex = '';
+          dragEl.style.boxShadow = '0 2px 8px rgba(0,0,0,.04)';
+          dragEl.style.cursor = 'grab';
+          dragEl = null;
+        }
+        getRows().forEach(row => {
+          row.addEventListener('pointerdown', onPointerDown);
+          row.addEventListener('pointermove', onPointerMove);
+          row.addEventListener('pointerup', onPointerUp);
+          row.addEventListener('pointercancel', onPointerUp);
+        });
+      })();
+    </script>
+  </section>
+  </div>
+
+  <!-- 5. RESEARCH & COMPETITORS -->
+  <div class="slide-shell panel">
+  <section class="slide panel" data-title="Research">
+    <div class="eyebrow">Topic Research &amp; Competitors</div>
+    <div class="meta-label" style="margin-bottom:14px;">Sources</div>
+    <div style="display:flex; flex-direction:column; gap:16px; max-width:720px; margin-bottom:32px;">
+      <div style="padding-bottom:16px; border-bottom:1px solid var(--line);">
+        <div><b>Personalized Experiences</b> <span style="opacity:.5; font-size:12px;">&middot; Article</span><p style="margin-top:2px;">Spotify's own design team on why personalization matters, yet the current app still doesn't go far&nbsp;enough.</p></div>
+      </div>
+      <div style="padding-bottom:16px; border-bottom:1px solid var(--line);">
+        <div><b>Don't Make Me Think</b> <span style="opacity:.5; font-size:12px;">&middot; Book, Steve Krug</span><p style="margin-top:2px;">Good design means users understand it without effort.</p></div>
+      </div>
+      <div style="padding-bottom:16px; border-bottom:1px solid var(--line);">
+        <div><b>Don Norman</b> <span style="opacity:.5; font-size:12px;">&middot; UX Pioneer</span><p style="margin-top:2px;">His work explains why personalization and customization matter so much in an app like this.</p></div>
+      </div>
+      <div>
+        <div><b>Spicetify</b> <span style="opacity:.5; font-size:12px;">&middot; Third-Party Tool</span><p style="margin-top:2px;">A command-line tool people already use to re-skin and customize their Spotify client, proof that the appetite for control goes further than what the app ships&nbsp;with.</p></div>
+      </div>
+    </div>
+    <div class="meta-label" style="margin-bottom:14px;">Competitors</div>
+    <div style="display:flex; align-items:stretch; gap:0; max-width:640px;">
+      <div class="card" style="flex:1; border-radius:8px 0 0 8px;"><div class="tag">Direct Competitor</div><h4>Apple Music</h4><p>Same subscription model, tighter Apple ecosystem integration, better audio quality.</p></div>
+      <div style="width:44px; display:flex; align-items:center; justify-content:center; font-family:'Poppins',sans-serif; font-weight:700; font-size:12px; color:var(--muted); flex-shrink:0;">VS</div>
+      <div class="card" style="flex:1; border-radius:0 8px 8px 0;"><div class="tag">Functional Competitor</div><h4>YouTube&nbsp;Music</h4><p>Personalized recommendations too, but bundles in video content alongside audio.</p></div>
+    </div>
+  </section>
+  </div>
+
+  <!-- 6. AUDIENCE INSIGHTS -->
+  <div class="slide-shell">
+  <section class="slide" data-title="Audience Insights">
+    <div class="eyebrow">Audience Interviews &amp; Usability Testing</div>
+    <div class="two-col top">
+      <div class="col" style="flex:0 0 220px;">
+        <div class="meta-label">Interviewed</div>
+        <div class="meta-value" style="line-height:1.9;">Conner, Mike, Rachel<br>Kathy, Xally, Isabella</div>
+        <p style="font-size:12px; color:var(--muted); margin-top:8px;">Fall 2024 &ndash; Feb/Mar</p>
+      </div>
+      <div class="col">
+        <div class="meta-label" style="margin-bottom:14px;">What testers preferred, across both interview rounds</div>
+        <div class="chart">
+          <div class="chart-row"><div class="chart-label">Preferred the minus icon over other remove options</div><div class="chart-track"><div class="chart-fill" style="width:100%;">3 / 3</div></div></div>
+          <div class="chart-row"><div class="chart-label">Found the drag / arrow interaction confusing</div><div class="chart-track"><div class="chart-fill" style="width:66%;">2 / 3</div></div></div>
+          <div class="chart-row"><div class="chart-label">Had trouble locating the light mode toggle</div><div class="chart-track"><div class="chart-fill" style="width:66%;">2 / 3</div></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="meta-label" style="margin-top:24px; margin-bottom:10px;">Key Findings</div>
+    <ul class="tight" style="max-width:680px;">
+      <li>Light mode is split down the middle, purely personal preference. Worth keeping, but the toggle button itself felt too big and a little obnoxious.</li>
+      <li>Being able to move things around was well liked, more customization is always welcome, but deleting a section should need a confirmation. It's too easy to lose one by accident.</li>
+      <li>Wants a way to fully remove a category they don't use, and to swap categories around within a section.</li>
+    </ul>
+  </section>
+  </div>
+
+  <!-- 7. PERSONAS -->
+  <div class="slide-shell panel">
+  <section class="slide panel" data-title="Personas">
+    <div class="eyebrow">Personas</div>
+    <p class="tab-hint"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V6a2 2 0 0 1 4 0v5"/><path d="M13 11V9a2 2 0 0 1 4 0v2"/><path d="M17 11v-1a2 2 0 0 1 4 0v6a5 5 0 0 1-5 5h-3a6 6 0 0 1-6-6v-4a2 2 0 0 1 4 0"/></svg>Click a name to see that persona.</p>
+    <div class="tab-row">
+      <button class="tab-btn active" data-tab="david">David Maylees</button>
+      <button class="tab-btn" data-tab="craig">Craig Simmers</button>
+      <button class="tab-btn" data-tab="audrey">Audrey Smiths</button>
+    </div>
+
+    <div class="tab-panel active" data-panel="david">
+      <div class="two-col top">
+        <div class="col" style="flex:0 0 280px;">
+          <img src="img/spotifypersona_1.png" alt="David Maylees" style="width:100%; height:340px; border-radius:8px; object-fit:cover; object-position:78% 30%; display:block; box-shadow:0 20px 40px rgba(0,0,0,.25);">
+        </div>
+        <div class="col">
+          <h3 style="font-family:'Poppins',sans-serif; font-weight:600; font-size:22px; margin-bottom:4px;">David Maylees</h3>
+          <div class="meta-value" style="color:var(--muted); margin-bottom:14px;">22 &middot; Data Analyst &middot; Oakland/SF</div>
+          <div class="grid-2" style="margin-top:0;">
+            <div><div class="meta-label">Goal</div><ul class="tight"><li>Hide the features he's not using</li><li>Keep his commute simple and&nbsp;low-stress</li></ul></div>
+            <div><div class="meta-label">Pain Point</div><ul class="tight"><li>Overwhelmed being forced to see everything at once</li><li>Switches between music and audiobooks, not both</li></ul></div>
+          </div>
+        </div>
+        <div class="col" style="flex:0 0 260px;">
+          <div class="card" style="border-color:var(--green);"><div class="tag">Quote</div><p style="font-size:14px; font-style:italic; color:var(--ink);">"I need an app that shows me the content I actually use, and is simple, easy, and personalized for&nbsp;me."</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-panel" data-panel="craig">
+      <div class="two-col top">
+        <div class="col" style="flex:0 0 280px;">
+          <img src="img/spotifypersona_2.png" alt="Craig Simmers" style="width:100%; height:340px; border-radius:8px; object-fit:cover; object-position:80% 30%; display:block; box-shadow:0 20px 40px rgba(0,0,0,.25);">
+        </div>
+        <div class="col">
+          <h3 style="font-family:'Poppins',sans-serif; font-weight:600; font-size:22px; margin-bottom:4px;">Craig Simmers</h3>
+          <div class="meta-value" style="color:var(--muted); margin-bottom:14px;">42 &middot; Product Manager &middot; San Francisco</div>
+          <div class="grid-2" style="margin-top:0;">
+            <div><div class="meta-label">Goal</div><ul class="tight"><li>Use Spotify in light mode</li><li>A consistent experience across all his apps</li></ul></div>
+            <div><div class="meta-label">Pain Point</div><ul class="tight"><li>Dark-mode default strains his aging eyes</li><li>Abrupt contrast vs. his other light-mode apps</li></ul></div>
+          </div>
+        </div>
+        <div class="col" style="flex:0 0 260px;">
+          <div class="card" style="border-color:var(--green);"><div class="tag">Quote</div><p style="font-size:14px; font-style:italic; color:var(--ink);">"Why is this the one app that won't just match everything else I use?"</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-panel" data-panel="audrey">
+      <div class="two-col top">
+        <div class="col" style="flex:0 0 280px;">
+          <img src="img/spotifypersona_3.png" alt="Audrey Smiths" style="width:100%; height:340px; border-radius:8px; object-fit:cover; object-position:75% 25%; display:block; box-shadow:0 20px 40px rgba(0,0,0,.25);">
+        </div>
+        <div class="col">
+          <h3 style="font-family:'Poppins',sans-serif; font-weight:600; font-size:22px; margin-bottom:4px;">Audrey Smiths</h3>
+          <div class="meta-value" style="color:var(--muted); margin-bottom:14px;">24 &middot; Barista &middot; Nashville</div>
+          <div class="grid-2" style="margin-top:0;">
+            <div><div class="meta-label">Goal</div><ul class="tight"><li>Feature only the music she actually enjoys</li><li>Recommendations that match her taste</li></ul></div>
+            <div><div class="meta-label">Pain Point</div><ul class="tight"><li>Never listens to podcasts or&nbsp;audiobooks</li><li>Forced to see them on her home screen&nbsp;anyway</li></ul></div>
+          </div>
+        </div>
+        <div class="col" style="flex:0 0 260px;">
+          <div class="card" style="border-color:var(--green);"><div class="tag">Quote</div><p style="font-size:14px; font-style:italic; color:var(--ink);">"That's all I use the app for, so why am I forced to look at the rest?"</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  </div>
+
+  <!-- 7b. THE QUOTE -->
+  <div class="slide-shell dark">
+  <section class="slide" data-title="The Quote" style="align-items:center; text-align:center;">
+    <div class="eyebrow" style="color:var(--green);">Audrey, Barista &middot; Nashville</div>
+    <p style="font-family:'Poppins',sans-serif; font-weight:700; font-size:clamp(32px,5.5vw,58px); line-height:1.2; max-width:900px; color:#fff;">
+      "That's all I use the app for.<br>So why am I forced to<br><span style="color:var(--green);">look at the rest?</span>"
+    </p>
+  </section>
+  </div>
+
+  <!-- 8. STORYBOARD -->
+  <div class="slide-shell">
+  <section class="slide" data-title="Storyboard">
+    <div class="eyebrow">David's Story</div>
+    <!-- TEMP: reverted to plain text steps, revisit and rebuild as 6 visual frames later -->
+    <div class="step-tracker">
+      <div class="step"><div class="num">01</div><p>David's home screen feels overwhelmed by features he never uses.</p></div>
+      <div class="step"><div class="num">02</div><p>He opens customization to control what shows up.</p></div>
+      <div class="step"><div class="num">03</div><p>Hides podcasts and audiobooks, switches to light mode.</p></div>
+      <div class="step"><div class="num">04</div><p>Reorganizes so his most-used music appears first.</p></div>
+      <div class="step"><div class="num">05</div><p>Confirms the layout feels like it's actually his.</p></div>
+      <div class="step"><div class="num">06</div><p>Opens the app and starts listening in seconds, not&nbsp;minutes.</p></div>
+    </div>
+  </section>
+  </div>
+
+  <!-- 9. MOODBOARD -->
+  <div class="slide-shell dark">
+  <section class="slide" data-title="Moodboard">
+    <div class="sp">
+      <div class="sp-eyebrow">Moodboard</div>
+      <h2 class="sp-head">Measured the dark. <em>Chose the light.</em></h2>
+      <p class="sp-lead">Spotify's dark palette already existed, so I sampled it rather than invent it. Light mode didn't exist on mobile, so those values are mine, held to the same rule the dark ones follow.</p>
+
+      <div class="sp-app">
+        <div class="sp-band">
+          <div class="sp-band-label"><span class="sp-tick"></span>Sampled from Spotify</div>
+          <div class="sp-row-4">
+            <div class="sp-card sp-card-hero"><div class="sp-art" style="background:#111111;"></div><b>Base<span class="sp-dot"></span></b><em>#111111 &middot; 57.6%</em></div>
+            <div class="sp-card"><div class="sp-art" style="background:#000000;"></div><b>True Black</b><em>#000000</em></div>
+            <div class="sp-card"><div class="sp-art" style="background:#B3B3B3;"></div><b>Secondary</b><em>#B3B3B3</em></div>
+            <div class="sp-card"><div class="sp-art" style="background:#1DB954;"></div><b>Yours</b><em>#1DB954 &middot; 0.9%</em></div>
+          </div>
+        </div>
+
+        <div class="sp-band sp-band-light">
+          <div class="sp-band-label"><span class="sp-tick on"></span>Chosen for light mode</div>
+          <div class="sp-row-4">
+            <div class="sp-card sp-card-hero"><div class="sp-art" style="background:#FFFFFF;"></div><b>Base<span class="sp-dot"></span></b><em>#FFFFFF &middot; 55.3%</em></div>
+            <div class="sp-card"><div class="sp-art" style="background:#000000;"></div><b>Primary</b><em>#000000</em></div>
+            <div class="sp-card"><div class="sp-art" style="background:#707070;"></div><b>Secondary</b><em>#707070</em></div>
+            <div class="sp-card"><div class="sp-art" style="background:#1DB954;"></div><b>Yours</b><em>#1DB954 &middot; unchanged</em></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sp-foot">
+        <p class="sp-rule"><b>57.6% dark, 55.3% light.</b> One color holds over half of either screen. Both themes lean on a single dominant surface to the same degree.</p>
+
+        <div class="sp-a11y">
+          <div class="sp-a11y-head">Contrast ratios &middot; checked against WCAG AA</div>
+          <div class="sp-a11y-grid">
+            <div class="sp-chk"><b>21.0</b><span>black on white</span></div>
+            <div class="sp-chk"><b>18.9</b><span>white on #111111</span></div>
+            <div class="sp-chk"><b>9.0</b><span>#B3B3B3 on #111111</span></div>
+            <div class="sp-chk sp-chk-edge"><b>4.95</b><span>#707070 on white</span></div>
+            <div class="sp-chk"><b>7.30</b><span>green on #111111</span></div>
+            <div class="sp-chk sp-chk-fail"><b>2.59</b><span>green on white</span></div>
+          </div>
+          <p class="sp-a11y-note"><b>The green doesn't survive the switch.</b> It clears AA comfortably on near-black and fails it on white, so in light mode it can't be text or an icon. It has to become a filled shape with dark type on top (8.12:1). That constraint only shows up if you build both themes instead of inverting one.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  </div>
+
+  <!-- 11. TASK FLOW -->
+  <div class="slide-shell panel">
+  <section class="slide panel" data-title="Task Flow">
+    <div class="eyebrow">Task Flow</div>
+    <p class="tab-hint"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V6a2 2 0 0 1 4 0v5"/><path d="M13 11V9a2 2 0 0 1 4 0v2"/><path d="M17 11v-1a2 2 0 0 1 4 0v6a5 5 0 0 1-5 5h-3a6 6 0 0 1-6-6v-4a2 2 0 0 1 4 0"/></svg>Click a name to see that task flow.</p>
+    <div class="tab-row">
+      <button class="tab-btn active" data-tab="david-flow">David</button>
+      <button class="tab-btn" data-tab="craig-flow">Craig</button>
+      <button class="tab-btn" data-tab="audrey-flow">Audrey</button>
+    </div>
+
+    <div class="tab-panel active" data-panel="david-flow">
+      <p class="lead">Task: David is trying to minimize clutter. If he doesn't use a feature, he doesn't want to see it.</p>
+      <div class="step-tracker">
+        <div class="step"><div class="num">1</div><p>Opens home screen, sees too much unused content.</p></div>
+        <div class="step"><div class="num">2</div><p>Taps the customize control on a section.</p></div>
+        <div class="step"><div class="num">3</div><p>Hides the sections he never uses.</p></div>
+        <div class="step"><div class="num">4</div><p>Drags his most-used section to the top.</p></div>
+      </div>
+      <p style="font-size:13px; color:var(--muted); margin-top:20px;"><strong style="color:var(--ink);">Measurable outcome:</strong> did he build his layout successfully, faster and with less frustration than the default?</p>
+    </div>
+
+    <div class="tab-panel" data-panel="craig-flow">
+      <p class="lead">Task: Craig wants the app to finally match every other light-mode app on his phone.</p>
+      <div class="step-tracker">
+        <div class="step"><div class="num">1</div><p>Opens Settings, looking for a light mode toggle.</p></div>
+        <div class="step"><div class="num">2</div><p>Finds it clearly labeled instead of guessing at an icon.</p></div>
+        <div class="step"><div class="num">3</div><p>Switches the whole app to light mode in one tap.</p></div>
+        <div class="step"><div class="num">4</div><p>Home screen now matches everything else he uses.</p></div>
+      </div>
+      <p style="font-size:13px; color:var(--muted); margin-top:20px;">Why it matters: Craig wants the same screen every morning. Consistency is the feature.</p>
+    </div>
+
+    <div class="tab-panel" data-panel="audrey-flow">
+      <p class="lead">Task: Audrey only uses Spotify for music, and wants the app to admit that.</p>
+      <div class="step-tracker">
+        <div class="step"><div class="num">1</div><p>Opens customization, sees every section listed.</p></div>
+        <div class="step"><div class="num">2</div><p>Hides podcasts and audiobooks she's never&nbsp;opened.</p></div>
+        <div class="step"><div class="num">3</div><p>Reorders so her own playlists appear first.</p></div>
+        <div class="step"><div class="num">4</div><p>Opens the app to music she actually chose, nothing else.</p></div>
+      </div>
+      <p style="font-size:13px; color:var(--muted); margin-top:20px;">Why it matters: Audrey finds plenty on her own. What tires her is everything else she gets handed.</p>
+    </div>
+  </section>
+  </div>
+
+  <!-- 11c. FINAL DESIGN -->
+  <div class="slide-shell dark">
+  <section class="slide" data-title="Final Design">
+    <div class="eyebrow">The Final Design</div>
+    <h2 style="font-size:clamp(24px,3.4vw,36px); max-width:640px; margin-bottom:8px;">A home screen that feels like <em>yours.</em></h2>
+    <p class="lead" style="margin-bottom:26px;">Every control sits on the screen you are already looking at, and the panel only opens when you want to change what is on it.</p>
+
+    <div class="fd-wrap">
+      <div class="fd-stage">
+        <img src="img/spotifyhomeclosed.png" alt="Final Spotify home screen with a hide control on each shelf and quick actions in the header" class="fd-shot">
+        <span class="fd-pin" style="left:84%; top:31%;">01</span>
+        <span class="fd-pin" style="left:57%; top:8.5%;">02</span>
+        <span class="fd-pin" style="left:3%; top:90%;">03</span>
+        <span class="fd-cap">Closed</span>
+      </div>
+      <div class="fd-stage">
+        <img src="img/spotifyhomeopen.png" alt="The same screen with the Saved panel open, switching which shelves appear, plus a light mode toggle" class="fd-shot">
+        <span class="fd-pin" style="left:91%; top:11%;">04</span>
+        <span class="fd-pin" style="left:51%; top:88%;">05</span>
+        <span class="fd-cap">Open</span>
+      </div>
+    </div>
+
+    <ol class="fd-key">
+      <li><span class="fd-n">01</span><b>Hide a shelf from the shelf itself.</b> One minus on the section header. No panel, no settings, no menu.</li>
+      <li><span class="fd-n">02</span><b>Everything reachable from the header.</b> Notifications, history, settings and add, all one tap from home.</li>
+      <li><span class="fd-n">03</span><b>Three destinations, not five.</b> Home, Search, Your Library. The tabs that existed to promote content are gone.</li>
+      <li><span class="fd-n">04</span><b>Saved: bring anything back.</b> Every shelf is listed here. Wrapped is switched off, so it is simply not on the page.</li>
+      <li><span class="fd-n">05</span><b>Light mode as a preference.</b> One switch, on the screen you are already looking at.</li>
+    </ol>
+  </section>
+  </div>
+
+  <!-- 12. TESTING RESULTS -->
+  <div class="slide-shell">
+  <section class="slide" data-title="Testing and Results">
+    <div class="eyebrow">Testing &amp; Results</div>
+    <p class="lead">3 testers (Kathy, Isabella, Xally), over FaceTime, completing tasks like turning off podcasts, dragging sections, and switching to light mode.</p>
+    <div class="grid-3" style="margin-top:20px;">
+      <div>
+        <div class="meta-label">Kathy</div>
+        <ul class="tight"><li>Didn't realize the bottom button controlled light mode.</li><li>Preferred the minus button, faster with fewer steps.</li><li>Found drag/arrow icons confusing; suggested an Edit button.</li></ul>
+      </div>
+      <div>
+        <div class="meta-label">Isabella</div>
+        <ul class="tight"><li>Clicked Settings first, expecting light mode to be there.</li><li>Also preferred the minus button over dragging.</li><li>Right arrow icon was unclear; wanted a clearer grab icon.</li></ul>
+      </div>
+      <div>
+        <div class="meta-label">Xally</div>
+        <ul class="tight"><li>Struggled to find light mode again; wanted it labeled in Settings.</li><li>Preferred the hamburger menu for dragging, minus for removing.</li><li>Liked the animation, but some text was hard to read.</li></ul>
+      </div>
+    </div>
+  </section>
+  </div>
+
+  <!-- 12a2. WHAT ROUND 1 CHANGED -->
+  <div class="slide-shell dark">
+  <section class="slide" data-title="What Round 1 Changed">
+    <div class="eyebrow">From Testing to Redesign</div>
+
+    <div class="cmp-split">
+      <div class="cmp-col">
+        <div class="cmp" tabindex="0" role="slider" aria-label="Drag to reveal the hide control appearing on the section header" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">
+          <img src="img/spotifyab1.png" alt="Final: the minus on the section header reveals Hide in place">
+          <div class="cmp-top"><img src="img/spotifyhomeopen.png" alt="Round 1: a separate Saved panel listing every section with large toggle buttons"></div>
+          <span class="cmp-tag l">Round 1</span>
+          <span class="cmp-tag r">Final</span>
+          <span class="cmp-line"></span>
+          <span class="cmp-grip">&#8596;</span>
+        </div>
+        <p class="cmp-note"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6 3 12l5 6M16 6l5 6-5 6"/></svg>Drag to swap the panel for the in-place control</p>
+      </div>
+      <div class="cmp-body">
+        <h2 style="font-size:clamp(23px,3.1vw,32px);">Hiding a section used to mean leaving it.</h2>
+        <p class="lead">Round&nbsp;1 kept the controls in a panel. Testers reached for the section itself first, so the control moved to where they were already looking.</p>
+        <ol class="fd-key">
+          <li><span class="fd-n">01</span><b>Before: open the panel, find the row.</b> Sections were switched off from a separate Saved list, so hiding something meant leaving the thing you wanted to hide.</li>
+          <li><span class="fd-n">02</span><b>After: minus, then Hide.</b> The control sits on the section. Press the minus, press Hide, and it is gone without the screen changing.</li>
+          <li><span class="fd-n">03</span><b>Why it changed.</b> Testers preferred the minus because it took fewer steps than the panel route.</li>
+          <li><span class="fd-n">04</span><b>What stayed.</b> The Saved list still exists for bringing a hidden section back, the one job it was genuinely good at.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+  </div>
+
+  <!-- 12a3. WHAT ROUND 2 CHANGED -->
+  <div class="slide-shell dark">
+  <section class="slide" data-title="What Round 2 Changed">
+    <div class="eyebrow">Round 2</div>
+
+    <div class="cmp-split">
+      <div class="cmp-col">
+        <div class="cmp" tabindex="0" role="slider" aria-label="Drag to swap the menu icon for the minus" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">
+          <img src="img/spotifyab2.png" alt="Final: a minus on each section header">
+          <div class="cmp-top"><img src="img/spotifyab3.png" alt="Round 2: a menu icon on each section header"></div>
+          <span class="cmp-tag l">Round 2</span>
+          <span class="cmp-tag r">Final</span>
+          <span class="cmp-line"></span>
+          <span class="cmp-grip">&#8596;</span>
+        </div>
+        <p class="cmp-note"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6 3 12l5 6M16 6l5 6-5 6"/></svg>Drag to swap the icon on the same screen</p>
+      </div>
+      <div class="cmp-body">
+        <h2 style="font-size:clamp(23px,3.1vw,32px);">The icon was telling people the wrong thing.</h2>
+        <p class="lead">Round&nbsp;2 put a menu icon on every section header. Testers read it as something to grab and drag, not something that removes, so the icon changed to match what it actually does.</p>
+        <ol class="fd-key">
+          <li><span class="fd-n">01</span><b>Before: a menu icon doing two jobs.</b> The same three lines were meant to open removal options, but the shape reads as a grab handle.</li>
+          <li><span class="fd-n">02</span><b>After: a minus, because it removes.</b> One icon, one meaning, no interpretation needed.</li>
+          <li><span class="fd-n">03</span><b>Straight from testing.</b> Testers said they preferred the menu icon for dragging and the minus for removing, which is exactly the split the final uses.</li>
+          <li><span class="fd-n">04</span><b>The lesson.</b> An icon is a promise about what happens next. This one was promising the wrong thing.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+  </div>
+
+  <!-- 12b3. DARK VS LIGHT -->
+  <div class="slide-shell dark">
+  <section class="slide" data-title="Dark vs Light">
+    <div class="eyebrow">Dark &amp; Light</div>
+
+    <div class="cmp-split">
+      <div class="cmp-col">
+        <div class="cmp" style="aspect-ratio:416/900;" tabindex="0" role="slider" aria-label="Drag to compare the home screen in dark mode and light mode" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">
+          <img src="img/spotifyhomeclosed.png" alt="The home screen in dark mode">
+          <div class="cmp-top"><img src="img/spotify_white.png" alt="The same home screen in light mode"></div>
+          <span class="cmp-tag l">Light</span>
+          <span class="cmp-tag r">Dark</span>
+          <span class="cmp-line"></span>
+          <span class="cmp-grip">&#8596;</span>
+        </div>
+        <p class="cmp-note"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6 3 12l5 6M16 6l5 6-5 6"/></svg>Drag to switch the theme</p>
+      </div>
+      <div class="cmp-body">
+        <h2 style="font-size:clamp(23px,3.1vw,32px);">One layout, two moods.</h2>
+        <p class="lead">Light mode is a preference. Both themes run on the same structure, so nothing moves when you switch. Only the surface changes.</p>
+        <ol class="fd-key">
+          <li><span class="fd-n">01</span><b>Nothing moves.</b> Same grid, same spacing, same order. Switching themes should feel like turning on a lamp.</li>
+          <li><span class="fd-n">02</span><b>Contrast rebuilt, not inverted.</b> Every grey was re-picked against a pale ground so text keeps the same weight it had on near-black.</li>
+          <li><span class="fd-n">03</span><b>The album art is the constant.</b> Covers carry the color in both themes, which is why the interface around them can stay this quiet.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+  </div>
+
+  <!-- 12c. DESIGN DECISIONS -->
+  <div class="slide-shell">
+  <section class="slide" data-title="Design Decisions">
+    <div class="eyebrow">Turning Feedback Into Decisions</div>
+    <h2 style="font-size:32px; max-width:700px; margin-bottom:30px;">Every change traces back to a tester.</h2>
+    <div style="max-width:820px;">
+      <div style="display:grid; grid-template-columns:1fr 32px 1fr; gap:0; font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; font-weight:700; color:var(--muted); padding-bottom:10px; border-bottom:1.5px solid var(--ink);">
+        <div>Decision</div><div></div><div>Why</div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 32px 1fr; gap:0; align-items:center; padding:14px 0; border-bottom:1px solid rgba(0,0,0,.08);">
+        <div style="font-size:13.5px; font-weight:600;">Hamburger icon for dragging</div><div style="color:var(--green-deep); text-align:center;">&larr;</div><div style="font-size:13.5px;">Testers read it as "grab" far more clearly than an arrow icon.</div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 32px 1fr; gap:0; align-items:center; padding:14px 0; border-bottom:1px solid rgba(0,0,0,.08);">
+        <div style="font-size:13.5px; font-weight:600;">Minus icon reserved for removing</div><div style="color:var(--green-deep); text-align:center;">&larr;</div><div style="font-size:13.5px;">Testers preferred it over dragging, faster with fewer steps.</div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 32px 1fr; gap:0; align-items:center; padding:14px 0;">
+        <div style="font-size:13.5px; font-weight:600;">Light mode moved into Settings, labeled</div><div style="color:var(--green-deep); text-align:center;">&larr;</div><div style="font-size:13.5px;">All 3 testers expected it there, not behind an unlabeled icon.</div>
+      </div>
+    </div>
+  </section>
+  </div>
+
+  <!-- 13. MOTION GRAPHIC -->
+  <div class="slide-shell dark">
+  <section class="slide" data-title="Motion Graphic" style="align-items:center;">
+    <div class="eyebrow" style="text-align:center;">The Companion Walkthrough</div>
+    <h2 style="font-size:30px; max-width:640px; margin-bottom:26px; text-align:center; margin-left:auto; margin-right:auto;">Every interaction, in motion.</h2>
+    <div style="width:100%; max-width:820px; aspect-ratio:16/9; border-radius:6px; overflow:hidden; box-shadow:0 30px 60px rgba(0,0,0,.15); margin:0 auto;">
+      <iframe style="width:100%; height:100%; border:none;" src="https://player.vimeo.com/video/1221734187" title="Spotify redesign motion graphic" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+    </div>
+  </section>
+  </div>
+
+  <!-- 13b. PROTOTYPE -->
+  <div class="slide-shell dark">
+  <section class="slide" data-title="Prototype">
+    <div class="eyebrow">Prototype</div>
+    <div class="two-col">
+      <div class="col" style="flex:0 0 auto;">
+        <div style="width:340px; aspect-ratio:800/450; border-radius:6px; overflow:hidden; box-shadow:0 30px 60px rgba(0,0,0,.15);">
+          <iframe style="width:100%; height:100%; border:none;" src="https://embed.figma.com/proto/SXE0YO1YfevSLPP9AxpXUn/Spotify-Redesign--Customization-?node-id=4167-32859&p=f&scaling=scale-down&content-scaling=fixed&page-id=4167%3A6127&starting-point-node-id=4167%3A32859&show-proto-sidebar=1&embed-host=share" allowfullscreen></iframe>
+        </div>
+      </div>
+      <div class="col">
+        <p class="lead">A fully customizable home screen: toggle off content you don't care about, drag-and-drop what matters to the top, switch between light and dark mode. A companion motion graphic walks through each interaction step by step.</p>
+        <a href="https://www.figma.com/proto/SXE0YO1YfevSLPP9AxpXUn/Spotify-Redesign--Customization-?node-id=4167-32859&p=f&scaling=scale-down&content-scaling=fixed&page-id=4167%3A6127&starting-point-node-id=4167%3A32859&show-proto-sidebar=1" class="link" style="display:inline-block; margin-top:16px;" target="_blank" rel="noopener">Open full prototype in Figma &rarr;</a>
+      </div>
+    </div>
+  </section>
+  </div>
+
+  <!-- 15. WRAP UP -->
+  <div class="slide-shell">
+  <section class="slide" data-title="Branding Guidelines">
+    <div class="sg">
+      <div class="eyebrow">Branding Guidelines</div>
+      <h2 class="sg-head">I didn't get to invent a brand. <em>That was the interesting part.</em></h2>
+      <p class="lead sg-lead">Redesigning something this well known is a constraint exercise, not a blank page. Most of the system was handed to me and locked. My job was to decide what could be added without the result stopping feeling like Spotify.</p>
+
+      <div class="sg-cols">
+        <div class="sg-col sg-inherited">
+          <div class="sg-col-head"><span class="sg-lock" aria-hidden="true">&#9679;</span>Inherited and locked</div>
+          <ul>
+            <li><b>The green.</b> <span>#1DB954, and the discipline of using it almost nowhere.</span></li>
+            <li><b>Near-black surfaces.</b> <span>#111111 is the ground the interface is built on, sampled from the app itself.</span></li>
+            <li><b>One typeface, three weights.</b> <span>Hierarchy by weight, never a second family.</span></li>
+            <li><b>Shelf-and-card geometry.</b> <span>Horizontal rows of square art. The thing everyone can already scan.</span></li>
+            <li><b>Player controls.</b> <span>Untouched. Muscle memory older than the redesign.</span></li>
+          </ul>
+        </div>
+
+        <div class="sg-col sg-added">
+          <div class="sg-col-head"><span class="sg-plus" aria-hidden="true">+</span>Added by me</div>
+          <ul>
+            <li><b>Minus means remove.</b> <span>One icon, one meaning. Round 2 proved the menu icon was promising the wrong thing.</span></li>
+            <li><b>Controls live on the thing they control.</b> <span>You hide a shelf from the shelf itself.</span></li>
+            <li><b>Saved, not deleted.</b> <span>Every hidden section is listed and one tap from coming back.</span></li>
+            <li><b>Light mode as a peer.</b> <span>Its own surface, with greys measured against white on their own terms.</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="sg-rules">
+        <div class="sg-rules-head">Rules I held myself to</div>
+        <div class="sg-rule-grid">
+          <div class="sg-rule"><b>Never invent a component Spotify doesn't have.</b><span>If it needed a new pattern, the idea was wrong.</span></div>
+          <div class="sg-rule"><b>Green marks state, never surface.</b><span>On, active, yours. It is not a decoration.</span></div>
+          <div class="sg-rule"><b>Nothing more than one tap deep.</b><span>A customization buried in settings isn't customization.</span></div>
+          <div class="sg-rule sg-rule-no"><b>No alert red.</b><span>Hiding a shelf is reversible. Nothing here should look like a warning.</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  </div>
+
+  <!-- 15c. THANK YOU -->
+  <div class="slide-shell panel">
+  <section class="slide panel" data-title="Wrap Up" style="align-items:center;">
+    <div style="max-width:600px; margin:0 auto; text-align:left;">
+      <div class="eyebrow">Conclusions</div>
+      <div class="meta-label">The Takeaway</div>
+      <p style="font-family:'Poppins',sans-serif; font-weight:700; font-size:26px; line-height:1.35; margin:8px 0 26px;">Personalization isn't just better recommendations.<br>It's giving people control over what they don't want.</p>
+      <div class="meta-label">What I Learned</div>
+      <p class="lead" style="margin:6px 0 20px;">People really do want to customize their home screen and hide what they don't use, though not everyone who says they want a feature will end up using it.</p>
+      <div class="meta-label">What I'd Do Next</div>
+      <ul style="list-style:none; padding:0; margin:8px 0 0; font-size:14px; line-height:2;">
+        <li>&rarr; Test with a larger sample</li>
+        <li>&rarr; Explore category-level customization</li>
+        <li>&rarr; Check whether people keep their custom layout over time</li>
+      </ul>
+    </div>
+  </section>
+  </div>
+
+  <!-- 15b. BRANDING GUIDELINES -->
+  <div class="slide-shell panel">
+  <section class="slide panel" data-title="Thank You" style="align-items:center; text-align:center;">
+    <div class="eyebrow">Conclusion</div>
+    <h1 style="font-size:64px; font-family:'Poppins',sans-serif; font-weight:700;">Thank <em>you</em></h1>
+    <p style="font-size:22px; margin-top:22px; opacity:.75; max-width:520px;">
+      The best playlist is still the one that feels like yours.
+    </p>
+    <div style="width:60px; height:2px; background:var(--green); margin:36px auto 18px;"></div>
+    <div style="font-weight:700; letter-spacing:.06em;">ALISA UTESHEVA</div>
+    <div style="opacity:.6; font-size:14px;">UX Designer</div>
+      <nav class="cs-end" aria-label="Case study navigation">
+      <a href="homepage.html#work"><span aria-hidden="true">&larr;</span> All Case Studies</a>
+      <a class="next" href="reboot.html">Next &middot; Reboot <span aria-hidden="true">&rarr;</span></a>
+    </nav>
+  </section>
+  </div>
+
+
+  </div>
+
+<script>
+  const slides = [...document.querySelectorAll('.slide')];
+  const total = slides.length;
+  const counter = document.getElementById('counter');
+  const progressLine = document.getElementById('progressLine');
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function pad(n){ return n < 10 ? '0'+n : n; }
+
+  /* One rule for whichever slide is under the fixed chrome: read the shell's
+     painted background and flip. Beats checking class names, since some shells
+     are darkened by an inline style and carry no class at all. */
+  function isLight(el){
+    var m = getComputedStyle(el).backgroundColor.match(/[\d.]+/g);
+    if (!m || (m.length > 3 && parseFloat(m[3]) === 0)) return false;
+    var lin = function(v){ v = v/255; return v <= .03928 ? v/12.92 : Math.pow((v+.055)/1.055, 2.4); };
+    return (.2126*lin(+m[0]) + .7152*lin(+m[1]) + .0722*lin(+m[2])) > .45;
+  }
+
+  function updateProgress(){
+    const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+    const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+    const percentage = scrollable > 0 ? (scrollTop/scrollable)*100 : 0;
+    const current = slides.reduce((closestIndex, slide, index) => {
+      const distance = Math.abs(slide.getBoundingClientRect().top - window.innerHeight*.35);
+      const closestDistance = Math.abs(slides[closestIndex].getBoundingClientRect().top - window.innerHeight*.35);
+      return distance < closestDistance ? index : closestIndex;
+    }, 0);
+    counter.textContent = pad(current+1) + ' / ' + pad(total);
+    if (window.railUpdate) window.railUpdate(current, total);
+    progressLine.style.width = percentage + '%';
+    var shell = slides[current].closest('.slide-shell');
+    var lightNow = !!shell && isLight(shell);
+    document.body.classList.toggle('on-light', lightNow);
+    document.body.classList.toggle('on-dark', !lightNow);
+  }
+
+  function scrollToSlide(slide){
+    (slide.closest('.slide-shell') || slide).scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+  }
+
+
+
+  /* A/B icon toggle */
+  document.querySelectorAll('.ab-demo').forEach(function(d){
+    var imgs=d.querySelectorAll('.ab-img');
+    d.querySelectorAll('.ab-btn').forEach(function(btn){
+      btn.addEventListener('click',function(){
+        d.querySelectorAll('.ab-btn').forEach(function(b){b.classList.remove('active');});
+        btn.classList.add('active');
+        var i=+btn.dataset.ab;
+        imgs.forEach(function(im,n){ im.classList.toggle('active', n===i); });
+      });
+    });
+  });
+
+  /* drag-to-compare */
+  document.querySelectorAll('.cmp').forEach(function(c){
+    var top=c.querySelector('.cmp-top'), line=c.querySelector('.cmp-line'),
+        grip=c.querySelector('.cmp-grip'), img=c.querySelector('.cmp-top img');
+    function size(){ if(img) img.style.width=c.clientWidth+'px'; }
+    function set(pct){
+      pct=Math.max(0,Math.min(100,pct));
+      top.style.width=pct+'%'; line.style.left=pct+'%'; grip.style.left=pct+'%';
+      c.setAttribute('aria-valuenow',Math.round(pct));
+    }
+    function from(e){ var r=c.getBoundingClientRect(); set((e.clientX-r.left)/r.width*100); }
+    var down=false;
+    c.addEventListener('pointerdown',function(e){down=true;c.setPointerCapture(e.pointerId);from(e);});
+    c.addEventListener('pointermove',function(e){if(down)from(e);});
+    ['pointerup','pointercancel'].forEach(function(ev){c.addEventListener(ev,function(){down=false;});});
+    c.addEventListener('keydown',function(e){
+      var v=parseFloat(c.getAttribute('aria-valuenow'))||50;
+      if(e.key==='ArrowLeft'){set(v-5);e.preventDefault();}
+      if(e.key==='ArrowRight'){set(v+5);e.preventDefault();}
+    });
+    size(); set(50);
+    addEventListener('resize',function(){size();set(parseFloat(c.getAttribute('aria-valuenow'))||50);});
+    if(img && !img.complete) img.addEventListener('load',size);
+  });
+
+  document.querySelectorAll('.tab-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const target = btn.dataset.tab;
+      const group = btn.closest('.slide');
+      group.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+      group.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+      btn.classList.add('active');
+      group.querySelector('[data-panel="'+target+'"]').classList.add('active');
+    });
+  });
+
+  window.addEventListener('scroll', updateProgress, { passive:true });
+  window.addEventListener('resize', updateProgress);
+  updateProgress();
+</script>
+
+<script>
+/* section reveal - same language as the homepage */
+(function(){
+  var sl=[].slice.call(document.querySelectorAll('.slide-shell .slide'));
+  if(!sl.length) return;
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduce||!('IntersectionObserver' in window)){
+    sl.forEach(function(e){e.classList.add('seen');}); return;
+  }
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(en){ if(en.isIntersecting){ en.target.classList.add('seen'); io.unobserve(en.target); } });
+  },{rootMargin:'0px 0px -10% 0px',threshold:0.06});
+  sl.forEach(function(e,i){ if(i<2){ e.classList.add('seen'); } else { io.observe(e); } });
+})();
+
+  /* the cover's scroll cue retires once the reader has taken the hint */
+  var scrollCue = document.getElementById('scrollCue');
+  if (scrollCue){
+    var hideCue = function(){
+      var y = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+      scrollCue.classList.toggle('gone', y > 40);
+    };
+    window.addEventListener('scroll', hideCue, {passive:true});
+    hideCue();
+  }
+
+  /* Chapter rail: pin it to the slide's real left edge, light the chapter whose
+     slide is on screen, and keep it out of the way on the cover and the close. */
+  (function(){
+    var rail = document.querySelector('.chapters');
+    if (!rail) return;
+    var items = [].slice.call(rail.querySelectorAll('a[data-slide]'));
+    function placeRail(){
+      var slide = document.querySelector('.slide');
+      if (!slide) return;
+      // Sit out in the page margin rather than in the slide's own gutter, so the
+      // rail reads as page furniture instead of crowding the case study. The
+      // inset takes about a third of the free space: near the left edge on a
+      // laptop, drifting in a little on a wide monitor so it never looks
+      // marooned. Whatever is left over becomes the gap to the text.
+      var textLeft = slide.getBoundingClientRect().left + parseFloat(getComputedStyle(slide).paddingLeft);
+      var railW = rail.getBoundingClientRect().width || 70;
+      var x = Math.round((textLeft - railW) * 0.34);
+      x = Math.max(40, Math.min(x, 150));
+      if (textLeft - (x + railW) < 26) x = Math.max(24, textLeft - railW - 26);
+      document.documentElement.style.setProperty('--rail-x', x + 'px');
+    }
+    placeRail();
+    window.addEventListener('resize', placeRail);
+    window.railUpdate = function(current, total){
+      rail.classList.toggle('on', current > 0 && current < total - 1);
+      var activeIdx = -1;
+      for (var i = 0; i < items.length; i++){
+        if (+items[i].dataset.slide <= current) activeIdx = i;
+      }
+      items.forEach(function(a, i){ a.classList.toggle('active', i === activeIdx); });
+    };
+    rail.addEventListener('click', function(e){
+      var a = e.target.closest('a[data-slide]');
+      if (!a) return;
+      e.preventDefault();
+      var slides = document.querySelectorAll('.slide');
+      var target = slides[+a.dataset.slide];
+      if (target) (target.closest('.slide-shell') || target).scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    });
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,1781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Flosser . A Case Study</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,500&family=Cinzel:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.cdnfonts.com/css/olivera" rel="stylesheet">
+<style>
+  :root{
+    --void:#FBFAF6;
+    --panel:#F1F4EA;
+    --panel-2:#FFFFFF;
+    --purple:#5C7A4E;
+    --purple-deep:#3F5636;
+    --pink:#C1502E;
+    --red:#A83D22;
+    --ink:#232620;
+    --muted:#63685C;
+    --line: rgba(35,38,32,0.12);
+
+    --p-void:#070908;
+    --p-chamber:#111B22;
+    --p-gold:#D4A83C;
+    --p-gold-soft:#E6C478;
+    --p-bone:#C8BFA8;
+  }
+  *{box-sizing:border-box;}
+  html,body{ margin:0; padding:0; width:100%; background:var(--void); color:var(--ink); font-family:'Manrope',sans-serif; font-weight:500; -webkit-font-smoothing:antialiased; }
+  html{ scroll-behavior:smooth; scroll-snap-type:y mandatory; }
+  body{ overflow-x:hidden; }
+  a{ color:inherit; }
+  button{ font-family:inherit; cursor:pointer; }
+
+  .deck{ width:100%; }
+
+  .slide-shell{
+    width:100%; min-height:100vh;
+    display:flex; align-items:center; justify-content:center;
+    scroll-snap-align:start;
+    border-top:1px solid var(--line);
+    background:var(--void);
+    /* decorative .blob circles sit past the slide's edge, which blows the
+       page into a horizontal scrollbar below ~1280px. clip (not hidden)
+       contains it without creating a scroll container, which would break
+       scroll-snap. Same fix already applied to spotify.html. */
+    overflow:clip;
+  }
+  .slide-shell.panel{ background:var(--panel); }
+  .slide-shell.portal{ background: radial-gradient(ellipse at 50% 30%, #111B22 0%, #070908 78%); border-top:none; }
+  .slide-shell:first-child{ border-top:none; }
+
+  .slide{
+    position:relative; max-width:1140px; width:100%; margin:0 auto;
+    padding:clamp(48px,8vw,90px) clamp(24px,7vw,90px);
+    display:flex; flex-direction:column; justify-content:center;
+    color:var(--ink);
+  }
+  .blob{ position:absolute; border-radius:50%; opacity:.18; filter:blur(60px); pointer-events:none; z-index:0; }
+  .slide > *:not(.blob){ position:relative; z-index:1; }
+
+  .eyebrow{
+    font-family:'Poppins',sans-serif; font-weight:700; letter-spacing:.16em;
+    text-transform:uppercase; font-size:12px; margin-bottom:14px; color:var(--pink);
+  }
+  h1,h2,h3{ font-family:'Manrope',sans-serif; font-weight:800; margin:0; line-height:1.15; }
+  em{ font-style:normal; color:var(--purple-deep); }
+
+  .meta-row{ display:flex; gap:40px; margin-top:32px; flex-wrap:wrap; }
+  .meta-label{ font-family:'Poppins',sans-serif; font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--purple-deep); font-weight:700; margin-bottom:5px; }
+  .meta-value{ font-size:14px; opacity:.85; font-weight:600; }
+
+  .counter{ position:fixed; top:30px; right:40px; z-index:20; font-family:'Poppins',sans-serif; font-size:11px; letter-spacing:.14em; color:#2F4A28; opacity:.6; }
+  .brandmark{ position:fixed; bottom:30px; left:40px; z-index:20; font-family:'Manrope',sans-serif; font-weight:800; font-size:16px; color:var(--pink); }
+  .progress-line{ position:fixed; top:0; left:0; height:3px; background:var(--purple); z-index:30; transition: width .5s cubic-bezier(.22,.8,.3,1); }
+
+  .pill{ display:inline-flex; align-items:center; padding:6px 15px; border-radius:14px 14px 14px 4px; border:1px solid var(--line); font-size:12px; font-family:'Poppins',sans-serif; font-weight:600; }
+  .pill.grad{ border:none; background:var(--purple); color:#fff; font-weight:700; }
+
+  .two-col{ display:flex; gap:56px; align-items:center; }
+  .two-col.top{ align-items:flex-start; }
+  .two-col .col{ flex:1; min-width:0; }
+
+  ul.tight{ list-style:none; padding:0; margin:16px 0 0; }
+  ul.tight li{ padding-left:18px; position:relative; margin-bottom:10px; font-size:14px; line-height:1.55; color:var(--muted); font-weight:500; }
+  ul.tight li::before{ content:''; position:absolute; left:0; top:7px; width:5px; height:5px; border-radius:50%; background:var(--purple); }
+  p.lead{ font-size:15px; line-height:1.6; color:var(--muted); max-width:560px; margin:0; font-weight:500; }
+
+  .card{ background:var(--panel-2); border:1px solid var(--line); border-radius:22px 22px 22px 8px; padding:20px 22px; box-shadow:0 8px 20px rgba(36,27,51,.08); }
+  .card .tag{ font-family:'Poppins',sans-serif; font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--purple-deep); font-weight:700; margin-bottom:8px; }
+  .card h4{ font-family:'Poppins',sans-serif; font-weight:700; font-size:15px; margin:0 0 6px; }
+  .card p{ font-size:12.5px; line-height:1.55; color:var(--muted); margin:0; font-weight:500; }
+  .grid-3{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:20px; }
+  .grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:20px; }
+
+  .mockup-phone{
+    width:132px; aspect-ratio:9/18.5; background:#fff; border-radius:22px; border:1px solid rgba(36,27,51,.12);
+    padding:9px 7px; display:flex; flex-direction:column; gap:6px; flex-shrink:0; box-shadow:0 20px 40px rgba(36,27,51,.14);
+  }
+  .mockup-topbar{ display:flex; justify-content:space-between; align-items:center; padding:0 2px; }
+  .mockup-icon{ width:14px; height:14px; border-radius:50%; background:var(--panel-2); }
+  .mockup-tile{ border-radius:8px; min-height:22px; background:var(--panel-2); }
+  .mockup-tile.purple{ background:var(--purple); }
+  .mockup-list{ display:flex; flex-direction:column; gap:5px; flex:1; }
+  .mockup-row{ height:16px; border-radius:8px; background:var(--panel-2); display:flex; align-items:center; padding:0 6px; }
+  .mockup-row.done{ background:rgba(124,79,191,.15); }
+  .mockup-row .check{ width:9px; height:9px; border-radius:3px; background:var(--purple); }
+  .mockup-bottomnav{ display:flex; justify-content:space-around; align-items:center; padding:2px 4px 0; }
+  .mockup-navicon{ width:9px; height:9px; border-radius:3px; background:rgba(36,27,51,.2); }
+  .mockup-navicon.active{ background:var(--pink); }
+  .mockup-timer{ width:56px; height:56px; border-radius:50%; background:#F1F4EA; display:flex; align-items:center; justify-content:center; font-family:'Poppins',sans-serif; font-weight:700; font-size:11px; color:var(--purple-deep); margin:6px auto; }
+
+  .streak-row{ display:flex; gap:8px; justify-content:center; margin:24px 0; }
+  .streak-dot{ width:34px; height:34px; border-radius:10px; background:var(--panel-2); border:1.5px solid var(--line); display:flex; align-items:center; justify-content:center; font-size:14px; }
+  .streak-dot.done{ background:var(--purple); border-color:var(--purple); color:#fff; }
+  .streak-dot.today{ background:var(--pink); border-color:var(--pink); color:#fff; }
+
+  .tab-row{ display:flex; gap:10px; margin-bottom:26px; flex-wrap:wrap; }
+  .tab-btn{ background:transparent; border:1px solid var(--line); color:var(--ink); opacity:.55; padding:9px 18px; border-radius:20px; font-family:'Poppins',sans-serif; font-size:12.5px; font-weight:700; transition:all .2s; }
+  .tab-btn.active{ opacity:1; border-color:var(--purple); color:var(--purple-deep); background:rgba(124,79,191,.10); }
+  .tab-panel{ display:none; }
+  .tab-panel.active{ display:block; }
+
+  .step-tracker{ display:flex; gap:0; margin-top:26px; flex-wrap:wrap; }
+  .step{ flex:1; min-width:150px; padding:16px 16px 16px 0; position:relative; }
+  .step .num{ font-family:'Poppins',sans-serif; font-weight:800; font-size:20px; color:#2F4A28; }
+  .step p{ font-size:12.5px; line-height:1.5; color:var(--muted); margin:6px 0 0; font-weight:500; }
+  /* the connector arrow sat at right:-4px, i.e. past its own step and directly
+     on top of the next step's number, so it read as a smudge rather than a
+     link. the numerals already carry the sequence, so it is gone. */
+
+  .link{ color:var(--purple-deep); font-weight:700; text-decoration:none; font-family:'Poppins',sans-serif; font-size:13px; }
+
+  .slide.portal{ color: var(--p-bone); align-items:center; text-align:center; justify-content:center; }
+  .portal-eyebrow{ font-family:'Cinzel',serif; font-weight:600; letter-spacing:.32em; text-transform:uppercase; font-size:12px; color:var(--p-gold); margin-bottom:22px; }
+  .portal-title{ font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:500; font-size:clamp(38px,6vw,60px); line-height:1.15; max-width:760px; color:var(--p-bone); }
+  .portal-body{ font-family:'Cormorant Garamond',serif; font-size:17px; line-height:1.75; opacity:.8; max-width:560px; margin:22px auto 0; color:var(--p-bone); }
+  .portal-btn{ font-family:'Cinzel',serif; letter-spacing:.14em; font-size:12.5px; text-transform:uppercase; background:transparent; color:var(--p-gold); border:1px solid var(--p-gold); padding:13px 32px; border-radius:2px; margin-top:32px; cursor:pointer; transition:all .3s; text-decoration:none; display:inline-block; }
+  .portal-btn:hover{ background:var(--p-gold); color:#070908; box-shadow:0 0 30px rgba(212,168,60,.4); }
+
+  .relic-frame{ width:140px; height:140px; margin-bottom:26px; }
+  .relic-frame svg{ width:100%; height:100%; filter:drop-shadow(0 10px 26px rgba(0,0,0,.55)); }
+
+  .reward-tag{ font-family:'Cinzel',serif; letter-spacing:.3em; text-transform:uppercase; font-size:11px; color:var(--p-gold-soft); opacity:.8; margin-bottom:14px; }
+  .reward-name{ font-family:'Cormorant Garamond',serif; font-style:italic; font-size:clamp(32px,5vw,42px); margin-top:2px; color:var(--p-bone); }
+  .reward-desc{ font-family:'Cormorant Garamond',serif; font-size:16px; line-height:1.7; opacity:.75; max-width:440px; margin-top:18px; color:var(--p-bone); }
+
+  .portfolio-nav{ position:fixed; top:22px; left:50%; transform:translateX(-50%); z-index:40; display:flex; align-items:center; gap:32px; padding:11px 19px 11px 26px; background:rgba(7,9,8,.72); backdrop-filter:blur(20px); border:1px solid rgba(212,168,60,.18); border-radius:100px; }
+  .portfolio-nav .nav-home,.portfolio-nav a{ font-family:'Cinzel',serif; text-decoration:none; white-space:nowrap; }
+  .portfolio-nav .nav-home{ color:var(--p-gold); font-size:13px; font-weight:700; letter-spacing:.14em; }
+  .portfolio-nav .nav-divider{ width:1px; height:14px; background:rgba(212,168,60,.2); }
+  .portfolio-nav ul{ list-style:none; display:flex; gap:24px; margin:0; padding:0; }
+  .portfolio-nav ul a{ color:var(--p-bone); opacity:.9; font-size:11.5px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; transition:color .2s,opacity .2s; }
+  .portfolio-nav ul a:hover{ opacity:1; color:var(--p-gold); }
+  .portfolio-nav .nav-contact{ color:var(--p-void); background:var(--p-gold); padding:9px 18px; border-radius:100px; font-size:11.5px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; transition:transform .2s,box-shadow .2s; }
+  .portfolio-nav .nav-contact:hover{ transform:scale(1.04); box-shadow:0 4px 18px rgba(212,168,60,.4); }
+
+  /* The pill is fixed + centred with no width cap, so as the window narrows the
+     logo slides off the left edge and Contact spills past the right - the same
+     failure the homepage nav had. Same ladder, adapted to .portfolio-nav. */
+  .portfolio-nav{ max-width:calc(100vw - 20px); }
+  .portfolio-nav .nav-home{ flex:0 1 auto; min-width:0; }
+  .portfolio-nav .nav-home img{ max-width:100%; object-fit:contain; object-position:left center; }
+  .portfolio-nav ul{ flex-shrink:0; }
+  .portfolio-nav .nav-divider{ flex-shrink:0; }
+  .portfolio-nav .nav-contact{ flex-shrink:0; }
+  .portfolio-nav .nav-home img{ height:26px; width:auto; display:block; }
+  @media(max-width:920px){
+    .portfolio-nav{ gap:12px; padding:8px 13px 8px 14px; }
+    .portfolio-nav ul{ gap:14px; }
+    .portfolio-nav ul a{ font-size:9px; letter-spacing:.09em; }
+    .portfolio-nav .nav-contact{ padding:8px 13px; font-size:9px; }
+  }
+  /* Résumé drops before the other two - Work/About/Résumé together stop fitting
+     the pill around here, and Work + About are what a visitor actually wants. */
+  @media(max-width:600px){
+    .portfolio-nav li.sec{ display:none; }
+  }
+  @media(max-width:560px){
+    .portfolio-nav{ top:12px; gap:8px; padding:7px 12px 7px 12px; }
+    .portfolio-nav ul{ gap:11px; }
+    .portfolio-nav .nav-contact{ padding:7px 11px; }
+    .portfolio-nav .nav-home img{ height:20px; }
+  }
+  @media(max-width:432px){
+    .portfolio-nav{ gap:5px; padding:6px 11px 6px 10px; }
+    .portfolio-nav .nav-divider{ display:none; }
+    .portfolio-nav ul{ gap:7px; }
+    .portfolio-nav .nav-contact{ padding:7px 9px; }
+  }
+  @media(max-width:390px){
+    .portfolio-nav{ gap:3px; padding:5px 10px 5px 8px; }
+    .portfolio-nav ul{ gap:5px; }
+    .portfolio-nav ul a{ font-size:8px; letter-spacing:.06em; }
+    .portfolio-nav .nav-contact{ padding:6px 9px; font-size:8px; letter-spacing:.06em; }
+    .portfolio-nav .nav-home img{ height:17px; }
+  }
+  @media(max-width:356px){
+    .portfolio-nav{ gap:6px; padding:4px 9px 4px 8px; }
+    .portfolio-nav ul{ gap:6px; }
+    .portfolio-nav ul a{ font-size:7.5px; letter-spacing:.05em; }
+    .portfolio-nav .nav-contact{ padding:5px 7px; font-size:7.5px; letter-spacing:.05em; }
+    .portfolio-nav .nav-home img{ height:14px; }
+  }
+  @media(max-width:325px){
+    .portfolio-nav{ gap:5px; padding:4px 9px 4px 7px; }
+    .portfolio-nav ul{ gap:5px; }
+    .portfolio-nav ul a{ font-size:7px; letter-spacing:.03em; }
+    .portfolio-nav .nav-contact{ padding:5px 6px; font-size:7px; letter-spacing:.03em; }
+    .portfolio-nav .nav-home img{ height:12px; }
+  }
+  /* narrower than any real device ships - brand + the one action that matters */
+  @media(max-width:310px){
+    .portfolio-nav ul{ display:none; }
+  }
+
+  @media (max-width:780px){
+    .two-col{ flex-direction:column; }
+    .two-col .col{ flex:1 1 auto !important; width:100%; }
+    .grid-3{ grid-template-columns:1fr; }
+    .grid-2{ grid-template-columns:1fr; }
+  }
+
+  /* Transitions match the homepage: a quiet fade-up as each section arrives.
+     Snapping now assists instead of trapping, so tall sections stay readable. */
+  .deck .slide-shell .slide{opacity:0;transform:translateY(22px);
+    transition:opacity .8s cubic-bezier(.16,.84,.44,1),transform .8s cubic-bezier(.16,.84,.44,1);}
+  .deck .slide-shell .slide.seen{opacity:1;transform:none;}
+  @media (max-height:820px),(pointer:coarse),(hover:none){
+    html{scroll-snap-type:none;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .deck .slide-shell .slide{opacity:1!important;transform:none!important;transition:none!important;}
+  }
+
+  /* ---- phone-width fit: slides were running taller than the viewport, so with
+     scroll-snap on the bottom of the content got cut off. Scale type, padding
+     and media down so each slide fits the screen. ---- */
+  @media (max-width:600px){
+    .slide{ padding:38px 20px; }
+    .slide h1{ font-size:clamp(30px,9vw,44px) !important; }
+    .slide h2{ font-size:clamp(20px,5.6vw,26px) !important; }
+    .slide h3{ font-size:clamp(17px,4.8vw,22px) !important; }
+    .eyebrow{ font-size:10px; margin-bottom:10px; }
+    .lead, p.lead{ font-size:13px !important; line-height:1.5 !important; }
+    ul.tight li{ font-size:12.5px; margin-bottom:7px; }
+    .card{ padding:13px 14px; }
+    .card h4{ font-size:13px; }
+    .card p{ font-size:11.5px; line-height:1.45; }
+    .grid-3, .grid-2{ gap:9px; margin-top:14px; }
+    .two-col{ gap:22px; }
+    .meta-row{ gap:18px; margin-top:20px; }
+    .mockup-phone{ width:104px; }
+    section[data-title="Persona"] img, section[data-title="Personas"] img{
+      max-height:50vh; width:auto !important; min-width:0 !important; margin:0 auto; display:block; }
+  }
+  @media (max-width:600px){
+    section[data-title="The Experience"] > div{ gap:10px !important; }
+    section[data-title="Iterations"] > div{ gap:12px !important; }
+    section[data-title="Iterations"] .grid-3{ grid-template-columns:1fr 1fr; }
+    section[data-title="Iterations"] .card h4{ font-size:12px; }
+    section[data-title="Iterations"] .card p{ font-size:10.5px; }
+  }
+  @media (max-width:430px){
+    .slide{ padding:30px 16px; }
+    .slide h2{ font-size:clamp(18px,5.2vw,22px) !important; }
+    .lead, p.lead{ font-size:12.5px !important; }
+    .card{ padding:11px 12px; }
+    .card p{ font-size:11px; }
+    .mockup-phone{ width:92px; }
+  }
+
+  /* Branding Guidelines: character + voice system, not a component sheet */
+  .brand-cols{ display:grid; grid-template-columns:0.9fr 1.1fr; gap:26px; align-items:start; }
+  .brand-chars{ display:flex; flex-direction:column; gap:10px; }
+  .brand-chars .card{ padding:13px 14px; }
+  .brand-chars h4{ font-size:14px; }
+  .brand-chars p{ font-size:12px; line-height:1.5; margin:0; }
+  .say-row{ display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:7px 0; border-bottom:1px solid var(--line); }
+  .say-row:last-of-type{ border-bottom:none; }
+  .say-head{ font-family:'Manrope',sans-serif; font-weight:700; font-size:9.5px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--muted); padding-bottom:5px; }
+  .say-yes,.say-no{ font-size:12.5px; line-height:1.45; }
+  .say-yes{ color:var(--ink); padding-left:16px; position:relative; }
+  .say-yes:before{ content:"✓"; position:absolute; left:0; top:0; color:var(--purple); font-weight:700; font-size:12px; }
+  .say-no{ color:var(--muted); padding-left:16px; position:relative; text-decoration:line-through;
+    text-decoration-color:rgba(193,80,46,.5); }
+  .say-no:before{ content:"✕"; position:absolute; left:0; top:0; color:var(--pink); font-weight:700; font-size:11px;
+    text-decoration:none; }
+  .mean-row{ display:grid; grid-template-columns:repeat(2,1fr); gap:8px 14px; }
+  .mean{ display:flex; align-items:center; gap:9px; }
+  .mean .sw{ width:22px; height:22px; border-radius:5px; flex:0 0 auto; border:1px solid var(--line); }
+  .mean .sw-x{ background:repeating-linear-gradient(45deg,#F1F4EA,#F1F4EA 4px,#D9DED2 4px,#D9DED2 8px); }
+  .mean b{ display:block; font-size:11.5px; font-weight:700; line-height:1.3; }
+  .mean i{ display:block; font-style:normal; font-size:10.5px; color:var(--muted); line-height:1.3; }
+  @media(max-width:900px){
+    .brand-cols{ grid-template-columns:1fr; gap:18px; }
+    .mean-row{ grid-template-columns:1fr; }
+  }
+  /* Moodboard: multi-panel brand board, laid out wide rather than tall.
+     Scoped palette so it can use the app's true colors without touching
+     the deck's global variables. */
+  .mb{ --mb-cream:#F7F5EF; --mb-green:#2F5D4A; --mb-thread:#3E7A5E; --mb-coral:#FF6A52;
+       --mb-mint:#CDE7D8; --mb-ink:#16241E; --mb-snaggle:#8FA85C; }
+  .mb-board{ display:grid; grid-template-columns:repeat(3,1fr); gap:11px; }
+  .mb-panel{ background:#FBFAF6; border-radius:14px; padding:14px 16px;
+    box-shadow:inset 0 0 0 1px rgba(22,36,30,.07); }
+  .mb-why{ grid-column:span 2; }
+  .mb-color{ grid-column:1 / -1; }
+  .mb-shapepanel{ grid-column:span 2; position:relative; overflow:hidden; }
+  .mb-label{ display:flex; align-items:center; gap:8px; font-family:'Poppins',sans-serif; font-weight:600;
+    font-size:9.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--mb-green); margin:0 0 8px; }
+  .mb-label span{ color:var(--mb-coral); font-weight:700; letter-spacing:.06em; }
+  .mb-label em{ font-style:normal; font-weight:500; letter-spacing:.04em; text-transform:none;
+    color:var(--muted); font-size:10px; }
+  .mb-note{ font-size:11px; line-height:1.5; color:var(--muted); margin:0 0 11px; }
+
+  .mb-why-grid{ display:grid; grid-template-columns:1.25fr .75fr; gap:16px; align-items:center; }
+  .mb-why-head{ font-family:'Poppins',sans-serif; font-weight:700; font-size:clamp(15px,1.55vw,19px);
+    line-height:1.28; color:var(--mb-green); margin:0 0 8px; }
+  .mb-why-head em{ font-style:normal; color:var(--mb-coral); }
+  .mb-why-lead{ font-size:11.5px; line-height:1.55; color:var(--muted); max-width:380px; margin:0 0 14px; }
+  .mb-loop{ display:flex; align-items:flex-start; gap:4px; flex-wrap:wrap; }
+  .mb-step{ text-align:center; width:70px; }
+  .mb-circle{ width:40px; height:40px; border-radius:50%; background:var(--mb-mint);
+    display:flex; align-items:center; justify-content:center; margin:0 auto 6px; }
+  .mb-circle svg{ width:18px; height:18px; }
+  .mb-circle-hot{ background:var(--mb-coral); }
+  .mb-step b{ display:block; font-family:'Poppins',sans-serif; font-weight:600; font-size:8.5px;
+    letter-spacing:.11em; text-transform:uppercase; color:var(--ink); line-height:1.3; }
+  .mb-step i{ display:block; font-style:normal; font-size:9px; color:var(--muted); line-height:1.3; margin-top:2px; }
+  .mb-arrow{ color:var(--muted); opacity:.45; font-size:13px; line-height:40px; }
+  .mb-cite{ font-size:10px; line-height:1.5; color:var(--muted); opacity:.85; margin:12px 0 0; }
+  .mb-cite i{ font-style:italic; }
+  .mb-why-art{ position:relative; display:flex; align-items:center; justify-content:center; min-height:150px; }
+  .mb-blob{ position:absolute; width:92%; padding-bottom:84%; background:var(--mb-mint); opacity:.6;
+    border-radius:58% 42% 47% 53% / 51% 55% 45% 49%; }
+  .mb-chip-art{ position:relative; z-index:3; width:66%; max-width:145px; height:auto;
+    filter:drop-shadow(0 6px 14px rgba(22,36,30,.14)); }
+
+
+  .mb-swatches{ display:grid; grid-template-columns:repeat(6,1fr); gap:9px; margin-bottom:7px; }
+  .mb-chip{ height:46px; border-radius:9px; display:flex; align-items:flex-start; padding:7px 9px;
+    font-family:'Poppins',sans-serif; font-weight:600; font-size:9px; letter-spacing:.05em;
+    text-transform:uppercase; line-height:1.25; margin-bottom:5px; }
+  .mb-chip-mascot{ position:relative; overflow:hidden; }
+  .mb-chip-mascot img{ position:absolute; right:-10px; bottom:-13px; width:52px; height:auto; opacity:.95; }
+  .mb-sw b{ display:block; font-size:10px; font-weight:700; color:var(--ink); line-height:1.3; }
+  .mb-sw i{ display:block; font-style:normal; font-size:9px; color:var(--muted); line-height:1.35; margin-top:1px; }
+  .mb-noalert{ font-size:10.5px; color:var(--muted); margin:0; padding-left:10px;
+    border-left:2px solid var(--mb-coral); line-height:1.45; }
+  .mb-noalert b{ color:var(--ink); font-weight:700; }
+
+  /* the photo bleeds to the panel edge; the icons sit straight on it, no card */
+  .mb-shape-grid{ position:relative; }
+  .mb-shape-grid > div{ width:54%; position:relative; z-index:2; }
+  .mb-shapefig{ position:absolute; top:-14px; right:-16px; bottom:-14px; width:54%;
+    margin:0; line-height:0; overflow:hidden; }
+  .mb-shapefig img{ width:100%; height:100%; object-fit:cover; object-position:38% 50%; display:block; }
+  .mb-shapefig:after{ content:""; position:absolute; inset:0;
+    background:linear-gradient(to right, #FBFAF6 0%, rgba(251,250,246,.45) 16%, rgba(251,250,246,0) 44%); }
+  .mb-shapes{ position:relative; z-index:3; width:calc(100% + 78px); display:flex; gap:7px; flex-wrap:wrap; }
+  .mb-shape{ text-align:center; width:48px; }
+  .mb-shape svg{ width:29px; height:23px; display:block; margin:0 auto 4px; }
+  .mb-shape span{ font-size:8px; color:var(--muted); line-height:1.25; display:block;
+    text-shadow:0 1px 3px rgba(251,250,246,.95), 0 0 8px rgba(251,250,246,.9); }
+  .mb-shapenote{ font-size:10px; line-height:1.5; color:var(--muted); margin:13px 0 0;
+    padding-top:11px; border-top:1px solid rgba(22,36,30,.08); }
+
+  .mb-shots{ display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
+  .mb-shot{ aspect-ratio:6/5; border-radius:7px; background-color:var(--mb-mint);
+    background-size:cover; background-position:center; margin-bottom:4px;
+    box-shadow:inset 0 0 0 1px rgba(22,36,30,.08); }
+  .mb-shots span{ font-size:8px; color:var(--muted); }
+  .mb-tags{ display:flex; gap:4px; flex-wrap:wrap; margin-top:9px; }
+  .mb-tags span{ font-family:'Poppins',sans-serif; font-size:8px; letter-spacing:.04em; color:var(--mb-green);
+    border:1px solid rgba(47,93,74,.28); border-radius:100px; padding:3px 7px; }
+
+  .mb-old{ display:flex; gap:6px; flex-wrap:wrap; }
+  .mb-old span{ width:27px; height:27px; border-radius:7px; flex:0 0 auto;
+    box-shadow:inset 0 0 0 1px rgba(22,36,30,.1); }
+  .mb-oldcap{ font-size:9px; color:var(--muted); opacity:.8; margin:8px 0 0; }
+
+  @media(max-width:900px){
+    .mb-board{ grid-template-columns:1fr; }
+    .mb-why, .mb-shapepanel{ grid-column:auto; }
+    .mb-why-grid{ grid-template-columns:1fr; gap:12px; }
+    .mb-why-art{ min-height:0; order:-1; }
+    .mb-chip-art{ width:30%; max-width:105px; }
+    .mb-blob{ width:44%; padding-bottom:40%; }
+    .mb-swatches{ grid-template-columns:repeat(3,1fr); }
+    .mb-shape-grid > div{ width:100%; }
+    .mb-shapefig{ position:relative; top:auto; right:auto; bottom:auto; width:100%;
+      margin-top:13px; border-radius:11px; }
+    .mb-shapefig img{ aspect-ratio:3/2; }
+    .mb-shapefig:after{ display:none; }
+    .mb-shapes{ width:100%; }
+    .mb-shape span{ text-shadow:none; }
+  }
+  @media(max-width:520px){
+    .mb-swatches{ grid-template-columns:repeat(2,1fr); }
+    .mb-step{ width:66px; }
+  }
+
+  /* Between 780 and 1000px the three persona columns (photo, detail, quote) are
+     all still side by side, so the middle one gets squeezed until short list
+     items and even the name break for a single word. Drop the quote card
+     underneath first, which is the column that needs the width least. */
+  @media(min-width:781px) and (max-width:1000px){
+    section[data-title="Personas"] .two-col.top,
+    section[data-title="Persona"] .two-col.top{ flex-wrap:wrap; row-gap:20px; }
+    section[data-title="Personas"] .two-col.top > .col:last-child,
+    section[data-title="Persona"] .two-col.top > .col:last-child{ flex:1 1 100% !important; }
+  }
+
+  /* ---------- widow control ----------
+     Handled at layout time so it keeps working at every viewport width instead
+     of being pinned by hardcoded non-breaking spaces. `balance` evens out the
+     lines of short headings; `pretty` stops a paragraph or list item ending on
+     a single-word line. Unsupported browsers fall back to normal wrapping. */
+  h1,h2,h3,h4{ text-wrap:balance; }
+  p,li,.lead,.meta-value,.card p,.step p{ text-wrap:pretty; }
+
+  /* Her dad reached the cover and did not realise the deck kept going, so the
+     first screen now says so out loud. It fades out on the first scroll. */
+  .slide-shell:first-child{ position:relative; }
+  .slide-shell:first-child > .slide{ padding-bottom:96px; }
+  .slide-shell > .scroll-cue{
+    position:fixed; left:50%; bottom:clamp(16px,3.2vh,32px); transform:translateX(-50%);
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+    font-family:'Poppins',sans-serif; font-size:10px; font-weight:700;
+    letter-spacing:.2em; text-transform:uppercase; white-space:nowrap;
+    color:var(--purple-deep); opacity:.85; z-index:12; pointer-events:none;
+    /* a short phone can push cover content under the cue, so it carries a
+       soft halo of the cover's own background rather than a box */
+    padding:11px 26px 9px;
+    background:radial-gradient(ellipse closest-side, rgba(251,250,246,.94) 22%, transparent 76%);
+    transition:opacity .45s ease, transform .45s ease;
+  }
+  .slide-shell > .scroll-cue .cue-chev{ animation:cue-bob 2.1s ease-in-out infinite; }
+  .slide-shell > .scroll-cue.gone{ opacity:0; transform:translateX(-50%) translateY(10px); }
+  @keyframes cue-bob{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(5px); } }
+
+  /* Closing hand-off: back to the shelf, or straight into the next study. */
+  .cs-end{ display:flex; flex-wrap:wrap; gap:11px; margin-top:44px; }
+  .cs-end a{
+    display:inline-flex; align-items:center; gap:9px; padding:12px 21px;
+    border-radius:100px; border:1px solid var(--line); color:var(--ink);
+    text-decoration:none; font-family:'Poppins',sans-serif; font-size:11px; font-weight:700;
+    letter-spacing:.11em; text-transform:uppercase; line-height:1;
+    transition:background .25s, border-color .25s, transform .25s, color .25s;
+  }
+  .cs-end a:hover{ transform:translateY(-2px); border-color:var(--purple-deep); background:rgba(92,122,78,.14); }
+  .cs-end a.next{ background:var(--purple-deep); border-color:var(--purple-deep); color:#FBFAF6; }
+  .cs-end a.next:hover{ background:var(--purple-deep); opacity:.88; }
+  @media (prefers-reduced-motion: reduce){
+    .slide-shell > .scroll-cue .cue-chev{ animation:none; }
+    .cs-end a:hover{ transform:none; }
+  }
+  @media(max-width:560px){
+    .cs-end{ gap:9px; }
+    .cs-end a{ padding:11px 16px; font-size:10px; letter-spacing:.08em; }
+  }
+
+  /* Chapter rail. Sits on the slide's own left edge (JS measures it into
+     --rail-x) rather than floating in the page corner, and only appears once
+     the reader has left the cover. Hidden below 1240px, where the slide's
+     gutter is too narrow to hold a label without crossing the text. */
+  .chapters{
+    position:fixed; left:var(--rail-x, 40px); top:50%; transform:translateY(-50%);
+    z-index:22; display:none; flex-direction:column;
+    opacity:0; visibility:hidden;
+    transition:opacity .45s ease, visibility 0s linear .45s;
+  }
+  .chapters.on{ opacity:1; visibility:visible; transition:opacity .45s ease, visibility 0s linear 0s; }
+  .chapters a{
+    position:relative; display:block; padding:7px 0 7px 13px;
+    border-left:1px solid var(--line);
+    font-family:'Poppins',sans-serif; font-size:8px; font-weight:600; letter-spacing:.09em;
+    text-transform:uppercase; text-decoration:none; white-space:nowrap;
+    color:var(--ink); opacity:.6;
+    transition:opacity .25s ease, color .25s ease;
+  }
+  .chapters a:hover{ opacity:.85; }
+  .chapters a.active{ opacity:1; font-weight:800; color:var(--purple-deep); border-left-color:var(--purple-deep);
+    box-shadow:inset 2px 0 0 var(--purple-deep); }
+  .chapters a:focus-visible{ outline:2px solid var(--purple-deep); outline-offset:2px; opacity:1; }
+  .chapters .ch-next{ margin-top:14px; padding-top:9px; padding-bottom:9px; color:var(--purple-deep); opacity:.7; }
+  .chapters .ch-next:hover{ opacity:1; }
+  .chapters .ch-next b{ display:block; font-weight:800; letter-spacing:.07em; margin-top:3px; }
+  .chapters .ch-next span{ opacity:.6; font-weight:600; }
+  @media (min-width:1240px) and (min-height:620px){
+    .chapters{ display:flex; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .chapters{ transition:none; }
+  }
+
+  /* four of Flosser's slides are darkened by an inline style, where the dark
+     ink rail would disappear completely */
+  body.on-dark .chapters a{ color:#F4ECE0; border-left-color:rgba(244,236,224,.20); }
+  body.on-dark .chapters a.active{ color:#EBB59C; border-left-color:#EBB59C; box-shadow:inset 2px 0 0 #EBB59C; }
+  body.on-dark .counter, body.on-dark .brandmark{ color:#F4ECE0; }
+</style>
+</head>
+<body>
+
+  <nav class="portfolio-nav" aria-label="Portfolio navigation">
+    <a class="nav-home" href="homepage.html"><img src="img/logo.png" alt="Alisa"></a>
+    <div class="nav-divider" aria-hidden="true"></div>
+    <ul>
+      <li><a href="homepage.html#work">Work</a></li>
+      <li><a href="homepage.html#about">About</a></li>
+      <li class="sec"><a href="homepage.html#resume">Résumé</a></li>
+    </ul>
+    <a class="nav-contact" href="homepage.html#contact">Contact</a>
+  </nav>
+
+  <nav class="chapters" aria-label="Case study sections">
+      <a href="#" data-slide="1">Overview</a>
+      <a href="#" data-slide="8">Research</a>
+      <a href="#" data-slide="13">Persona</a>
+      <a href="#" data-slide="15">Design</a>
+      <a href="#" data-slide="17">Testing</a>
+      <a href="#" data-slide="18">Iterations</a>
+      <a href="#" data-slide="21">Prototype</a>
+      <a href="#" data-slide="22">Gameplay</a>
+      <a href="#" data-slide="27">Branding</a>
+      <a href="#" data-slide="28">Wrap Up</a>
+      <a class="ch-next" href="nuance.html"><span>Next</span><b>Nuance &rarr;</b></a>
+  </nav>
+
+
+  <div class="counter" id="counter">01 / 23</div>
+  <div class="brandmark">flosser.</div>
+  <div class="progress-line" id="progressLine" style="width:0%;"></div>
+
+  <div class="deck" id="deck">
+
+  <!-- 3. COVER -->
+  <div class="slide-shell"><section class="slide" data-title="Cover" style="align-items:center; text-align:center;">
+    <div class="blob" style="width:520px;height:520px; background:var(--purple); top:-200px; left:50%; transform:translateX(-50%);"></div>
+    <div class="eyebrow">UX / UI Case Study &middot; Mobile App</div>
+    <svg viewBox="0 0 100 110" width="46" height="50" style="margin:0 auto 6px; display:block;">
+      <path d="M50 8c-14 0-24 10-24 26 0 10 2 20 5 30 3 10 4 20 6 28 1 4 3 6 5 6 3 0 4-3 5-8 1-5 1-10 3-10s2 5 3 10c1 5 2 8 5 8 2 0 4-2 5-6 2-8 3-18 6-28 3-10 5-20 5-30 0-16-10-26-24-26z" fill="none" stroke="var(--purple-deep)" stroke-width="4" stroke-linejoin="round"/>
+    </svg>
+    <h1 style="font-size:clamp(44px,7vw,84px); line-height:.98; color:var(--pink);">flosser.</h1>
+    <p class="lead" style="margin:18px auto 0; text-align:center;">A tiny daily habit, finally made easy to keep. Reminders, a two-minute timer, and a streak worth protecting.</p>
+    <div class="streak-row">
+      <div class="streak-dot done">&#10003;</div>
+      <div class="streak-dot done">&#10003;</div>
+      <div class="streak-dot done">&#10003;</div>
+      <div class="streak-dot done">&#10003;</div>
+      <div class="streak-dot today">5</div>
+      <div class="streak-dot">6</div>
+      <div class="streak-dot">7</div>
+    </div>
+    <div style="display:flex; gap:32px; flex-wrap:wrap; justify-content:center;">
+      <div><div class="meta-label">Role</div><div class="meta-value">UX / UI Designer</div></div>
+      <div><div class="meta-label">Platform</div><div class="meta-value">iOS Mobile</div></div>
+      <div><div class="meta-label">Tools</div><div class="meta-value">Figma</div></div>
+    </div>
+  </section>
+    <div class="scroll-cue" id="scrollCue" aria-hidden="true">
+      <span>Scroll to continue</span>
+      <svg class="cue-chev" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.5v10"/><path d="M3.6 8.4 8 12.8l4.4-4.4"/></svg>
+    </div>
+  </div>
+
+  <!-- 4. WHY I BUILT THIS -->
+  <div class="slide-shell panel"><section class="slide panel" data-title="Why I Built This">
+    <div class="eyebrow">Personal Interest</div>
+    <p style="font-family:'Olivera','Cormorant Garamond',serif; font-style:normal; font-weight:400; font-size:clamp(26px,3.6vw,38px); line-height:1.4; max-width:760px; color:#2F4A28;">
+      "I keep floss at my desk, because I forget so often at night. Hearing friends and family talk about skipping it, and catching myself doing the same, made me realize this is common, and&nbsp;overlooked."
+    </p>
+    <p style="font-size:13px; color:var(--muted); max-width:600px; margin-top:22px;">I like designing from real behavior and small daily frustrations, turning them into low-pressure, realistic habits that survive the version of you awake at 11pm.</p>
+  </section></div>
+
+  <!-- 3b. HOW MIGHT WE -->
+  <div class="slide-shell"><section class="slide" data-title="How Might We">
+    <div class="eyebrow">How Might We</div>
+    <h2 style="font-family:'Manrope',sans-serif; font-weight:800; font-size:clamp(30px,4.2vw,46px); line-height:1.35; max-width:820px;">
+      Help people who struggle to floss build a simple daily habit, so they can improve their oral hygiene and feel more confident about their&nbsp;smile?
+    </h2>
+  </section></div>
+
+  <!-- 4b. WHY IT MATTERS -->
+  <div class="slide-shell panel"><section class="slide panel" data-title="Why It Matters">
+    <div class="eyebrow">Background Research</div>
+    <h2 style="font-size:clamp(28px,3.6vw,42px); max-width:700px; margin-bottom:36px; color:#2F4A28;">This isn't a small habit to skip.</h2>
+    <div class="two-col top">
+      <div class="col">
+        <div class="meta-label" style="color:var(--pink);">If you skip it</div>
+        <ul class="tight" style="margin-top:14px;">
+          <li>Gum disease starts quietly: inflammation, bleeding, then tooth loss</li>
+          <li>Linked to heart disease, diabetes, and Alzheimer's</li>
+          <li>Brushing alone can't reach between teeth</li>
+        </ul>
+      </div>
+      <div class="col">
+        <div class="meta-label">What actually works</div>
+        <ul class="tight" style="margin-top:14px;">
+          <li>Reminders keep people consistent</li>
+          <li>Tracking progress boosts motivation</li>
+          <li>Social accountability drives follow-through</li>
+        </ul>
+      </div>
+    </div>
+  </section></div>
+
+  <!-- 4c. BY THE NUMBERS -->
+  <div class="slide-shell" style="background:var(--ink);"><section class="slide" data-title="By the Numbers" style="color:var(--void);">
+    <div class="blob" style="width:420px;height:420px; background:var(--purple); opacity:.35; top:-140px; right:-80px;"></div>
+    <div class="eyebrow" style="color:var(--pink);">Survey Says</div>
+    <h2 style="font-size:28px; max-width:640px; margin-bottom:36px; color:var(--void); font-weight:800; font-family:'Manrope',sans-serif;">What's actually stopping people from flossing.</h2>
+    <div style="display:flex; align-items:stretch; gap:0; flex-wrap:wrap;">
+      <div style="flex:1; min-width:150px; padding-right:24px;">
+        <div style="font-family:'Manrope',sans-serif; font-weight:800; font-size:clamp(44px,6vw,64px); line-height:1; color:var(--void);">77<span style="font-size:.45em; opacity:.6;">%</span></div>
+        <p style="font-size:12.5px; opacity:.7; margin-top:10px; max-width:190px; line-height:1.6; color:var(--void);">Cite forgetfulness as the reason they skip&nbsp;flossing</p>
+      </div>
+      <div style="width:1px; background:rgba(247,236,229,.18);"></div>
+      <div style="flex:1; min-width:150px; padding:0 24px;">
+        <div style="font-family:'Manrope',sans-serif; font-weight:800; font-size:clamp(44px,6vw,64px); line-height:1; color:var(--void);">64<span style="font-size:.45em; opacity:.6;">%</span></div>
+        <p style="font-size:12.5px; opacity:.7; margin-top:10px; max-width:190px; line-height:1.6; color:var(--void);">Admit laziness gets in the way, even when they know better</p>
+      </div>
+      <div style="width:1px; background:rgba(247,236,229,.18);"></div>
+      <div style="flex:1; min-width:150px; padding:0 24px;">
+        <div style="font-family:'Manrope',sans-serif; font-weight:800; font-size:clamp(44px,6vw,64px); line-height:1; color:var(--pink);">30&ndash;40<span style="font-size:.45em; opacity:.6;">%</span></div>
+        <p style="font-size:12.5px; opacity:.7; margin-top:10px; max-width:190px; line-height:1.6; color:var(--void);">Of people floss daily, per the American Dental&nbsp;Association</p>
+      </div>
+      <div style="width:1px; background:rgba(247,236,229,.18);"></div>
+      <div style="flex:1; min-width:150px; padding-left:24px;">
+        <div style="font-family:'Manrope',sans-serif; font-weight:800; font-size:clamp(44px,6vw,64px); line-height:1; color:var(--void);">22</div>
+        <p style="font-size:12.5px; opacity:.7; margin-top:10px; max-width:190px; line-height:1.6; color:var(--void);">Survey respondents, on what actually gets in the way</p>
+      </div>
+    </div>
+  </section></div>
+  <div class="slide-shell"><section class="slide" data-title="The Big Idea">
+    <div class="eyebrow">The Big Idea</div>
+    <h2 style="font-size:30px; max-width:680px; margin-bottom:8px; color:#2F4A28;">Make the tiny habit impossible to forget.</h2>
+    <p style="font-size:13px; color:var(--muted); max-width:600px; margin-bottom:10px;">Built on the cue-routine-reward loop from Charles Duhigg's <em style="font-style:italic;">The Power of Habit</em>.</p>
+    <div style="display:flex; align-items:center; justify-content:center; margin:20px 0 10px;">
+      <svg viewBox="0 0 420 220" width="100%" style="max-width:460px;">
+        <defs>
+          <marker id="arrowPurple" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+            <path d="M0,0 L8,4 L0,8 Z" fill="var(--purple)"/>
+          </marker>
+        </defs>
+        <path d="M 110 55 A 150 150 0 0 1 310 55" stroke="var(--purple)" stroke-width="2.5" fill="none" marker-end="url(#arrowPurple)"/>
+        <path d="M 330 90 A 100 100 0 0 1 245 168" stroke="var(--purple)" stroke-width="2.5" fill="none" marker-end="url(#arrowPurple)"/>
+        <path d="M 175 168 A 100 100 0 0 1 90 90" stroke="var(--purple)" stroke-width="2.5" fill="none" marker-end="url(#arrowPurple)"/>
+        <circle cx="90" cy="60" r="46" fill="#F1F4EA"/>
+        <circle cx="330" cy="60" r="46" fill="#F1F4EA"/>
+        <circle cx="210" cy="168" r="46" fill="var(--purple)"/>
+        <text x="90" y="55" text-anchor="middle" font-family="Poppins" font-weight="800" font-size="15" fill="var(--ink)">Cue</text>
+        <text x="90" y="72" text-anchor="middle" font-family="Manrope" font-size="9" fill="var(--muted)">Daily reminder</text>
+        <text x="330" y="55" text-anchor="middle" font-family="Poppins" font-weight="800" font-size="15" fill="var(--ink)">Routine</text>
+        <text x="330" y="72" text-anchor="middle" font-family="Manrope" font-size="9" fill="var(--muted)">2-min timer</text>
+        <g transform="translate(210,150) scale(0.32)">
+          <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--purple-deep)" stroke-width="3" transform="translate(-45,-50)"/>
+          <circle cx="-12" cy="-8" r="4.5" fill="var(--ink)"/><circle cx="12" cy="-8" r="4.5" fill="var(--ink)"/>
+          <path d="M-12 8 Q0 18 12 8" fill="none" stroke="var(--ink)" stroke-width="3.5" stroke-linecap="round"/>
+        </g>
+        <text x="210" y="184" text-anchor="middle" font-family="Poppins" font-weight="800" font-size="13" fill="#fff">Reward</text>
+        <text x="210" y="197" text-anchor="middle" font-family="Manrope" font-size="8" fill="#fff" opacity="0.85">Streak kept</text>
+      </svg>
+    </div>
+  </section></div>
+
+  <!-- 5b. DESIGN PRINCIPLES -->
+  <div class="slide-shell"><section class="slide" data-title="Design Principles">
+    <div class="eyebrow">What Guided Every Decision</div>
+    <h2 style="font-size:clamp(26px,3.4vw,38px); max-width:640px; margin-bottom:36px; color:#2F4A28;">Three principles that shaped everything.</h2>
+    <div class="grid-3">
+      <div class="card" style="border-color:var(--purple);">
+        <div class="tag">01</div>
+        <h4>Remind, don't nag</h4>
+        <p>Make the habit easier to remember without creating notification fatigue. One default reminder.</p>
+      </div>
+      <div class="card" style="border-color:var(--purple);">
+        <div class="tag">02</div>
+        <h4>Reward consistency, not perfection</h4>
+        <p>Missing a day shouldn't erase what someone already built. Streaks recover, they don't reset to shame.</p>
+      </div>
+      <div class="card" style="border-color:var(--purple);">
+        <div class="tag">03</div>
+        <h4>Make progress feel alive</h4>
+        <p>Chip and cosmetic rewards give the habit a visible, ongoing sense of&nbsp;progression.</p>
+      </div>
+    </div>
+  </section></div>
+
+  <!-- 5c. FROM INSIGHT TO DESIGN -->
+  <div class="slide-shell panel"><section class="slide panel" data-title="From Insight to Design">
+    <div class="eyebrow">Turning Research Into Decisions</div>
+    <h2 style="font-size:clamp(24px,3vw,32px); max-width:640px; margin-bottom:30px; color:#2F4A28;">Every feature traces back to something someone said.</h2>
+    <div style="max-width:760px;">
+      <div style="display:grid; grid-template-columns:1fr 32px 1fr; gap:0; font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; font-weight:700; color:var(--muted); padding-bottom:10px; border-bottom:1.5px solid var(--ink);">
+        <div>Research Finding</div><div></div><div>Design Response</div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 32px 1fr; gap:0; align-items:center; padding:14px 0; border-bottom:1px solid var(--line);">
+        <div style="font-size:13.5px;">People forget to floss</div><div style="color:var(--pink); text-align:center;">&rarr;</div><div style="font-size:13.5px; font-weight:600;">Persistent daily reminder</div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 32px 1fr; gap:0; align-items:center; padding:14px 0; border-bottom:1px solid var(--line);">
+        <div style="font-size:13.5px;">Flossing feels like a chore</div><div style="color:var(--pink); text-align:center;">&rarr;</div><div style="font-size:13.5px; font-weight:600;">Short, guided 2-minute routine</div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 32px 1fr; gap:0; align-items:center; padding:14px 0; border-bottom:1px solid var(--line);">
+        <div style="font-size:13.5px;">People lose motivation over time</div><div style="color:var(--pink); text-align:center;">&rarr;</div><div style="font-size:13.5px; font-weight:600;">Streaks with visible progress</div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 32px 1fr; gap:0; align-items:center; padding:14px 0; border-bottom:1px solid var(--line);">
+        <div style="font-size:13.5px;">People respond to accountability</div><div style="color:var(--pink); text-align:center;">&rarr;</div><div style="font-size:13.5px; font-weight:600;">Friends feature</div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 32px 1fr; gap:0; align-items:center; padding:14px 0;">
+        <div style="font-size:13.5px;">Gamification can feel punishing</div><div style="color:var(--pink); text-align:center;">&rarr;</div><div style="font-size:13.5px; font-weight:600;">Cosmetic rewards, never penalties</div>
+      </div>
+    </div>
+  </section></div>
+
+  <!-- 6. RESEARCH & COMPETITORS -->
+  <div class="slide-shell panel"><section class="slide panel" data-title="Research">
+    <div class="eyebrow">Topic Research &amp; Competitors</div>
+    <div class="grid-3">
+      <div class="card"><div class="tag">Book</div><h4>The Power of Habit</h4><p>Charles Duhigg, the cue-routine-reward loop framework behind Flosser's reminders and&nbsp;rewards.</p></div>
+      <div class="card"><div class="tag">Study</div><h4>Forming a Flossing Habit</h4><p>Judah, Gardner &amp; Aunger, the psychological determinants of why flossing specifically is hard to stick with.</p></div>
+      <div class="card"><div class="tag">Person</div><h4>BJ Fogg, PhD</h4><p>Stanford Behavior Design Lab, tiny consistent behaviors become habits when tied to triggers and emotion.</p></div>
+    </div>
+    <div class="grid-2" style="margin-top:8px;">
+      <div class="card"><div class="tag">Competitor</div><h4>Text2Floss</h4><p>Text-message reminders and progress tracking, simple and accountable.</p></div>
+      <div class="card"><div class="tag">Competitor</div><h4>Toothy</h4><p>Toothbrush timer and full dental routine tracking, clear guidance built in.</p></div>
+    </div>
+  </section></div>
+
+  <!-- 7. TARGET AUDIENCE -->
+  <div class="slide-shell"><section class="slide" data-title="Target Audience">
+    <div class="eyebrow">Target Audience</div>
+    <div class="two-col top">
+      <div class="col">
+        <h2 style="font-size:clamp(28px,3.4vw,40px); margin-bottom:18px; color:#2F4A28;">Basically people who want to floss more.</h2>
+        <ul class="tight">
+          <li>Some people do not floss enough</li>
+          <li>Some people do not floss at all</li>
+          <li>People who want to take their oral hygiene more seriously</li>
+        </ul>
+        <p style="font-size:14px; color:var(--muted); margin-top:20px; max-width:420px;">
+          This app helps people with flossing problems to motivate them to pick up the floss and just use it.
+        </p>
+      </div>
+      <div class="col" style="display:flex; justify-content:center; align-items:center;">
+        <div class="card" style="width:100%; max-width:420px; padding:32px; display:flex; flex-direction:column; align-items:center; gap:20px;">
+          <svg viewBox="0 0 200 200" width="200" height="200" style="overflow:visible;">
+            <!-- donut chart: Never 26.1, Rarely 8.7, Sometimes 4.4, Multiple Times a Week 21.7, Often 13, Always 26.1 -->
+            <g transform="rotate(-90 100 100)">
+              <circle cx="100" cy="100" r="70" fill="none" stroke="#C1502E" stroke-width="34" stroke-dasharray="182.6 439.6" stroke-dashoffset="0"/>
+              <circle cx="100" cy="100" r="70" fill="none" stroke="#D6472E" stroke-width="34" stroke-dasharray="60.9 439.6" stroke-dashoffset="-182.6"/>
+              <circle cx="100" cy="100" r="70" fill="none" stroke="#E0A93E" stroke-width="34" stroke-dasharray="30.8 439.6" stroke-dashoffset="-243.5"/>
+              <circle cx="100" cy="100" r="70" fill="none" stroke="#A83D22" stroke-width="34" stroke-dasharray="151.9 439.6" stroke-dashoffset="-274.3"/>
+              <circle cx="100" cy="100" r="70" fill="none" stroke="#7FC9A8" stroke-width="34" stroke-dasharray="91 439.6" stroke-dashoffset="-426.2"/>
+              <circle cx="100" cy="100" r="70" fill="none" stroke="#3F5636" stroke-width="34" stroke-dasharray="182.6 439.6" stroke-dashoffset="-517.2"/>
+            </g>
+            <text x="100" y="95" text-anchor="middle" font-family="Manrope" font-weight="800" font-size="26" fill="var(--ink)">22</text>
+            <text x="100" y="114" text-anchor="middle" font-family="Poppins" font-size="9" letter-spacing="1" fill="var(--muted)">RESPONSES</text>
+          </svg>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px 18px; width:100%; font-size:12px;">
+            <div style="display:flex; align-items:center; gap:7px;"><span style="width:9px;height:9px;border-radius:50%;background:#C1502E;display:inline-block;"></span>Never &middot; 26.1%</div>
+            <div style="display:flex; align-items:center; gap:7px;"><span style="width:9px;height:9px;border-radius:50%;background:#D6472E;display:inline-block;"></span>Rarely &middot; 8.7%</div>
+            <div style="display:flex; align-items:center; gap:7px;"><span style="width:9px;height:9px;border-radius:50%;background:#E0A93E;display:inline-block;"></span>Sometimes &middot; 4.4%</div>
+            <div style="display:flex; align-items:center; gap:7px;"><span style="width:9px;height:9px;border-radius:50%;background:#A83D22;display:inline-block;"></span>Multiple x/Week &middot; 21.7%</div>
+            <div style="display:flex; align-items:center; gap:7px;"><span style="width:9px;height:9px;border-radius:50%;background:#7FC9A8;display:inline-block;"></span>Often &middot; 13%</div>
+            <div style="display:flex; align-items:center; gap:7px;"><span style="width:9px;height:9px;border-radius:50%;background:#241B33;display:inline-block;"></span>Always &middot; 26.1%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section></div>
+
+  <!-- 7b. WHO'S NOT FLOSSING -->
+  <div class="slide-shell" style="background:var(--ink);"><section class="slide" data-title="Who's Not Flossing" style="color:var(--void);">
+    <div class="blob" style="width:400px;height:400px; background:var(--pink); opacity:.3; bottom:-150px; left:-100px;"></div>
+    <div class="eyebrow" style="color:var(--pink);">From the Same Survey</div>
+    <div style="display:flex; align-items:center; gap:48px; flex-wrap:wrap;">
+      <div>
+        <div style="font-family:'Manrope',sans-serif; font-weight:800; font-size:clamp(70px,10vw,120px); line-height:1; color:var(--void);">35<span style="font-size:.4em; opacity:.6;">%</span></div>
+      </div>
+      <p style="font-size:16px; line-height:1.7; max-width:400px; color:var(--void); opacity:.85;">Never or rarely floss at all. For more than a third of respondents, this app is not a reminder. It is the first thing that has ever asked them to&nbsp;start.</p>
+    </div>
+  </section></div>
+  <div class="slide-shell panel"><section class="slide panel" data-title="Survey">
+    <div class="eyebrow">Survey</div>
+    <div class="two-col top">
+      <div class="col" style="flex:0 0 340px;">
+        <h2 style="font-size:clamp(26px,3.2vw,36px); margin-bottom:16px; color:#2F4A28;">What's actually in the way.</h2>
+        <p style="font-size:14.5px; line-height:1.75; color:var(--muted);">
+          This shows that the people who are too lazy to floss probably will be too lazy to floss even
+          with the app. The people who forget, though, will appreciate the app since it's a reminder
+          that motivates them to keep using it.
+        </p>
+      </div>
+      <div class="col">
+        <div class="card" style="padding:28px;">
+          <div style="font-size:13px; font-weight:700; margin-bottom:2px;">What factors influence whether or not you floss regularly?</div>
+          <div style="font-size:11px; color:var(--muted); margin-bottom:20px;">22 responses</div>
+          <div style="display:flex; flex-direction:column; gap:16px;">
+            <div>
+              <div style="display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:5px;"><span>Forgetfulness</span><b>17 &middot; 77.3%</b></div>
+              <div style="background:var(--panel-2); border-radius:6px; height:12px; overflow:hidden;"><div style="width:77.3%; height:100%; background:linear-gradient(90deg,#C1502E,#A83D22); border-radius:6px;"></div></div>
+            </div>
+            <div>
+              <div style="display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:5px;"><span>Laziness</span><b>14 &middot; 63.6%</b></div>
+              <div style="background:var(--panel-2); border-radius:6px; height:12px; overflow:hidden;"><div style="width:63.6%; height:100%; background:linear-gradient(90deg,#C1502E,#A83D22); border-radius:6px;"></div></div>
+            </div>
+            <div>
+              <div style="display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:5px;"><span>Time constraints</span><b>7 &middot; 31.8%</b></div>
+              <div style="background:var(--panel-2); border-radius:6px; height:12px; overflow:hidden;"><div style="width:31.8%; height:100%; background:linear-gradient(90deg,#C1502E,#A83D22); border-radius:6px;"></div></div>
+            </div>
+            <div>
+              <div style="display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:5px;"><span>Discomfort or pain</span><b>4 &middot; 18.2%</b></div>
+              <div style="background:var(--panel-2); border-radius:6px; height:12px; overflow:hidden;"><div style="width:18.2%; height:100%; background:linear-gradient(90deg,#C1502E,#A83D22); border-radius:6px;"></div></div>
+            </div>
+            <div>
+              <div style="display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:5px;"><span>Perceived effectiveness of other methods</span><b>4 &middot; 18.2%</b></div>
+              <div style="background:var(--panel-2); border-radius:6px; height:12px; overflow:hidden;"><div style="width:18.2%; height:100%; background:linear-gradient(90deg,#C1502E,#A83D22); border-radius:6px;"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section></div>
+
+  <!-- 9. AUDIENCE INSIGHTS -->
+  <div class="slide-shell"><section class="slide" data-title="Audience Insights">
+    <div class="eyebrow">Audience Interview &amp; Strategy</div>
+    <p style="font-size:12.5px; color:var(--muted); max-width:640px; margin-bottom:18px;">What I was trying to learn: why so many people struggle to floss regularly, whether it's forgetfulness, low motivation, not knowing proper technique, or just not seeing the point.</p>
+    <div class="two-col top">
+      <div class="col" style="flex:0 0 150px;">
+        <div class="meta-label">Interviewed</div>
+        <div class="meta-value" style="line-height:1.9; font-size:13px;">Jessica<br>Gabe<br>Kathy<br>Rachel<br>Mike</div>
+      </div>
+      <div class="col">
+        <ul class="tight">
+          <li>"I need annoying reminders or I won't floss at all." <span style="opacity:.5;">&middot; Jessica</span></li>
+          <li>"I only floss at night, I just need a notification to make sure I don't forget." <span style="opacity:.5;">&middot; Gabe</span></li>
+          <li>"I will only use the app if it comes with the product." <span style="opacity:.5;">&middot; Kathy</span></li>
+          <li>"Dentists need to convince me to use the app." <span style="opacity:.5;">&middot; Rachel</span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="card" style="margin-top:20px; max-width:700px; border-color:var(--purple);">
+      <p style="font-size:12.5px; line-height:1.6; color:var(--ink); margin:0; font-style:italic;">"Primary obstacles that hindered the adoption of ideal oral health behaviours included limited knowledge, fatigue, busy schedules, and financial constraints."</p>
+      <p style="font-size:10.5px; color:var(--muted); margin-top:8px;">Springer, Public Health journal, 2025</p>
+    </div>
+  </section></div>
+
+  <!-- 10. PERSONA -->
+  <div class="slide-shell panel"><section class="slide panel" data-title="Persona">
+    <div class="eyebrow">Persona</div>
+    <p style="font-size:12px; color:var(--muted); margin-bottom:18px; max-width:600px;">Forgetfulness, rigid apps, wanting a nudge rather than a lecture: these patterns became Emily.</p>
+    <div class="two-col top">
+      <div class="col" style="flex:0 0 280px;">
+        <img src="img/flosserpersona.png" alt="Emily Watts" style="width:100%; height:340px; border-radius:8px; object-fit:cover; display:block; box-shadow:0 20px 40px rgba(0,0,0,.2);">
+      </div>
+      <div class="col">
+        <h3 style="font-family:'Manrope',sans-serif; font-weight:800; font-size:24px; margin-bottom:4px;">Emily Watts</h3>
+        <div class="meta-value" style="color:var(--muted); margin-bottom:14px;">24 &middot; Graphic Designer &middot; San Francisco</div>
+        <div class="grid-2" style="margin-top:0;">
+          <div><div class="meta-label">Goals</div><ul class="tight"><li>A consistent nightly flossing routine</li><li>Guidance on proper&nbsp;technique</li><li>Streaks to stay&nbsp;motivated</li></ul></div>
+          <div><div class="meta-label">Pain Points</div><ul class="tight"><li>Easily forgets to floss at night</li><li>Current reminder apps feel rigid</li><li>Progress tracking is unclear or&nbsp;cumbersome</li></ul></div>
+        </div>
+      </div>
+      <div class="col" style="flex:0 0 260px;">
+        <div class="card" style="border-color:var(--purple);"><div class="tag">Quote</div><p style="font-size:14px; font-style:italic; color:var(--ink);">"I feel better knowing I didn't skip tonight, my streak keeps me on track."</p></div>
+      </div>
+    </div>
+  </section></div>
+
+  <!-- 11. STORYBOARD -->
+  <div class="slide-shell"><section class="slide" data-title="Storyboard">
+    <div class="eyebrow">Emily's Story</div>
+    <div class="step-tracker">
+      <div class="step"><div class="num">01</div><p>Long workday ends, and flossing is the easiest thing to skip.</p></div>
+      <div class="step"><div class="num">02</div><p>A reminder lands at exactly the right&nbsp;moment.</p></div>
+      <div class="step"><div class="num">03</div><p>She opens Flosser instead of scrolling past it.</p></div>
+      <div class="step"><div class="num">04</div><p>A quick tutorial reminds her of proper technique.</p></div>
+      <div class="step"><div class="num">05</div><p>The 2-minute timer keeps her from rushing.</p></div>
+      <div class="step"><div class="num">06</div><p>Her streak ticks up, and she actually feels good about it.</p></div>
+    </div>
+  </section></div>
+
+  <!-- 12. MOODBOARD -->
+  <div class="slide-shell panel"><section class="slide panel" data-title="Moodboard">
+    <div class="mb">
+      <div class="eyebrow">Moodboard &middot; Brand World</div>
+      <h2 style="font-size:clamp(21px,2.7vw,28px); margin-bottom:4px; color:var(--mb-green);">From soft lavender to Mint&nbsp;Thread.</h2>
+      <p class="lead" style="max-width:700px; margin-bottom:13px; font-size:12.5px;">The first build was pastel lavender on white, the same silhouette as every wellness and period-tracker app. Mint Thread is built around the actual color of a floss spool, and the coral it warns&nbsp;with.</p>
+
+      <div class="mb-board">
+
+        <div class="mb-panel mb-why">
+          <div class="mb-label"><span>01</span>Our Why</div>
+          <div class="mb-why-grid">
+            <div>
+              <h3 class="mb-why-head">Most people know they should floss.<br><em>Most people forget.</em></h3>
+              <p class="mb-why-lead">Flosser was designed around one idea: small actions become habits when they feel easy, rewarding and consistent.</p>
+              <div class="mb-loop">
+                <div class="mb-step">
+                  <div class="mb-circle"><svg viewBox="0 0 24 24" fill="none" stroke="var(--mb-green)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10.5 21a2 2 0 0 0 3 0"/></svg></div>
+                  <b>Remember</b><i>a gentle nudge</i>
+                </div>
+                <div class="mb-arrow">&rarr;</div>
+                <div class="mb-step">
+                  <div class="mb-circle"><svg viewBox="0 0 24 24" fill="none" stroke="var(--mb-green)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3v6a5 5 0 0 0 10 0V3"/><path d="M12 14v7"/><path d="M9 21h6"/></svg></div>
+                  <b>Floss</b><i>just 2 minutes</i>
+                </div>
+                <div class="mb-arrow">&rarr;</div>
+                <div class="mb-step">
+                  <div class="mb-circle mb-circle-hot"><svg viewBox="0 0 24 24" fill="none" stroke="#FFF3F0" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.5 9.7l5.9-.9z"/></svg></div>
+                  <b>Reward</b><i>feel-good progress</i>
+                </div>
+                <div class="mb-arrow">&rarr;</div>
+                <div class="mb-step">
+                  <div class="mb-circle"><svg viewBox="0 0 24 24" fill="none" stroke="var(--mb-green)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 0 0-14-4.5L3 9"/><path d="M3 4v5h5"/><path d="M4 13a8 8 0 0 0 14 4.5L21 15"/><path d="M21 20v-5h-5"/></svg></div>
+                  <b>Repeat</b><i>build your routine</i>
+                </div>
+              </div>
+              <p class="mb-cite">Built on the cue&ndash;routine&ndash;reward loop from Charles Duhigg's <i>The Power of Habit</i>.</p>
+            </div>
+            <div class="mb-why-art">
+              <div class="mb-blob" aria-hidden="true"></div>
+              <svg class="mb-chip-art" viewBox="-4 -5 98 110" role="img" aria-label="Chip, the tooth mascot">
+                <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="#16241E" stroke-width="2.8"/>
+                <circle cx="19" cy="55" r="7" fill="#FFC2B4" opacity="0.9"/>
+                <circle cx="71" cy="55" r="7" fill="#FFC2B4" opacity="0.9"/>
+                <circle cx="33" cy="46" r="5" fill="#16241E"/><circle cx="57" cy="46" r="5" fill="#16241E"/>
+                <path d="M33 60 Q45 70 57 60" fill="none" stroke="#16241E" stroke-width="3.4" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-panel">
+          <div class="mb-label"><span>02</span>Photography</div>
+          <p class="mb-note">Real bathroom moments, photographed the way they actually happen.</p>
+          <div class="mb-shots">
+            <div><div class="mb-shot" style="background-image:url('img/flosser_mood_1.png');"></div><span>real &amp; relatable</span></div>
+            <div><div class="mb-shot" style="background-image:url('img/flosser_mood_2.png');"></div><span>bright &amp; natural</span></div>
+            <div><div class="mb-shot" style="background-image:url('img/flosser_mood_3.png');"></div><span>clean &amp; fresh</span></div>
+          </div>
+          <div class="mb-tags"><span>natural light</span><span>soft shadows</span><span>clean surfaces</span><span>everyday moments</span></div>
+        </div>
+
+        <div class="mb-panel mb-color">
+          <div class="mb-label"><span>03</span>Color Story <em>&middot; every color has one job</em></div>
+          <div class="mb-swatches">
+            <div class="mb-sw"><div class="mb-chip" style="background:var(--mb-thread); color:#EAF3ED;">Thread<br>Green</div><b>our primary</b><i>growth, trust, consistency</i></div>
+            <div class="mb-sw"><div class="mb-chip" style="background:var(--mb-coral); color:#FFF3F0;">Floss<br>Coral</div><b>energy &amp; highlights</b><i>motivation, celebration</i></div>
+            <div class="mb-sw"><div class="mb-chip" style="background:var(--mb-mint); color:#2F5D4A;">Mint<br>Tint</div><b>calm backgrounds</b><i>freshness, balance</i></div>
+            <div class="mb-sw"><div class="mb-chip" style="background:var(--mb-cream); color:#6B6A61; border:1px solid rgba(22,36,30,.12);">Paper</div><b>breathing room</b><i>clean, soft, neutral</i></div>
+            <div class="mb-sw"><div class="mb-chip" style="background:var(--mb-ink); color:#DCE4DE;">Ink</div><b>text &amp; icons</b><i>clarity, contrast</i></div>
+            <div class="mb-sw"><div class="mb-chip mb-chip-mascot" style="background:var(--mb-snaggle); color:#20301A;">Snaggle<br>Green<img src="img/snaggle.png" alt=""></div><b>our mascot</b><i>personality, playfulness</i></div>
+          </div>
+          <p class="mb-noalert"><b>No alert red.</b> Nothing in the app is allowed to look like a failure state.</p>
+        </div>
+
+        <div class="mb-panel mb-shapepanel">
+          <div class="mb-label"><span>04</span>Shape Language</div>
+          <div class="mb-shape-grid">
+           <div>
+            <p class="mb-note">Soft shapes for a soft habit. Round, approachable, easy to live&nbsp;with.</p>
+            <div class="mb-shapes">
+              <div class="mb-shape"><svg viewBox="0 0 34 26"><rect x="5" y="4" width="24" height="18" rx="7" fill="none" stroke="var(--mb-green)" stroke-width="1.8"/></svg><span>round edges</span></div>
+              <div class="mb-shape"><svg viewBox="0 0 34 26"><path d="M4 13 Q9 4 14 13 T24 13 T34 13" fill="none" stroke="var(--mb-green)" stroke-width="1.8" stroke-linecap="round"/></svg><span>wavy thread</span></div>
+              <div class="mb-shape"><svg viewBox="0 0 34 26"><path d="M10 5 Q22 1 27 8 Q33 15 26 20 Q17 26 10 21 Q3 16 6 11 Z" fill="none" stroke="var(--mb-green)" stroke-width="1.8" stroke-linejoin="round"/></svg><span>organic blobs</span></div>
+              <div class="mb-shape"><svg viewBox="0 0 34 26"><path d="M6 9 Q17 22 28 9" fill="none" stroke="var(--mb-green)" stroke-width="1.8" stroke-linecap="round"/></svg><span>smile curves</span></div>
+              <div class="mb-shape"><svg viewBox="0 0 34 26"><path d="M4 16 Q12 6 20 12 T31 9" fill="none" stroke="var(--mb-green)" stroke-width="1.8" stroke-linecap="round"/></svg><span>gentle motion</span></div>
+            </div>
+            <p class="mb-shapenote">Chip's smile, the streak dots and the timer ring are all drawn from the same few curves. Nothing in the interface has a hard&nbsp;corner.</p>
+           </div>
+           <figure class="mb-shapefig">
+             <img src="img/flosser_shape.png" alt="A soft organic blob shape and a curving line of floss beside a mint floss pick and water droplets on cream fabric">
+           </figure>
+          </div>
+        </div>
+
+        <div class="mb-panel">
+          <div class="mb-label"><span>05</span>The Direction I Left Behind</div>
+          <p class="mb-note">Violet on white read as <em style="font-style:italic; color:var(--ink);">clinical</em> to me, closer to a medication tracker than a habit worth keeping, so I left it&nbsp;behind.</p>
+          <div class="mb-old">
+            <span style="background:#F5F3FF;"></span><span style="background:#A78BFA;"></span><span style="background:#7C3AED;"></span><span style="background:#E5E7EB;"></span>
+          </div>
+          <p class="mb-oldcap">Sampled from the original prototype.</p>
+        </div>
+
+      </div>
+    </div>
+  </section></div>
+
+  <!-- 14. TASK FLOW -->
+  <div class="slide-shell panel"><section class="slide panel" data-title="Task Flow">
+    <div class="eyebrow">Task Flow</div>
+    <p class="lead">Task: build a consistent flossing habit by setting reminders and tracking progress.</p>
+    <div class="step-tracker">
+      <div class="step"><div class="num">1</div><p>Opens the app to Chip, defaulted to a daily reminder, no setup screen in the way.</p></div>
+      <div class="step"><div class="num">2</div><p>Reads a quick how-to-floss guide.</p></div>
+      <div class="step"><div class="num">3</div><p>Starts the 2-minute flossing timer.</p></div>
+      <div class="step"><div class="num">4</div><p>Chip reacts, the streak thread fills in for the day.</p></div>
+      <div class="step"><div class="num">5</div><p>Shares with friends to stay&nbsp;accountable.</p></div>
+      <div class="step"><div class="num">6</div><p>Outcome: the habit has&nbsp;started.</p></div>
+    </div>
+    <p style="font-size:13px; color:var(--muted); margin-top:22px;"><strong style="color:var(--ink);">Measurable outcome:</strong> did the user complete a session with the timer and begin building a daily habit?</p>
+    <p style="font-size:12.5px; color:var(--muted); margin-top:10px;">Flossing days now live in Settings, defaulted to every day, rather than gating onboarding. Someone building a daily habit shouldn't have to configure it first.</p>
+  </section></div>
+
+  <!-- 15. TESTING RESULTS -->
+  <div class="slide-shell"><section class="slide" data-title="Testing and Results">
+    <div class="eyebrow">Focus Group &amp; Results</div>
+    <span class="pill grad" style="margin-bottom:16px; display:inline-block;">Focus Group</span>
+    <div class="two-col top">
+      <div class="col">
+        <p class="lead">Kathy, Xally, and Isabella, in one session, talking through their real flossing habits.</p>
+        <div class="grid-3" style="margin-top:18px; max-width:640px;">
+          <div>
+            <div class="meta-label">Isabella</div>
+            <ul class="tight"><li>Wants friends' activity surfaced&nbsp;earlier</li><li>Wants a simple bottom nav</li></ul>
+          </div>
+          <div>
+            <div class="meta-label">Xally</div>
+            <ul class="tight"><li>Alarm placement was&nbsp;confusing</li><li>Timer and guide were most useful</li></ul>
+          </div>
+          <div>
+            <div class="meta-label">Kathy</div>
+            <ul class="tight"><li>Echoed the nav and motivation&nbsp;feedback</li></ul>
+          </div>
+        </div>
+        <div class="card" style="margin-top:18px; max-width:640px; border-color:var(--purple); padding:18px 20px;">
+          <div class="tag">Testing Changed the Product</div>
+          <div style="display:grid; grid-template-columns:1fr 24px 1fr; gap:0; font-size:9.5px; letter-spacing:.08em; text-transform:uppercase; font-weight:700; color:var(--muted); padding-bottom:8px; border-bottom:1px solid var(--ink);">
+            <div>What Users Said</div><div></div><div>What Changed</div>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 24px 1fr; gap:0; align-items:center; padding:10px 0; border-bottom:1px solid var(--line);">
+            <div style="font-size:12px;">"I couldn't find Friends quickly."</div><div style="color:var(--pink); text-align:center; font-size:12px;">&rarr;</div><div style="font-size:12px; font-weight:600;">Moved Friends into primary nav</div>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 24px 1fr; gap:0; align-items:center; padding:10px 0; border-bottom:1px solid var(--line);">
+            <div style="font-size:12px;">Alarm placement was&nbsp;confusing</div><div style="color:var(--pink); text-align:center; font-size:12px;">&rarr;</div><div style="font-size:12px; font-weight:600;">Simplified the reminder interaction</div>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 24px 1fr; gap:0; align-items:center; padding:10px 0;">
+            <div style="font-size:12px;">Decaying tooth felt punishing</div><div style="color:var(--pink); text-align:center; font-size:12px;">&rarr;</div><div style="font-size:12px; font-weight:600;">Chip reacts, Snaggle takes the blame</div>
+          </div>
+        </div>
+      </div>
+      <div class="col" style="flex:0 0 260px;">
+        <div class="meta-label" style="margin-bottom:2px;">Design Goal</div>
+        <p style="font-size:11px; color:var(--muted); margin:0 0 14px;">Illustrative target, not a measured result</p>
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
+          <div style="width:80px; font-size:12px; color:var(--muted);">Typical week</div>
+          <div style="flex:1; height:22px; background:var(--panel-2); border-radius:6px; overflow:hidden;"><div style="width:29%; height:100%; background:var(--muted); border-radius:6px;"></div></div>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="width:80px; font-size:12px; color:var(--ink); font-weight:600;">With Flosser</div>
+          <div style="flex:1; height:22px; background:var(--panel-2); border-radius:6px; overflow:hidden;"><div style="width:86%; height:100%; background:var(--purple); border-radius:6px;"></div></div>
+        </div>
+        <p style="font-size:11px; color:var(--muted); margin-top:10px;">~2 nights/week typical &rarr; 6 nights/week goal</p>
+      </div>
+    </div>
+  </section></div>
+
+  <!-- 15b. THE GOAL -->
+  <div class="slide-shell" style="background:var(--ink);"><section class="slide" data-title="The Goal" style="color:var(--void);">
+    <div class="blob" style="width:420px;height:420px; background:var(--purple); opacity:.35; top:-140px; right:-80px;"></div>
+    <div class="eyebrow" style="color:var(--pink);">The Design Goal</div>
+    <div style="display:flex; align-items:center; gap:32px; flex-wrap:wrap;">
+      <div style="font-family:'Manrope',sans-serif; font-weight:800; font-size:clamp(60px,9vw,100px); line-height:1; color:var(--void);">2</div>
+      <div style="font-size:28px; opacity:.5; color:var(--void);">&rarr;</div>
+      <div style="font-family:'Manrope',sans-serif; font-weight:800; font-size:clamp(60px,9vw,100px); line-height:1; color:var(--pink);">6</div>
+      <p style="font-size:14px; color:var(--void); opacity:.8; max-width:280px;">nights a week, typical to target. Not a measured result yet, the number Flosser's reminders, timer, and streaks are built to&nbsp;close.</p>
+    </div>
+  </section></div>
+
+  <!-- 15c. THE EXPERIENCE -->
+  <div class="slide-shell"><section class="slide" data-title="The Experience">
+    <div class="eyebrow">The Experience</div>
+    <h2 style="font-size:clamp(26px,3.4vw,38px); max-width:640px; margin-bottom:30px; color:#2F4A28;">Three screens, one loop.</h2>
+    <div style="display:flex; gap:36px; justify-content:center; flex-wrap:wrap;">
+
+      <div style="text-align:center; max-width:min(200px,28vw);">
+        <div style="width:min(180px,27vw); border-radius:26px; border:1px solid var(--line); margin:0 auto; box-shadow:0 20px 40px rgba(0,0,0,.08); overflow:hidden; line-height:0;">
+          <img src="img/flosser_home.png" alt="Flosser home screen showing Chip the tooth mascot, a 1-day streak, and the week's flossing checklist" style="width:100%; height:auto; display:block;">
+        </div>
+        <div class="meta-label" style="margin-top:12px;">01 &middot; Home</div>
+        <p style="font-size:11.5px; color:var(--muted); margin:2px 0 0;">Opens straight to Chip and today's streak, no setup screen in the way.</p>
+      </div>
+
+      <div style="text-align:center; max-width:min(200px,28vw);">
+        <div style="width:min(180px,27vw); border-radius:26px; border:1px solid var(--line); margin:0 auto; box-shadow:0 20px 40px rgba(0,0,0,.08); overflow:hidden; line-height:0;">
+          <img src="img/flosser_timer.png" alt="Flosser timer screen with a 2-minute countdown ring and skip-timer option" style="width:100%; height:auto; display:block;">
+        </div>
+        <div class="meta-label" style="margin-top:12px;">02 &middot; Timer &amp; Guide</div>
+        <p style="font-size:11.5px; color:var(--muted); margin:2px 0 0;">A two-minute timer so you don't rush, guide open the whole time.</p>
+      </div>
+
+      <div style="text-align:center; max-width:min(200px,28vw);">
+        <div style="width:min(180px,27vw); border-radius:26px; border:1px solid var(--line); margin:0 auto; box-shadow:0 20px 40px rgba(0,0,0,.08); overflow:hidden; line-height:0;">
+          <img src="img/flosser_friends.png" alt="Flosser friends activity screen showing each friend's weekly flossing streak" style="width:100%; height:auto; display:block;">
+        </div>
+        <div class="meta-label" style="margin-top:12px;">03 &middot; Friends</div>
+        <p style="font-size:11.5px; color:var(--muted); margin:2px 0 0;">See how friends are keeping up with their streaks, so you can hold each other&nbsp;accountable.</p>
+      </div>
+
+    </div>
+  </section></div>
+
+  <!-- 15b. ITERATIONS -->
+  <div class="slide-shell panel"><section class="slide panel" data-title="Iterations">
+    <div class="eyebrow">Design Evolution</div>
+    <h2 style="font-size:clamp(26px,3.4vw,38px); max-width:640px; margin-bottom:8px; color:#2F4A28;">From early prototype to launch.</h2>
+    <p class="lead" style="max-width:560px; margin-bottom:30px;">The first working version proved the loop worked. It didn't yet make anyone want to open it.</p>
+
+    <div style="display:flex; gap:48px; justify-content:center; align-items:flex-start; flex-wrap:wrap;">
+
+      <div style="text-align:center; max-width:min(210px,36vw);">
+        <div style="width:min(190px,34vw); border-radius:26px; border:1px solid var(--line); margin:0 auto; box-shadow:0 20px 40px rgba(0,0,0,.08); overflow:hidden; line-height:0; filter:grayscale(.15) saturate(.85);">
+          <img src="img/flosserrough_1.png" alt="Early Flosser prototype: timer and flossing guide screen with a hamburger menu and no mascot" style="width:100%; height:auto; display:block;">
+        </div>
+        <div class="meta-label" style="margin-top:12px; opacity:.65;">Early Prototype</div>
+        <p style="font-size:11.5px; color:var(--muted); margin:2px 0 0;">There wasn't a real home screen yet. The timer and guide doubled as one.</p>
+      </div>
+
+      <div style="display:flex; align-items:center; align-self:center; padding:0 4px; opacity:.4;">
+        <svg width="30" height="20" viewBox="0 0 30 20"><path d="M1 10 H27 M20 3 L27 10 L20 17" stroke="var(--ink)" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+
+      <div style="text-align:center; max-width:min(210px,36vw);">
+        <div style="width:min(190px,34vw); border-radius:26px; border:1px solid var(--line); margin:0 auto; box-shadow:0 20px 40px rgba(0,0,0,.08); overflow:hidden; line-height:0;">
+          <img src="img/flosser_home.png" alt="Final Flosser home screen with Chip the mascot, streak, and a bottom tab bar" style="width:100%; height:auto; display:block;">
+        </div>
+        <div class="meta-label" style="margin-top:12px;">Final Design</div>
+        <p style="font-size:11.5px; color:var(--muted); margin:2px 0 0;">One screen, one job: open Chip and start&nbsp;flossing.</p>
+      </div>
+
+    </div>
+
+    <div class="grid-3" style="max-width:920px; margin:36px auto 0;">
+      <div class="card"><div class="tag">Navigation</div><h4>Hamburger &rarr; tab bar</h4><p>Four sections used in a two-minute session shouldn't hide behind a menu icon.</p></div>
+      <div class="card"><div class="tag">Structure</div><h4>One screen &rarr; two</h4><p>Progress and Friends got split into their own tabs instead of competing for space.</p></div>
+      <div class="card"><div class="tag">Reward</div><h4>No mascot &rarr; Chip</h4><p>The cue-routine-reward loop needed a face carrying the "reward" half. Chip became that.</p></div>
+      <div class="card"><div class="tag">Color</div><h4>Generic violet &rarr; warm palette</h4><p>Purple reads as productivity software. Cream, mint, and coral read as a habit worth&nbsp;keeping.</p></div>
+      <div class="card"><div class="tag">Accountability</div><h4>Flat stats &rarr; stakes</h4><p>"4/7 days" became "2 days behind, Snaggle's creeping in", so friends' progress now has tension.</p></div>
+      <div class="card"><div class="tag">Home Screen</div><h4>Timer-first &rarr; Chip-first</h4><p>The old home screen doubled as the timer. The new one gives you a reason to press start.</p></div>
+    </div>
+  </section></div>
+
+  <!-- 16. PROTOTYPE -->
+  <div class="slide-shell panel"><section class="slide panel" data-title="Prototype">
+    <div class="eyebrow">Prototype</div>
+    <div class="two-col">
+      <div class="col" style="flex:0 0 auto;">
+        <div style="width:340px; aspect-ratio:800/450; border-radius:6px; overflow:hidden; box-shadow:0 30px 60px rgba(0,0,0,.15);">
+          <iframe style="width:100%; height:100%; border:none;" src="https://embed.figma.com/proto/XsnrzTOWaJteE5XCSivBek/Flooser-Remake?node-id=4-1758&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1&starting-point-node-id=4%3A1758&show-proto-sidebar=1&embed-host=share" allowfullscreen></iframe>
+        </div>
+      </div>
+      <div class="col">
+        <p class="lead">Four tools carry the whole idea: notifications to remind you, a timer so you don't rush, friends so you don't want to embarrass yourself by skipping, and Chip, a mascot who gives you a reason to come back tomorrow.</p>
+        <a href="https://www.figma.com/proto/XsnrzTOWaJteE5XCSivBek/Flooser-Remake?node-id=4-1758" class="link" style="display:inline-block; margin-top:16px;">Open full prototype in Figma &rarr;</a>
+      </div>
+    </div>
+  </section></div>
+
+  <!-- 17. GAMIFICATION CONCEPT -->
+  <div class="slide-shell"><section class="slide" data-title="Gamification Concept">
+    <div style="display:flex; align-items:center; gap:0; height:100%; position:relative;">
+      <div style="flex:0 0 48%; display:flex; align-items:center; justify-content:center; position:relative; margin-left:-3%;">
+        <div style="position:absolute; width:360px; height:360px; border-radius:50%; background:#F1F4EA;"></div>
+        <svg width="320" height="342" viewBox="0 0 90 100" style="position:relative; filter:drop-shadow(0 20px 30px rgba(0,0,0,.08));">
+          <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+          <circle cx="33" cy="42" r="4.5" fill="var(--ink)"/><circle cx="57" cy="42" r="4.5" fill="var(--ink)"/>
+          <circle cx="20" cy="48" r="6" fill="#FFB6A3" opacity="0.6"/><circle cx="70" cy="48" r="6" fill="#FFB6A3" opacity="0.6"/>
+          <path d="M33 58 Q45 68 57 58" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div style="flex:1; padding-left:20px;">
+        <div class="eyebrow">01 &middot; The Idea</div>
+        <h2 style="font-size:clamp(28px,3.6vw,40px); line-height:1.15; margin-bottom:24px;">A mascot to protect, not a tooth to&nbsp;lose.</h2>
+        <div style="display:flex; flex-direction:column; gap:14px; max-width:380px;">
+          <div><span style="font-size:10px; letter-spacing:.14em; text-transform:uppercase; font-weight:700; color:var(--muted);">Problem</span><p style="margin:2px 0 0; font-size:14px;">Missing a day feels like personal&nbsp;failure.</p></div>
+          <div><span style="font-size:10px; letter-spacing:.14em; text-transform:uppercase; font-weight:700; color:var(--pink);">Solution</span><p style="margin:2px 0 0; font-size:14px;">Give the consequence to Snaggle&nbsp;instead.</p></div>
+          <div><span style="font-size:10px; letter-spacing:.14em; text-transform:uppercase; font-weight:700; color:var(--purple-deep);">Result</span><p style="margin:2px 0 0; font-size:14px;">A reason to return, without feeling&nbsp;blamed.</p></div>
+        </div>
+        <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:28px;">
+          <svg width="26" height="28" viewBox="0 0 90 100"><path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="5"/></svg>
+          <span style="opacity:.35; font-size:12px;">&rarr;</span>
+          <svg width="22" height="24" viewBox="0 0 100 110"><circle cx="50" cy="52" r="42" fill="#8FA85C"/><circle cx="36" cy="44" r="6" fill="#2E3B1A"/><circle cx="64" cy="44" r="6" fill="#2E3B1A"/></svg>
+          <span style="opacity:.35; font-size:12px;">&rarr;</span>
+          <svg width="20" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--purple-deep)" stroke-width="2"><path d="M12 2c-2.5 0-4 2-4 4.5 0 2.5 1 5 1.4 6.9.25 1.3.9 2 1.6 2s1.1-.7 1.3-1.9c.25-1.1.3-2.1 1.7-2.1s1.25 1 1.5 2.1c.2 1.2.6 1.9 1.3 1.9s1.35-.7 1.6-2c.4-1.9 1.4-4.4 1.4-6.9C20 4 18.5 2 16 2c-1 0-1.75.4-2 .4S13 2 12 2z"/></svg>
+          <span style="opacity:.35; font-size:12px;">&rarr;</span>
+          <span class="pill grad" style="font-size:11px;">Chip recovers</span>
+        </div>
+      </div>
+    </div>
+  </section></div>
+
+  <!-- SNAGGLE LORE -->
+  <div class="slide-shell" style="background:#212B18;"><section class="slide" data-title="Snaggle and the Lore" style="color:#F4ECE0; overflow:visible;">
+    <div style="display:flex; align-items:center; gap:20px; height:100%;">
+      <div style="flex:1; max-width:380px; z-index:2;">
+        <div class="eyebrow" style="color:#E8A84F;">02 &middot; The Villain</div>
+        <h2 style="font-size:clamp(38px,5.4vw,60px); line-height:1; margin-bottom:18px; color:#F4ECE0;">Meet<br>Snaggle.</h2>
+        <p style="font-size:15px; line-height:1.7; opacity:.85; margin-bottom:24px;">Jealous of every smile that isn't his. Snaggle spreads grime whenever Chip is left unguarded, but consistency is his weakness, every flossing session pushes him&nbsp;back.</p>
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <div><span style="font-size:10px; letter-spacing:.14em; text-transform:uppercase; font-weight:700; color:#E8A84F;">His Scheme</span><span style="font-size:13px; margin-left:8px; opacity:.85;">Spread grime.</span></div>
+          <div><span style="font-size:10px; letter-spacing:.14em; text-transform:uppercase; font-weight:700; color:#E8A84F;">His Weakness</span><span style="font-size:13px; margin-left:8px; opacity:.85;">Consistency.</span></div>
+          <div><span style="font-size:10px; letter-spacing:.14em; text-transform:uppercase; font-weight:700; color:#E8A84F;">His Enemy</span><span style="font-size:13px; margin-left:8px; opacity:.85;">Flossing.</span></div>
+        </div>
+      </div>
+      <div style="flex:0 0 48%; position:relative; display:flex; align-items:center; justify-content:center; margin-right:-6%; overflow:visible;">
+        <div style="position:absolute; width:420px; height:420px; border-radius:50%; background:#8FA85C; opacity:.18; filter:blur(60px);"></div>
+        <div style="position:absolute; top:14%; left:8%; width:7px; height:7px; border-radius:50%; background:#8FA85C; opacity:.7;"></div>
+        <div style="position:absolute; top:60%; left:2%; width:5px; height:5px; border-radius:50%; background:#6B8F3A; opacity:.6;"></div>
+        <div style="position:absolute; top:30%; right:6%; width:6px; height:6px; border-radius:50%; background:#8FA85C; opacity:.5;"></div>
+        <div style="position:absolute; bottom:12%; right:14%; width:8px; height:8px; border-radius:50%; background:#6B8F3A; opacity:.55;"></div>
+        <div style="position:absolute; top:8%; right:26%; width:4px; height:4px; border-radius:50%; background:#8FA85C; opacity:.6;"></div>
+        <img src="img/snaggle.png" alt="Snaggle, the grime villain mascot, a spiky green blob with tendrils and a sly grin" style="width:300px; height:auto; position:relative;">
+      </div>
+    </div>
+  </section></div>
+
+  <!-- NEGLECT STATE -->
+  <div class="slide-shell panel"><section class="slide panel" data-title="If Snaggle Wins">
+    <div class="eyebrow" style="text-align:center; justify-content:center;">03 &middot; The System</div>
+    <h2 style="font-size:clamp(28px,3.6vw,42px); text-align:center; margin-bottom:10px; color:#2F4A28;">What happens when you stop?</h2>
+    <p class="lead" style="margin-bottom:24px; text-align:center; max-width:520px; margin-left:auto; margin-right:auto;">Based on consecutive missed days. The grime happens <em>to</em> Chip, and he wears it patiently.</p>
+    <div style="display:flex; align-items:flex-end; justify-content:center; gap:6px; flex-wrap:wrap;">
+
+      <div style="text-align:center; width:150px;">
+        <svg width="110" height="122" viewBox="0 0 90 100" style="margin:0 auto 10px;">
+          <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+          <circle cx="33" cy="42" r="4.5" fill="var(--ink)"/><circle cx="57" cy="42" r="4.5" fill="var(--ink)"/>
+          <circle cx="20" cy="48" r="6" fill="#FFB6A3" opacity="0.6"/><circle cx="70" cy="48" r="6" fill="#FFB6A3" opacity="0.6"/>
+          <path d="M33 58 Q45 68 57 58" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+        <div style="font-family:'Manrope',sans-serif; font-weight:800; font-size:18px;">Clear</div>
+        <div style="font-size:11px; color:var(--muted); margin-top:2px;">0 days</div>
+      </div>
+
+      <div style="font-size:22px; opacity:.3; padding-bottom:34px;">&rarr;</div>
+
+      <div style="text-align:center; width:150px;">
+        <svg width="110" height="122" viewBox="0 0 90 100" style="margin:0 auto 10px;">
+          <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+          <path d="M60 20 Q74 26 72 42 Q68 46 60 40 Q56 30 60 20 Z" fill="#8FA85C" opacity="0.85"/>
+          <circle cx="33" cy="42" r="4.5" fill="var(--ink)"/><circle cx="57" cy="40" r="4" fill="var(--ink)"/>
+          <circle cx="20" cy="48" r="6" fill="#FFB6A3" opacity="0.5"/>
+          <path d="M34 60 Q45 64 56 60" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+        <div style="font-family:'Manrope',sans-serif; font-weight:800; font-size:18px;">Spotted</div>
+        <div style="font-size:11px; color:var(--muted); margin-top:2px;">2 days</div>
+      </div>
+
+      <div style="font-size:22px; opacity:.3; padding-bottom:34px;">&rarr;</div>
+
+      <div style="text-align:center; width:150px;">
+        <svg width="110" height="122" viewBox="0 0 90 100" style="margin:0 auto 10px;">
+          <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+          <path d="M58 16 Q78 24 76 46 Q74 58 62 56 Q54 44 58 16 Z" fill="#6B8F3A"/>
+          <path d="M62 34 Q68 38 66 44 Q60 46 58 40 Q58 36 62 34 Z" fill="#3F5423"/>
+          <circle cx="33" cy="44" r="4.5" fill="var(--ink)"/>
+          <path d="M50 38 Q57 34 63 38" fill="none" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M30 40 Q26 36 22 40" fill="none" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M34 64 Q45 60 56 64" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+        <div style="font-family:'Manrope',sans-serif; font-weight:800; font-size:18px;">Worried</div>
+        <div style="font-size:11px; color:var(--muted); margin-top:2px;">5 days</div>
+      </div>
+
+      <div style="font-size:22px; opacity:.3; padding-bottom:34px;">&rarr;</div>
+
+      <div style="text-align:center; width:150px;">
+        <svg width="110" height="122" viewBox="0 0 90 100" style="margin:0 auto 10px;">
+          <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--red)" stroke-width="2.2"/>
+          <path d="M50 6 Q80 14 80 46 Q78 70 60 92 Q48 88 48 70 Q44 40 50 6 Z" fill="#4A6428"/>
+          <ellipse cx="64" cy="42" rx="9" ry="12" fill="#2E3B1A"/>
+          <circle cx="30" cy="46" r="4.5" fill="var(--ink)"/>
+          <path d="M48 40 Q56 33 64 38" fill="none" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M27 42 Q22 36 17 41" fill="none" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M30 66 Q45 76 55 68" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+        <div style="font-family:'Manrope',sans-serif; font-weight:800; font-size:18px; color:var(--red);">Overrun</div>
+        <div style="font-size:11px; color:var(--muted); margin-top:2px;">9+ days</div>
+      </div>
+
+    </div>
+    <p style="text-align:center; font-size:12.5px; color:var(--muted); margin-top:30px;">Every state is reversible. One ordinary session, and Chip starts clearing again.</p>
+  </section></div>
+
+  <!-- LEVELING & CLOSET -->
+  <div class="slide-shell panel"><section class="slide panel" data-title="Leveling and Closet">
+    <div class="eyebrow" style="text-align:center; justify-content:center;">04 &middot; The Reward</div>
+    <h2 style="font-size:clamp(28px,3.6vw,42px); text-align:center; margin-bottom:36px;">Your smile evolves with you.</h2>
+
+    <div style="display:flex; align-items:flex-end; justify-content:center; gap:6px; flex-wrap:wrap;">
+
+      <div style="text-align:center; width:150px; position:relative;">
+        <svg width="100" height="112" viewBox="-6 -14 102 114" style="margin:0 auto 10px; position:relative;">
+          <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+          <circle cx="33" cy="42" r="4.5" fill="var(--ink)"/><circle cx="57" cy="42" r="4.5" fill="var(--ink)"/>
+          <path d="M33 58 Q45 68 57 58" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+        <div style="font-family:'Manrope',sans-serif; font-weight:800; font-size:15px;">Bright Smile</div>
+      </div>
+
+      <div style="font-size:18px; opacity:.3; padding-bottom:26px;">&rarr;</div>
+
+      <div style="text-align:center; width:150px; position:relative;">
+        <div style="position:absolute; top:14px; left:50%; transform:translateX(-50%); width:100px; height:100px; border-radius:50%; background:#FFD9EC; opacity:.6; filter:blur(20px);"></div>
+        <svg width="100" height="112" viewBox="-6 -14 102 114" style="margin:0 auto 10px; position:relative;">
+          <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+          <circle cx="33" cy="42" r="4.5" fill="var(--ink)"/><circle cx="57" cy="42" r="4.5" fill="var(--ink)"/>
+          <path d="M33 58 Q45 68 57 58" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+          <path d="M68 18 L71 25 L78 27 L71 29 L68 36 L65 29 L58 27 L65 25 Z" fill="#FF9FC4"/>
+        </svg>
+        <div style="font-family:'Manrope',sans-serif; font-weight:800; font-size:15px;">Pearl Shine</div>
+      </div>
+
+      <div style="font-size:18px; opacity:.3; padding-bottom:26px;">&rarr;</div>
+
+      <div style="text-align:center; width:150px; position:relative;">
+        <div style="position:absolute; top:14px; left:50%; transform:translateX(-50%); width:100px; height:100px; border-radius:50%; background:#FFD166; opacity:.5; filter:blur(20px);"></div>
+        <svg width="100" height="112" viewBox="-6 -14 102 114" style="margin:0 auto 10px; position:relative;">
+          <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+          <circle cx="33" cy="42" r="4.5" fill="var(--ink)"/><circle cx="57" cy="42" r="4.5" fill="var(--ink)"/>
+          <path d="M33 58 Q45 68 57 58" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+          <path d="M26 12 L34 -2 L42 8 L45 -6 L48 8 L56 -2 L64 12 Z" fill="#FFD166" stroke="var(--ink)" stroke-width="1.4" stroke-linejoin="round"/>
+        </svg>
+        <div style="font-family:'Manrope',sans-serif; font-weight:800; font-size:15px;">Golden Grin</div>
+      </div>
+
+      <div style="font-size:18px; opacity:.3; padding-bottom:26px;">&rarr;</div>
+
+      <div style="text-align:center; width:150px; position:relative;">
+        <div style="position:absolute; top:14px; left:50%; transform:translateX(-50%); width:110px; height:110px; border-radius:50%; background:#BFE9F5; opacity:.6; filter:blur(22px);"></div>
+        <svg width="100" height="112" viewBox="-6 -14 102 114" style="margin:0 auto 10px; position:relative;">
+          <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+          <circle cx="33" cy="42" r="4.5" fill="var(--ink)"/><circle cx="57" cy="42" r="4.5" fill="var(--ink)"/>
+          <path d="M33 58 Q45 68 57 58" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+          <path d="M70 14 L73 21 L80 23 L73 25 L70 32 L67 25 L60 23 L67 21 Z" fill="#7EC8DB"/>
+          <path d="M18 60 L20 65 L25 67 L20 69 L18 74 L16 69 L11 67 L16 65 Z" fill="#7EC8DB"/>
+        </svg>
+        <div style="font-family:'Manrope',sans-serif; font-weight:800; font-size:15px;">Diamond Grin</div>
+      </div>
+
+    </div>
+
+    <div style="margin-top:44px; padding-top:24px; border-top:1px solid var(--line); display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap;">
+      <span class="meta-label" style="margin:0 10px 0 0;">Unlockable cosmetics</span>
+      <span class="pill" style="background:#F1F4EA; border-color:transparent;">Princess Chip</span>
+      <span class="pill" style="background:#F1F4EA; border-color:transparent;">Cool Chip</span>
+      <span class="pill" style="background:#F1F4EA; border-color:transparent;">Wizard Hat &middot; 60-day streak</span>
+      <span class="pill grad">Diamond Aura &middot; top tier</span>
+    </div>
+    <p style="font-size:11.5px; color:var(--muted); text-align:center; margin-top:14px;">Purely cosmetic. Missing a day never costs someone something they already earned.</p>
+  </section></div>
+
+  <!-- 17b. CLOSET CONCEPTS -->
+  <div class="slide-shell panel"><section class="slide panel" data-title="Closet Concepts">
+    <div class="eyebrow">The Full Wardrobe</div>
+    <h2 style="font-size:clamp(24px,3vw,32px); max-width:600px; margin-bottom:18px;">What's built, and what's next.</h2>
+
+    <div class="meta-label" style="margin-bottom:10px;">Already in the app</div>
+    <div style="display:grid; grid-template-columns:repeat(6,1fr); gap:12px; margin-bottom:22px;">
+
+      <div class="card" style="text-align:center; padding:14px 8px; border-color:var(--purple);">
+        <svg width="70" height="92" viewBox="-6 -32 102 134" style="margin:0 auto 6px;" role="img" aria-label="Princess Chip">
+          <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+          <path d="M20 78 Q45 66 70 78 L70 89 Q64 96 58 89 Q52 96 46 89 Q40 96 34 89 Q28 96 22 89 Z" fill="#FF9FC4" stroke="var(--ink)" stroke-width="1.3" stroke-linejoin="round"/>
+          <circle cx="19" cy="54" r="6" fill="#FFB6A3" opacity="0.6"/><circle cx="71" cy="54" r="6" fill="#FFB6A3" opacity="0.6"/>
+          <circle cx="33" cy="46" r="4.5" fill="var(--ink)"/><circle cx="57" cy="46" r="4.5" fill="var(--ink)"/>
+          <path d="M33 60 Q45 70 57 60" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+          <path d="M27 12 L27 -5 L36 4 L45 -16 L54 4 L63 -5 L63 12 Z" fill="#FFD166" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round"/>
+          <circle cx="45" cy="-16" r="2.8" fill="#A83D22"/><circle cx="27" cy="-5" r="2.2" fill="#FF9FC4"/><circle cx="63" cy="-5" r="2.2" fill="#FF9FC4"/>
+        </svg>
+        <div style="font-size:11px; font-weight:700;">Princess Chip</div>
+      </div>
+
+      <div class="card" style="text-align:center; padding:14px 8px; border-color:var(--purple);">
+        <svg width="70" height="92" viewBox="-6 -32 102 134" style="margin:0 auto 6px;" role="img" aria-label="Cool Chip">
+          <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+          <path d="M20 76 Q45 66 70 76 L72 95 Q45 85 18 95 Z" fill="#5C7FB0" stroke="var(--ink)" stroke-width="1.3" stroke-linejoin="round"/>
+          <path d="M34 72 L45 87 L56 72 L53 93 L37 93 Z" fill="#F1F4EA" stroke="var(--ink)" stroke-width="1.2" stroke-linejoin="round"/>
+          <circle cx="19" cy="54" r="6" fill="#FFB6A3" opacity="0.45"/><circle cx="71" cy="54" r="6" fill="#FFB6A3" opacity="0.45"/>
+          <path d="M21 44 L11 40" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round"/>
+          <path d="M69 44 L79 40" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round"/>
+          <rect x="21" y="39" width="19" height="13" rx="6.5" fill="var(--ink)"/>
+          <rect x="50" y="39" width="19" height="13" rx="6.5" fill="var(--ink)"/>
+          <path d="M40 44 L50 44" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+          <path d="M25.5 42.5 L31 42.5" stroke="#fff" stroke-width="1.7" opacity="0.5" stroke-linecap="round"/>
+          <path d="M33 62 Q45 70 58 60" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+        <div style="font-size:11px; font-weight:700;">Cool Chip</div>
+      </div>
+
+      <div class="card" style="text-align:center; padding:14px 8px; border-color:var(--purple);">
+        <svg width="70" height="92" viewBox="-6 -32 102 134" style="margin:0 auto 6px;" role="img" aria-label="Wizard Hat">
+          <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+          <circle cx="33" cy="46" r="4.5" fill="var(--ink)"/><circle cx="57" cy="46" r="4.5" fill="var(--ink)"/>
+          <path d="M33 60 Q45 70 57 60" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+          <path d="M24 15 L40 -20 Q45 -30 51 -21 L66 15 Z" fill="#7C4FBF" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round"/>
+          <path d="M30 2 Q45 7 60 2" fill="none" stroke="#FFD166" stroke-width="3"/>
+          <ellipse cx="45" cy="15" rx="27" ry="6.5" fill="#7C4FBF" stroke="var(--ink)" stroke-width="1.6"/>
+          <path d="M48 -25 L49.6 -21.4 L53.4 -20 L49.6 -18.6 L48 -15 L46.4 -18.6 L42.6 -20 L46.4 -21.4 Z" fill="#FFD166" stroke="var(--ink)" stroke-width="0.8" stroke-linejoin="round"/>
+        </svg>
+        <div style="font-size:11px; font-weight:700;">Wizard Hat</div>
+      </div>
+
+      <div class="card" style="text-align:center; padding:14px 8px; border-color:var(--purple);">
+        <svg width="70" height="92" viewBox="-6 -32 102 134" style="margin:0 auto 6px;" role="img" aria-label="Diamond Aura">
+          <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+          <circle cx="33" cy="46" r="4.5" fill="var(--ink)"/><circle cx="57" cy="46" r="4.5" fill="var(--ink)"/>
+          <path d="M33 60 Q45 70 57 60" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+          <ellipse cx="45" cy="44" rx="40" ry="44" fill="none" stroke="#BFE9F5" stroke-width="1.8" opacity="0.65"/>
+          <ellipse cx="45" cy="44" rx="46" ry="50" fill="none" stroke="#7EC8DB" stroke-width="2.6" opacity="0.85"/>
+          <path d="M80 3 L82.1 7.9 L87 10 L82.1 12.1 L80 17 L77.9 12.1 L73 10 L77.9 7.9 Z" fill="#7EC8DB"/>
+          <path d="M11 60 L12.8 64.2 L17 66 L12.8 67.8 L11 72 L9.2 67.8 L5 66 L9.2 64.2 Z" fill="#7EC8DB"/>
+          <path d="M72 81 L73.5 84.5 L77 86 L73.5 87.5 L72 91 L70.5 87.5 L67 86 L70.5 84.5 Z" fill="#7EC8DB"/>
+          <path d="M18 11.5 L19.4 14.7 L22.5 16 L19.4 17.4 L18 20.5 L16.6 17.4 L13.5 16 L16.6 14.7 Z" fill="#7EC8DB"/>
+        </svg>
+        <div style="font-size:11px; font-weight:700;">Diamond Aura</div>
+      </div>
+
+    </div>
+
+    <div class="meta-label" style="margin-bottom:8px;">What Else Could Live Here</div>
+    <p class="lead" style="margin-bottom:14px;">A concept sheet of early explorations for where the closet could go&nbsp;next.</p>
+    <div style="display:grid; grid-template-columns:repeat(6,1fr); gap:12px;">
+
+      <div class="card" style="text-align:center; padding:14px 8px;">
+        <svg width="70" height="92" viewBox="-6 -32 102 134" style="margin:0 auto 6px;" role="img" aria-label="Beanie Chip">
+          <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+          <circle cx="33" cy="46" r="4.5" fill="var(--ink)"/><circle cx="57" cy="46" r="4.5" fill="var(--ink)"/>
+          <path d="M33 60 Q45 70 57 60" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+          <path d="M16 20 Q16 -12 45 -12 Q74 -12 74 20 Z" fill="#C1502E" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round"/>
+          <path d="M30 -7 L30 13 M45 -11 L45 13 M60 -7 L60 13" stroke="#A83D22" stroke-width="1.5" opacity="0.75"/>
+          <rect x="13" y="13" width="64" height="13" rx="6.5" fill="#A83D22" stroke="var(--ink)" stroke-width="1.6"/>
+          <circle cx="45" cy="-15" r="7" fill="#F1F4EA" stroke="var(--ink)" stroke-width="1.6"/>
+        </svg>
+        <div style="font-size:11px; font-weight:700;">Beanie Chip</div>
+      </div>
+
+      <div class="card" style="text-align:center; padding:14px 8px;">
+        <svg width="70" height="92" viewBox="-6 -32 102 134" style="margin:0 auto 6px;" role="img" aria-label="Chef Chip">
+          <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+          <circle cx="33" cy="46" r="4.5" fill="var(--ink)"/><circle cx="57" cy="46" r="4.5" fill="var(--ink)"/>
+          <path d="M33 60 Q45 70 57 60" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+          <path d="M31 76 Q45 84 59 76 L57 90 Q45 95 33 90 Z" fill="#C1502E" stroke="var(--ink)" stroke-width="1.3" stroke-linejoin="round"/>
+          <path d="M20 14 C19 3 22 -5 30 -8 C33 -20 38 -25 45 -25 C52 -25 57 -20 60 -8 C68 -5 71 3 70 14 Z" fill="#fff" stroke="var(--ink)" stroke-width="1.7" stroke-linejoin="round"/>
+          <rect x="23" y="6" width="44" height="14" rx="3.5" fill="#fff" stroke="var(--ink)" stroke-width="1.7"/>
+        </svg>
+        <div style="font-size:11px; font-weight:700;">Chef Chip</div>
+      </div>
+
+      <div class="card" style="text-align:center; padding:14px 8px;">
+        <svg width="70" height="92" viewBox="-6 -32 102 134" style="margin:0 auto 6px;" role="img" aria-label="Pirate Chip">
+          <defs><clipPath id="pirClip"><path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z"/></clipPath></defs>
+          <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+          <g clip-path="url(#pirClip)"><path d="M0 -6 H90 V22 Q45 30 0 22 Z" fill="#C1502E"/><circle cx="24" cy="10" r="2" fill="#F1F4EA" opacity="0.8"/><circle cx="45" cy="14" r="2" fill="#F1F4EA" opacity="0.8"/><circle cx="66" cy="10" r="2" fill="#F1F4EA" opacity="0.8"/></g>
+          <path d="M12 17 L-3 8 L1 22 L-5 31 L13 27 Z" fill="#A83D22" stroke="var(--ink)" stroke-width="1.3" stroke-linejoin="round"/>
+          <path d="M50 41 Q40 36 25 35" fill="none" stroke="var(--ink)" stroke-width="2" stroke-linecap="round"/>
+          <path d="M65 42 L80 40" stroke="var(--ink)" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="33" cy="46" r="4.5" fill="var(--ink)"/>
+          <ellipse cx="57" cy="45" rx="8.5" ry="7.5" fill="var(--ink)"/>
+          <path d="M32 60 Q45 71 58 60" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+        <div style="font-size:11px; font-weight:700;">Pirate Chip</div>
+      </div>
+
+      <div class="card" style="text-align:center; padding:14px 8px;">
+        <svg width="70" height="92" viewBox="-6 -32 102 134" style="margin:0 auto 6px;" role="img" aria-label="Flower Chip">
+          <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+          <circle cx="33" cy="46" r="4.5" fill="var(--ink)"/><circle cx="57" cy="46" r="4.5" fill="var(--ink)"/>
+          <path d="M33 60 Q45 70 57 60" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="19" cy="54" r="6" fill="#FFB6A3" opacity="0.5"/><circle cx="71" cy="54" r="6" fill="#FFB6A3" opacity="0.5"/>
+          <ellipse cx="9" cy="35" rx="6" ry="3.4" fill="#5C7A4E" transform="rotate(-32 9 35)"/>
+          <ellipse cx="81" cy="35" rx="6" ry="3.4" fill="#5C7A4E" transform="rotate(32 81 35)"/>
+          <circle cx="12" cy="28" r="3.2" fill="#FF9FC4"/><circle cx="20" cy="28" r="3.2" fill="#FF9FC4"/><circle cx="16" cy="24" r="3.2" fill="#FF9FC4"/><circle cx="16" cy="32" r="3.2" fill="#FF9FC4"/><circle cx="16" cy="28" r="2.5" fill="#FFD166"/>
+          <circle cx="22" cy="12" r="3.2" fill="#FFD166"/><circle cx="30" cy="12" r="3.2" fill="#FFD166"/><circle cx="26" cy="8" r="3.2" fill="#FFD166"/><circle cx="26" cy="16" r="3.2" fill="#FFD166"/><circle cx="26" cy="12" r="2.5" fill="#fff"/>
+          <circle cx="41" cy="4" r="3.2" fill="#FF9FC4"/><circle cx="49" cy="4" r="3.2" fill="#FF9FC4"/><circle cx="45" cy="0" r="3.2" fill="#FF9FC4"/><circle cx="45" cy="8" r="3.2" fill="#FF9FC4"/><circle cx="45" cy="4" r="2.5" fill="#FFD166"/>
+          <circle cx="60" cy="12" r="3.2" fill="#C1502E"/><circle cx="68" cy="12" r="3.2" fill="#C1502E"/><circle cx="64" cy="8" r="3.2" fill="#C1502E"/><circle cx="64" cy="16" r="3.2" fill="#C1502E"/><circle cx="64" cy="12" r="2.5" fill="#FFD166"/>
+          <circle cx="70" cy="28" r="3.2" fill="#FFD166"/><circle cx="78" cy="28" r="3.2" fill="#FFD166"/><circle cx="74" cy="24" r="3.2" fill="#FFD166"/><circle cx="74" cy="32" r="3.2" fill="#FFD166"/><circle cx="74" cy="28" r="2.5" fill="#fff"/>
+        </svg>
+        <div style="font-size:11px; font-weight:700;">Flower Chip</div>
+      </div>
+
+      <div class="card" style="text-align:center; padding:14px 8px;">
+        <svg width="70" height="92" viewBox="-6 -32 102 134" style="margin:0 auto 6px;" role="img" aria-label="Astro Chip">
+          <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+          <circle cx="33" cy="46" r="4.5" fill="var(--ink)"/><circle cx="57" cy="46" r="4.5" fill="var(--ink)"/>
+          <path d="M33 60 Q45 70 57 60" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+          <ellipse cx="45" cy="44" rx="45" ry="49" fill="#BFE9F5" opacity="0.3"/>
+          <path d="M16 30 Q22 13 38 6" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity="0.75"/>
+          <ellipse cx="45" cy="44" rx="45" ry="49" fill="none" stroke="#5C7FB0" stroke-width="3"/>
+          <path d="M45 -5 L45 -18" stroke="#5C7FB0" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="45" cy="-21" r="4" fill="#A83D22" stroke="var(--ink)" stroke-width="1.2"/>
+          <rect x="13" y="84" width="64" height="11" rx="5.5" fill="#5C7FB0" stroke="var(--ink)" stroke-width="1.4"/>
+        </svg>
+        <div style="font-size:11px; font-weight:700;">Astro Chip</div>
+      </div>
+
+      <div class="card" style="text-align:center; padding:14px 8px;">
+        <svg width="70" height="92" viewBox="-6 -32 102 134" style="margin:0 auto 6px;" role="img" aria-label="Hero Chip">
+          <defs><clipPath id="heroClip"><path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z"/></clipPath></defs>
+          <path d="M24 54 Q45 46 66 54 L88 100 Q45 84 2 100 Z" fill="#5C7A4E" stroke="var(--ink)" stroke-width="1.4" stroke-linejoin="round"/>
+          <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+          <g clip-path="url(#heroClip)"><path d="M2 33 Q45 26 88 33 L88 53 Q45 60 2 53 Z" fill="#3F5636"/></g>
+          <ellipse cx="33" cy="44" rx="6.5" ry="5.5" fill="#fff"/><ellipse cx="57" cy="44" rx="6.5" ry="5.5" fill="#fff"/>
+          <circle cx="33" cy="44" r="3.4" fill="var(--ink)"/><circle cx="57" cy="44" r="3.4" fill="var(--ink)"/>
+          <path d="M33 60 Q45 70 57 60" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+        <div style="font-size:11px; font-weight:700;">Hero Chip</div>
+      </div>
+
+    </div>
+  </section></div>
+
+  <!-- 18. BRANDING -->
+  <div class="slide-shell"><section class="slide" data-title="Branding Guidelines">
+    <div class="eyebrow">Branding Guidelines</div>
+    <h2 style="font-size:clamp(24px,3.1vw,34px); max-width:640px; margin-bottom:6px; color:#2F4A28;">The mascots are the brand.</h2>
+    <p class="lead" style="max-width:600px; margin-bottom:20px;">Flosser's identity isn't a logo and a palette. It's two characters and one rule about who gets blamed.</p>
+
+    <div class="brand-cols">
+
+      <div class="brand-chars">
+        <div class="card" style="border-color:var(--purple); display:flex; gap:12px; align-items:flex-start;">
+          <svg width="42" height="47" viewBox="0 0 90 100" style="flex:0 0 auto; margin-top:2px;" role="img" aria-label="Chip">
+            <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.6"/>
+            <circle cx="33" cy="46" r="5" fill="var(--ink)"/><circle cx="57" cy="46" r="5" fill="var(--ink)"/>
+            <path d="M33 60 Q45 70 57 60" fill="none" stroke="var(--ink)" stroke-width="3.4" stroke-linecap="round"/>
+          </svg>
+          <div>
+            <div class="tag">Chip</div>
+            <h4 style="margin-bottom:4px;">Reacts. Never blames.</h4>
+            <p>He dulls when the habit slips and brightens when it returns. He never reports a number and never asks where you've been.</p>
+          </div>
+        </div>
+
+        <div class="card" style="border-color:var(--pink); display:flex; gap:12px; align-items:flex-start;">
+          <img src="img/snaggle.png" alt="Snaggle" style="width:46px; height:auto; flex:0 0 auto; margin-top:2px;">
+          <div>
+            <div class="tag">Snaggle</div>
+            <h4 style="margin-bottom:4px;">Takes the blame. Always.</h4>
+            <p>Every consequence is attributed to him, never to the user. He is a nuisance you push back, and that is the whole trick.</p>
+          </div>
+        </div>
+
+        <div class="card" style="background:#2F4A28; border-color:#2F4A28;">
+          <div class="tag" style="color:#C7D8B8; border-color:rgba(199,216,184,.4);">The rule underneath</div>
+          <p style="color:#F1F4EA; font-size:13.5px; line-height:1.55; margin:0;">Grime happens <em style="font-style:italic; color:#E8A84F;">to</em> Chip. It is never something the user did wrong.</p>
+        </div>
+      </div>
+
+      <div class="brand-voice">
+        <div class="meta-label" style="margin-bottom:8px;">Voice &middot; how the app talks about a missed day</div>
+        <div class="say-row say-head">
+          <div>We say</div><div>We never say</div>
+        </div>
+        <div class="say-row">
+          <div class="say-yes">"2 days behind, Snaggle's creeping in."</div>
+          <div class="say-no">"You missed 3 of 7 days."</div>
+        </div>
+        <div class="say-row">
+          <div class="say-yes">"Chip's looking a little dull today."</div>
+          <div class="say-no">"You broke your streak."</div>
+        </div>
+        <div class="say-row">
+          <div class="say-yes">"One ordinary session and Chip starts clearing."</div>
+          <div class="say-no">"Get back on track before you lose it all."</div>
+        </div>
+
+        <div class="meta-label" style="margin:18px 0 8px;">Color &middot; what each one is allowed to mean</div>
+        <div class="mean-row">
+          <div class="mean"><span class="sw" style="background:var(--purple);"></span><div><b>Thread green</b><i>Progress already earned</i></div></div>
+          <div class="mean"><span class="sw" style="background:var(--pink);"></span><div><b>Floss coral</b><i>Attention, never alarm</i></div></div>
+          <div class="mean"><span class="sw" style="background:var(--ink);"></span><div><b>Ink</b><i>Plain information</i></div></div>
+          <div class="mean"><span class="sw sw-x"></span><div><b>No alert red</b><i>Nothing in the app fails you</i></div></div>
+        </div>
+      </div>
+
+    </div>
+  </section></div>
+
+  <!-- 19. WRAP UP -->
+  <div class="slide-shell panel"><section class="slide panel" data-title="Wrap Up" style="align-items:center;">
+    <div class="eyebrow" style="text-align:center;">Reflection</div>
+    <div style="max-width:680px; text-align:left;">
+      <div class="meta-label">What Changed</div>
+      <p class="lead" style="margin:6px 0 26px;">The original idea was a flossing reminder. The final product became a habit system: remember, act, reward, return. Every screen exists to move someone through that loop without friction or guilt.</p>
+      <div class="meta-label" style="margin-bottom:10px;">What I Learned</div>
+      <div class="grid-3">
+        <div class="card"><div class="tag">01</div><h4>Test the interaction, not just the screen</h4><p>A visually clear interface can still fail when the interaction model doesn't match what someone expects.</p></div>
+        <div class="card"><div class="tag">02</div><h4>Motivation and punishment aren't the same thing</h4><p>Chip and Snaggle taught me gamification can create urgency without making the user feel guilty.</p></div>
+        <div class="card"><div class="tag">03</div><h4>Small friction matters in habit products</h4><p>When the behavior itself takes under two minutes, even one unnecessary decision is a reason not to do it.</p></div>
+      </div>
+      <div class="meta-label" style="margin-top:26px;">What's Next</div>
+      <p class="lead" style="margin:6px 0 0;">Testing Chip and Snaggle with a larger group to see if the mascot system holds up past the novelty of a first session, and building out Friends into a real accountability feature rather than a single share screen.</p>
+    </div>
+  </section></div>
+
+  <!-- 27. THANK YOU -->
+  <div class="slide-shell"><section class="slide" data-title="Thank You" style="align-items:center; text-align:center;">
+    <div class="blob" style="width:480px;height:480px; background:var(--purple); opacity:.16; top:-170px; left:50%; transform:translateX(-50%);"></div>
+
+    <div style="position:relative; display:inline-block; background:var(--panel-2); border:2px solid var(--ink); border-radius:20px; padding:16px 26px; max-width:360px; margin:0 auto; font-family:'Poppins',sans-serif; font-weight:600; font-size:15px; line-height:1.5; color:var(--ink); z-index:1;">
+      That&rsquo;s the week done. Thanks for flossing&nbsp;along.
+      <span style="position:absolute; bottom:-10px; left:50%; transform:translateX(-50%) rotate(45deg); width:18px; height:18px; background:var(--panel-2); border-right:2px solid var(--ink); border-bottom:2px solid var(--ink); border-bottom-right-radius:4px;"></span>
+    </div>
+
+    <svg width="112" height="124" viewBox="0 0 90 100" style="margin:24px auto 0; display:block; position:relative; z-index:1;">
+      <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="var(--panel-2)" stroke="var(--ink)" stroke-width="3"/>
+      <circle cx="25" cy="53" r="6.5" fill="var(--pink)" opacity=".32"/>
+      <circle cx="65" cy="53" r="6.5" fill="var(--pink)" opacity=".32"/>
+      <circle cx="33" cy="42" r="5" fill="var(--ink)"/>
+      <circle cx="57" cy="42" r="5" fill="var(--ink)"/>
+      <path d="M33 58 Q45 68 57 58" fill="none" stroke="var(--ink)" stroke-width="3.5" stroke-linecap="round"/>
+    </svg>
+
+    <div class="streak-row" style="margin:26px 0 0;">
+      <div class="streak-dot done">&#10003;</div>
+      <div class="streak-dot done">&#10003;</div>
+      <div class="streak-dot done">&#10003;</div>
+      <div class="streak-dot done">&#10003;</div>
+      <div class="streak-dot done">&#10003;</div>
+      <div class="streak-dot done">&#10003;</div>
+      <div class="streak-dot done">&#10003;</div>
+    </div>
+    <div style="font-family:'Poppins',sans-serif; font-weight:700; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--purple-deep); margin-top:14px;">7 of 7 &middot; perfect week</div>
+
+    <div style="margin-top:46px; font-family:'Poppins',sans-serif; font-weight:700; font-size:15px; color:var(--ink);">Alisa Utesheva</div>
+    <div style="font-size:13px; color:var(--muted); margin-top:3px;">UX &amp; UI Designer</div>
+      <nav class="cs-end" aria-label="Case study navigation">
+      <a href="homepage.html#work"><span aria-hidden="true">&larr;</span> All Case Studies</a>
+      <a class="next" href="nuance.html">Next &middot; Nuance <span aria-hidden="true">&rarr;</span></a>
+    </nav>
+  </section></div>
+
+  </div>
+
+<script>
+  const slides = [...document.querySelectorAll('.slide')];
+  const total = slides.length;
+  const counter = document.getElementById('counter');
+  const progressLine = document.getElementById('progressLine');
+  const stepInsideBtn = document.getElementById('stepInsideBtn');
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function pad(n){ return n < 10 ? '0'+n : n; }
+
+  /* One rule for whichever slide is under the fixed chrome: read the shell's
+     painted background and flip. Beats checking class names, since some shells
+     are darkened by an inline style and carry no class at all. */
+  function isLight(el){
+    var m = getComputedStyle(el).backgroundColor.match(/[\d.]+/g);
+    if (!m || (m.length > 3 && parseFloat(m[3]) === 0)) return false;
+    var lin = function(v){ v = v/255; return v <= .03928 ? v/12.92 : Math.pow((v+.055)/1.055, 2.4); };
+    return (.2126*lin(+m[0]) + .7152*lin(+m[1]) + .0722*lin(+m[2])) > .45;
+  }
+
+  function updateProgress(){
+    const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+    const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+    const percentage = scrollable > 0 ? (scrollTop/scrollable)*100 : 0;
+    const current = slides.reduce((closestIndex, slide, index) => {
+      const distance = Math.abs(slide.getBoundingClientRect().top - window.innerHeight*.35);
+      const closestDistance = Math.abs(slides[closestIndex].getBoundingClientRect().top - window.innerHeight*.35);
+      return distance < closestDistance ? index : closestIndex;
+    }, 0);
+    counter.textContent = pad(current+1) + ' / ' + pad(total);
+    if (window.railUpdate) window.railUpdate(current, total);
+    var shell = slides[current].closest('.slide-shell');
+    var lightNow = !!shell && isLight(shell);
+    document.body.classList.toggle('on-light', lightNow);
+    document.body.classList.toggle('on-dark', !lightNow);
+
+    progressLine.style.width = percentage + '%';
+  }
+
+  function scrollToSlide(slide){
+    (slide.closest('.slide-shell') || slide).scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+  }
+
+  if(stepInsideBtn){ stepInsideBtn.addEventListener('click', (e)=>{ e.preventDefault(); scrollToSlide(slides[1]); }); }
+
+  document.querySelectorAll('.continue-btn').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.preventDefault();
+      const nextShell = btn.closest('.slide-shell').nextElementSibling;
+      if(nextShell){ scrollToSlide(nextShell.querySelector('.slide')); }
+    });
+  });
+
+  document.querySelectorAll('.tab-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const target = btn.dataset.tab;
+      const group = btn.closest('.slide');
+      group.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+      group.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+      btn.classList.add('active');
+      group.querySelector('[data-panel="'+target+'"]').classList.add('active');
+    });
+  });
+
+  window.addEventListener('scroll', updateProgress, { passive:true });
+  window.addEventListener('resize', updateProgress);
+  updateProgress();
+</script>
+
+<script>
+/* section reveal - same language as the homepage */
+(function(){
+  var sl=[].slice.call(document.querySelectorAll('.slide-shell .slide'));
+  if(!sl.length) return;
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduce||!('IntersectionObserver' in window)){
+    sl.forEach(function(e){e.classList.add('seen');}); return;
+  }
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(en){ if(en.isIntersecting){ en.target.classList.add('seen'); io.unobserve(en.target); } });
+  },{rootMargin:'0px 0px -10% 0px',threshold:0.06});
+  sl.forEach(function(e,i){ if(i<2){ e.classList.add('seen'); } else { io.observe(e); } });
+})();
+
+  /* the cover's scroll cue retires once the reader has taken the hint */
+  var scrollCue = document.getElementById('scrollCue');
+  if (scrollCue){
+    var hideCue = function(){
+      var y = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+      scrollCue.classList.toggle('gone', y > 40);
+    };
+    window.addEventListener('scroll', hideCue, {passive:true});
+    hideCue();
+  }
+
+  /* Chapter rail: pin it to the slide's real left edge, light the chapter whose
+     slide is on screen, and keep it out of the way on the cover and the close. */
+  (function(){
+    var rail = document.querySelector('.chapters');
+    if (!rail) return;
+    var items = [].slice.call(rail.querySelectorAll('a[data-slide]'));
+    function placeRail(){
+      var slide = document.querySelector('.slide');
+      if (!slide) return;
+      // Sit out in the page margin rather than in the slide's own gutter, so the
+      // rail reads as page furniture instead of crowding the case study. The
+      // inset takes about a third of the free space: near the left edge on a
+      // laptop, drifting in a little on a wide monitor so it never looks
+      // marooned. Whatever is left over becomes the gap to the text.
+      var textLeft = slide.getBoundingClientRect().left + parseFloat(getComputedStyle(slide).paddingLeft);
+      var railW = rail.getBoundingClientRect().width || 70;
+      var x = Math.round((textLeft - railW) * 0.34);
+      x = Math.max(40, Math.min(x, 150));
+      if (textLeft - (x + railW) < 26) x = Math.max(24, textLeft - railW - 26);
+      document.documentElement.style.setProperty('--rail-x', x + 'px');
+    }
+    placeRail();
+    window.addEventListener('resize', placeRail);
+    window.railUpdate = function(current, total){
+      rail.classList.toggle('on', current > 0 && current < total - 1);
+      var activeIdx = -1;
+      for (var i = 0; i < items.length; i++){
+        if (+items[i].dataset.slide <= current) activeIdx = i;
+      }
+      items.forEach(function(a, i){ a.classList.toggle('active', i === activeIdx); });
+    };
+    rail.addEventListener('click', function(e){
+      var a = e.target.closest('a[data-slide]');
+      if (!a) return;
+      e.preventDefault();
+      var slides = document.querySelectorAll('.slide');
+      var target = slides[+a.dataset.slide];
+      if (target) (target.closest('.slide-shell') || target).scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    });
+  })();
+</script>
+</body>
+</html>
