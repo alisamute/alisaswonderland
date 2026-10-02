@@ -1,0 +1,1396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Docket · Prototype</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F6F5F1; --side:#EFEDE7; --surface:#FCFCFB; --white:#FFFFFF;
+    --ink:#1C1B17; --ink-2:#52514E; --muted:#696760;
+    --line:#E1E0D9; --line-2:#ECEBE6; --axis:#C3C2B7;
+    --yellow:#FDE68A; --yellow-ink:#6B5C05; --red:#B0402F;
+    --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a;
+    --sans:'IBM Plex Sans',system-ui,sans-serif; --serif:'IBM Plex Serif',Georgia,serif; --mono:'IBM Plex Mono',ui-monospace,monospace;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans); font-size:14px; -webkit-font-smoothing:antialiased; }
+  button,select,input{ font:inherit; color:inherit; }
+  a{ color:inherit; }
+  .mono{ font-family:var(--mono); }
+
+  .app{ display:grid; grid-template-columns:232px minmax(0,1fr); min-height:100vh; }
+  main{ min-width:0; }
+
+  /* ---------- sidebar ---------- */
+  .side{ background:var(--side); border-right:1px solid var(--line); padding:18px 12px; display:flex; flex-direction:column;
+    position:sticky; top:0; height:100vh; }
+  .brand{ font-family:var(--mono); font-weight:600; font-size:18px; padding:4px 10px 2px; letter-spacing:-.01em; }
+  .brand em{ font-style:normal; color:var(--red); }
+  .org{ font-family:var(--mono); font-size:10.5px; color:var(--muted); padding:0 10px 22px; }
+  .nav-label{ font-family:var(--mono); font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); padding:0 10px 8px; }
+  .nav a, .nav span.off{ display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px 10px; border-radius:4px;
+    text-decoration:none; font-weight:500; border:1px solid transparent; }
+  .nav a{ cursor:pointer; }
+  .nav a:hover{ background:rgba(28,27,23,.04); }
+  .nav a.on{ background:var(--surface); border-color:var(--line); }
+  .nav .count{ font-family:var(--mono); font-size:11px; color:var(--muted); }
+  .nav span.off{ color:var(--muted); cursor:not-allowed; }
+  .nav .soon{ font-family:var(--mono); font-size:9.5px; letter-spacing:.06em; text-transform:uppercase; border:1px solid var(--line); padding:1px 5px; border-radius:2px; }
+  .side-foot{ margin-top:auto; border-top:1px solid var(--line); padding:14px 10px 2px; display:flex; flex-direction:column; gap:12px; }
+  .me{ display:flex; gap:10px; align-items:center; }
+  .avatar{ width:30px; height:30px; border-radius:50%; background:var(--ink); color:#fff; font-size:11px; font-weight:600;
+    display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .me b{ display:block; font-weight:600; font-size:13px; }
+  .me small{ color:var(--muted); font-size:12px; }
+  .back-cs{ font-family:var(--mono); font-size:11px; color:var(--muted); text-decoration:none; }
+  .back-cs:hover{ color:var(--red); }
+
+  /* ---------- top bar ---------- */
+  .top{ height:56px; border-bottom:1px solid var(--line); background:var(--surface); display:flex; align-items:center; gap:18px; padding:0 28px;
+    position:sticky; top:0; z-index:10; }
+  .crumb{ display:flex; align-items:center; gap:10px; font-weight:500; white-space:nowrap; overflow:hidden; }
+  .crumb .req{ font-family:var(--mono); font-size:11.5px; color:var(--ink-2); border:1px solid var(--line); padding:2px 6px; border-radius:3px; background:var(--white); }
+  .search{ margin-left:auto; position:relative; }
+  .search input{ width:240px; padding:7px 10px 7px 30px; border:1px solid var(--line); border-radius:4px; background:var(--white); font-size:13px; }
+  .search input:focus{ outline:2px solid var(--ink); outline-offset:-1px; }
+  .search svg{ position:absolute; left:9px; top:50%; transform:translateY(-50%); color:var(--muted); }
+
+  .page{ padding:26px 28px 120px; max-width:1240px; }
+  h1{ font-size:24px; font-weight:600; margin:0; letter-spacing:-.01em; }
+  .sub{ color:var(--ink-2); margin-top:4px; }
+
+  /* ---------- status pills ---------- */
+  .pill{ display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:500; padding:3px 8px; border-radius:3px; white-space:nowrap; border:1px solid transparent; }
+  .pill::before{ content:""; width:6px; height:6px; border-radius:50%; background:currentColor; opacity:.8; }
+  .st-awaiting{ background:var(--yellow); color:var(--yellow-ink); }
+  .st-scheduling{ border-color:var(--line); color:var(--ink-2); background:var(--white); }
+  .st-interviewing{ border-color:#CFCDC4; color:var(--ink); background:var(--white); }
+  .st-passed{ background:#E4F1E4; color:#1D5E1D; }
+  .st-offer{ background:#CFE9CF; color:#124A12; font-weight:600; }
+  .st-nmf, .st-withdrew, .st-archived{ background:#EEEDE9; color:var(--muted); }
+
+  /* ---------- filters ---------- */
+  .head-row{ display:flex; align-items:flex-end; justify-content:space-between; gap:20px; margin-bottom:18px; }
+  .chips{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px; }
+  .chip{ border:1px solid var(--line); background:var(--white); border-radius:4px; padding:5px 10px; font-size:12.5px; cursor:pointer; display:flex; gap:7px; align-items:center; }
+  .chip .n{ font-family:var(--mono); font-size:11px; color:var(--muted); }
+  .chip.on{ background:var(--ink); color:#fff; border-color:var(--ink); }
+  .chip.on .n{ color:rgba(255,255,255,.65); }
+  .chip.final:not(.on){ border-color:#BFD8EE; background:#EFF6FC; }
+
+  /* ---------- table ---------- */
+  .tbl-wrap{ background:var(--surface); border:1px solid var(--line); border-radius:6px; overflow-x:auto; }
+  table.tbl{ width:100%; border-collapse:collapse; }
+  .tbl th{ text-align:left; font-family:var(--mono); font-size:10.5px; font-weight:500; letter-spacing:.06em; text-transform:uppercase; color:var(--muted);
+    padding:10px 14px; border-bottom:1px solid var(--line); background:var(--white); white-space:nowrap; }
+  .tbl td{ padding:12px 14px; border-bottom:1px solid var(--line-2); vertical-align:middle; }
+  .tbl tr:last-child td{ border-bottom:none; }
+  .tbl tbody tr{ cursor:pointer; transition:background .12s; }
+  .tbl tbody tr:hover{ background:#F7F6F2; }
+  .tbl tbody tr:focus-visible{ outline:2px solid var(--ink); outline-offset:-2px; }
+  .tbl tbody tr.sel{ background:#F3F1EA; }
+  .tbl .cb{ width:42px; }
+  .tbl input[type=checkbox]{ width:15px; height:15px; accent-color:var(--ink); cursor:pointer; }
+  /* one checkbox selects a row. What to do with the selection (Compare or Archive) is chosen
+     from the bulk bar once something is picked, so there is only one selection control to learn. */
+  .tbl.v3 td.cb{ vertical-align:middle; }
+  .toast .t-undo{ font:inherit; font-weight:600; color:var(--yellow); background:none; border:none; padding:0 0 0 8px; cursor:pointer; text-decoration:underline; }
+  /* clickable column headers, added after round 3: Leo suggested clicking a column title (e.g. Status) to sort,
+     instead of hunting for the Sort by menu */
+  .tbl th.sortable{ cursor:pointer; user-select:none; }
+  .tbl th.sortable:hover{ color:var(--ink); }
+  .tbl th.sortable .arw{ display:inline-block; margin-left:4px; opacity:.4; font-size:10px; }
+  .tbl th.sortable.active{ color:var(--ink); }
+  .tbl th.sortable.active .arw{ opacity:1; color:var(--ink); }
+
+  .cand-name{ font-weight:600; }
+  .cand-meta{ font-size:12.5px; color:var(--ink-2); margin-top:1px; }
+  .muted{ color:var(--muted); }
+  .t-mono{ font-family:var(--mono); font-size:12px; color:var(--ink-2); font-variant-numeric:tabular-nums; }
+  .newdot{ display:inline-flex; align-items:center; gap:5px; color:var(--red); font-size:12.5px; font-weight:500; }
+  .newdot::before{ content:""; width:6px; height:6px; border-radius:50%; background:var(--red); }
+  .empty{ padding:40px; text-align:center; color:var(--muted); }
+
+  .pips{ display:inline-flex; gap:3px; vertical-align:middle; margin-right:8px; }
+  .pips i{ width:10px; height:10px; border:1px solid #A9A79F; border-radius:2px; display:block; }
+  .pips i.done{ background:var(--ink); border-color:var(--ink); }
+  .pips i.sched{ border:1px dashed var(--ink); }
+  .pips i.owed{ border:1px solid var(--red); background:#F3D3CB; }
+
+  /* ---------- compare bar ---------- */
+  .bulk{ position:fixed; left:calc(50% + 116px); bottom:24px; transform:translate(-50%, 140%); background:var(--ink); color:#fff;
+    border-radius:6px; padding:10px 10px 10px 18px; display:flex; align-items:center; gap:18px; box-shadow:0 10px 30px rgba(0,0,0,.18);
+    transition:transform .28s cubic-bezier(.2,.8,.3,1); z-index:30; white-space:nowrap; }
+  .bulk:not(.show){ opacity:0; visibility:hidden; transition:transform .28s, opacity .2s, visibility 0s linear .28s; }
+  .bulk.show{ transform:translate(-50%, 0); }
+  .bulk .msg{ font-size:13px; }
+  .bulk .msg small{ color:rgba(255,255,255,.6); margin-left:8px; }
+  .bulk .btn{ color:var(--ink); }
+  .btn{ border:1px solid var(--line); background:var(--white); border-radius:4px; padding:7px 13px; font-size:13px; font-weight:500; cursor:pointer; }
+  .btn:hover{ border-color:var(--ink-2); }
+  .btn.primary{ background:var(--yellow); border-color:var(--yellow); color:var(--ink); font-weight:600; }
+  .btn.primary:hover{ background:#FCDC5C; }
+  .btn:disabled{ opacity:.45; cursor:not-allowed; }
+  .btn.ghost{ background:transparent; border-color:rgba(255,255,255,.25); color:#fff; }
+
+  /* ---------- record ---------- */
+  .backlink{ display:inline-flex; gap:6px; align-items:center; font-size:13px; color:var(--ink-2); text-decoration:none; margin-bottom:16px; cursor:pointer; background:none; border:none; padding:0; }
+  .backlink:hover{ color:var(--ink); }
+  .rec-head{ display:flex; justify-content:space-between; gap:24px; align-items:flex-start; flex-wrap:wrap; }
+  .rec-meta{ font-family:var(--mono); font-size:12px; color:var(--ink-2); margin-top:6px; }
+  .status-ctl{ display:flex; flex-direction:column; align-items:flex-end; gap:8px; }
+  .status-ctl .row{ display:flex; gap:8px; align-items:center; }
+  .status-ctl select{ padding:6px 8px; border:1px solid var(--line); border-radius:4px; background:var(--white); font-size:13px; cursor:pointer; }
+  .next-line{ margin-top:18px; display:flex; gap:12px; align-items:center; flex-wrap:wrap; background:var(--white); border:1px dashed #CFCDC4; border-radius:4px; padding:10px 14px; }
+  .next-line .k{ font-family:var(--mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
+  .next-line .v{ font-weight:500; }
+  .next-line .by{ font-family:var(--mono); font-size:11.5px; color:var(--muted); margin-left:auto; }
+
+  .subtabs{ display:flex; gap:22px; border-bottom:1px solid var(--line); margin:26px 0 22px; }
+  .subtabs button{ background:none; border:none; padding:10px 0; font-size:13.5px; font-weight:500; color:var(--ink-2); cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; display:flex; gap:7px; align-items:center; }
+  .subtabs button.on{ color:var(--ink); border-bottom-color:var(--ink); }
+  .subtabs .n{ font-family:var(--mono); font-size:11px; color:var(--muted); }
+
+  .iv-summary{ display:grid; grid-template-columns:220px 1fr; gap:0; background:var(--surface); border:1px solid var(--line); border-radius:6px; margin-bottom:16px; }
+  .iv-summary > div{ padding:18px 20px; }
+  .iv-summary > div + div{ border-left:1px solid var(--line); }
+  .k-label{ font-family:var(--mono); font-size:10.5px; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }
+  .big{ font-size:34px; font-weight:600; letter-spacing:-.02em; line-height:1; }
+  .big small{ font-size:15px; font-weight:500; color:var(--ink-2); letter-spacing:0; margin-left:4px; }
+  .avg-rows{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:10px 28px; }
+  .avg-row{ display:grid; grid-template-columns:120px 1fr 64px; gap:10px; align-items:center; font-size:13px; }
+  .avg-track{ height:8px; background:var(--line-2); border-radius:0 4px 4px 0; position:relative; }
+  .avg-fill{ position:absolute; left:0; top:0; bottom:0; background:var(--s1); border-radius:0 4px 4px 0; }
+  .avg-row .t-mono{ text-align:right; }
+
+  .iv{ background:var(--surface); border:1px solid var(--line); border-radius:6px; margin-bottom:12px; }
+  .iv-top{ display:flex; gap:14px; align-items:center; padding:14px 18px; border-bottom:1px solid var(--line-2); flex-wrap:wrap; }
+  .iv-round{ font-family:var(--mono); font-size:11px; color:var(--muted); width:22px; }
+  .iv-title{ font-weight:600; }
+  .iv-who{ color:var(--ink-2); font-size:13px; }
+  .iv-date{ margin-left:auto; font-family:var(--mono); font-size:12px; color:var(--ink-2); }
+  .rec{ font-size:12px; font-weight:600; padding:3px 8px; border-radius:3px; border:1px solid var(--line); background:var(--white); }
+  .rec.sy{ border-color:#1D5E1D; color:#1D5E1D; }
+  .rec.y{ color:#1D5E1D; }
+  .rec.n{ color:var(--red); }
+  .iv-scores{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:14px; padding:14px 18px; border-bottom:1px solid var(--line-2); }
+  .score .lbl{ font-size:12px; color:var(--ink-2); margin-bottom:6px; }
+  .seg{ display:flex; gap:2px; align-items:center; }
+  .seg i{ width:18px; height:6px; background:var(--line-2); display:block; }
+  .seg i:first-child{ border-radius:2px 0 0 2px; } .seg i:last-of-type{ border-radius:0 2px 2px 0; }
+  .seg i.f{ background:var(--s1); }
+  .seg span{ font-family:var(--mono); font-size:11.5px; color:var(--ink-2); margin-left:8px; }
+  .seg .nr{ font-family:var(--mono); font-size:11.5px; color:var(--muted); margin-left:0; }
+  .iv-notes{ display:grid; grid-template-columns:1fr 1fr; }
+  .iv-notes > div{ padding:14px 18px 16px; }
+  .iv-notes > div + div{ border-left:1px solid var(--line-2); }
+  .note-k{ font-family:var(--mono); font-size:10.5px; letter-spacing:.07em; text-transform:uppercase; margin-bottom:6px; color:var(--muted); }
+  .note-k.good::before{ content:"+ "; color:#1D5E1D; font-weight:600; }
+  .note-k.bad::before{ content:"\2212 "; color:var(--red); font-weight:600; }
+  .serif{ font-family:var(--serif); font-size:14.5px; line-height:1.6; color:var(--ink); margin:0; }
+  .iv.pending{ background:transparent; border-style:dashed; border-color:#CFCDC4; }
+  .iv.owed{ border-color:var(--red); border-style:solid; background:#FBF1EE; }
+  .iv.owed .iv-date{ color:var(--red); font-weight:600; }
+
+  /* ---------- who's late (added after research) ---------- */
+  .wt{ font-size:12.5px; color:var(--ink-2); white-space:nowrap; }
+  .wt b{ font-weight:600; color:var(--ink); }
+  .wt .d{ font-family:var(--mono); font-size:11.5px; }
+  .wt.due .d{ color:var(--ink); font-weight:600; }
+  .wt.late b, .wt.late .d{ color:var(--red); }
+  .wt.late .flag{ font-family:var(--mono); font-size:10px; letter-spacing:.06em; text-transform:uppercase; color:#fff; background:var(--red);
+    padding:1px 5px; border-radius:2px; margin-left:6px; }
+  .late-bar{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; background:var(--white); border:1px solid var(--line);
+    border-left:3px solid var(--red); border-radius:4px; padding:11px 14px; margin-bottom:14px; font-size:13px; }
+  .late-bar .k{ font-family:var(--mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--red); font-weight:600; }
+  .late-bar .goal{ font-family:var(--mono); font-size:11.5px; color:var(--muted); margin-left:auto; }
+  .wait-line{ margin-top:10px; display:flex; gap:12px; align-items:center; flex-wrap:wrap; background:var(--white); border:1px solid var(--line);
+    border-left:3px solid var(--ink-2); border-radius:4px; padding:10px 14px; }
+  .wait-line.late{ border-left-color:var(--red); background:#FBF1EE; }
+  .wait-line .k{ font-family:var(--mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
+  .wait-line.late .k{ color:var(--red); }
+  .wait-line .v{ font-weight:500; }
+  .wait-line .goal{ font-family:var(--mono); font-size:11.5px; color:var(--muted); }
+  .wait-line .btn{ margin-left:auto; padding:5px 11px; font-size:12.5px; }
+  .iv.pending .iv-top{ border-bottom:none; }
+  .iv.pending .iv-title{ color:var(--ink-2); }
+
+  .docs{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  .doc-k{ font-family:var(--mono); font-size:11px; color:var(--muted); margin-bottom:8px; display:flex; justify-content:space-between; }
+  .paper{ background:var(--white); border:1px solid var(--line); box-shadow:0 1px 0 var(--line), 0 6px 18px rgba(28,27,23,.05); padding:34px 38px; font-family:var(--serif); min-height:520px; }
+  .paper h2{ font-family:var(--serif); font-weight:500; font-size:22px; margin:0; }
+  .paper .r-sub{ color:var(--ink-2); font-size:13.5px; margin-top:4px; }
+  .paper h4{ font-family:var(--sans); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin:24px 0 10px; font-weight:600; border-bottom:1px solid var(--line-2); padding-bottom:6px; }
+  .r-role{ margin-bottom:14px; font-size:14px; }
+  .r-role span{ float:right; font-family:var(--mono); font-size:11.5px; color:var(--muted); }
+  .r-role p, .paper p{ margin:4px 0 0; font-size:14px; line-height:1.65; color:#2E2D28; }
+  .paper .letter p{ margin:0 0 14px; }
+
+  .timeline{ background:var(--surface); border:1px solid var(--line); border-radius:6px; padding:8px 0; }
+  .tl{ display:grid; grid-template-columns:130px 18px 1fr; gap:10px; padding:10px 20px; align-items:start; }
+  .tl .when{ font-family:var(--mono); font-size:12px; color:var(--muted); padding-top:1px; }
+  .tl .dot{ width:9px; height:9px; border-radius:50%; border:2px solid var(--ink-2); margin-top:4px; background:var(--surface); }
+  .tl.status .dot{ background:var(--yellow); border-color:var(--yellow-ink); }
+  .tl.fresh{ background:#FFFBEA; }
+  .tl .what{ line-height:1.5; }
+  .tl .what small{ display:block; color:var(--muted); font-size:12.5px; }
+
+  /* ---------- compare ---------- */
+  .card{ background:var(--surface); border:1px solid var(--line); border-radius:6px; padding:20px 22px; margin-bottom:16px; }
+  .card h3{ font-size:15px; font-weight:600; margin:0 0 4px; }
+  .card .desc{ color:var(--ink-2); font-size:13px; margin-bottom:14px; }
+  .legend{ display:flex; gap:18px; flex-wrap:wrap; margin-bottom:8px; }
+  .legend span{ display:inline-flex; align-items:center; gap:7px; font-size:13px; }
+  .legend i{ width:12px; height:12px; border-radius:2px; display:block; }
+  .chart-box{ position:relative; }
+  .chart-box svg{ width:100%; height:auto; display:block; overflow:visible; }
+  .chart-box .bar{ cursor:default; }
+  .chart-box .hit{ fill:transparent; outline:none; }
+  .chart-box .hit:focus-visible{ stroke:var(--ink); stroke-width:1.5; }
+  .tip{ position:absolute; pointer-events:none; background:var(--ink); color:#fff; font-size:12px; padding:7px 10px; border-radius:4px;
+    white-space:nowrap; transform:translate(-50%, calc(-100% - 10px)); opacity:0; transition:opacity .12s; z-index:5; }
+  .tip b{ display:block; font-weight:600; }
+  .tip span{ font-family:var(--mono); font-size:11.5px; color:rgba(255,255,255,.75); }
+  .tip.show{ opacity:1; }
+  table.mini{ width:100%; border-collapse:collapse; margin-top:16px; font-size:13px; }
+  .mini th{ text-align:left; font-family:var(--mono); font-size:10.5px; font-weight:500; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); padding:7px 10px; border-bottom:1px solid var(--line); }
+  .mini td{ padding:8px 10px; border-bottom:1px solid var(--line-2); }
+  .mini td.num{ font-family:var(--mono); font-variant-numeric:tabular-nums; }
+  .mini .sw{ display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:8px; vertical-align:-1px; }
+  .table-toggle{ background:none; border:none; padding:0; margin-top:12px; font-size:12.5px; color:var(--ink-2); text-decoration:underline; text-underline-offset:3px; cursor:pointer; }
+
+  .cmp-cols{ display:grid; gap:14px; }
+  .cmp-col{ background:var(--surface); border:1px solid var(--line); border-radius:6px; overflow:hidden; }
+  .cmp-col .hd{ padding:14px 16px; border-bottom:1px solid var(--line-2); border-top:3px solid; }
+  .cmp-col .hd .nm{ font-weight:600; font-size:15px; display:flex; justify-content:space-between; align-items:center; gap:8px; }
+  .cmp-col .hd .nm a{ text-decoration:none; }
+  .cmp-col .hd .nm a:hover{ text-decoration:underline; }
+  .cmp-col .facts{ display:flex; flex-direction:column; gap:6px; margin-top:10px; font-size:12.5px; color:var(--ink-2); }
+  .cmp-col .facts .t-mono{ color:var(--ink); }
+  .cmp-col .sec{ padding:12px 16px 14px; border-bottom:1px solid var(--line-2); }
+  .cmp-col .sec:last-child{ border-bottom:none; }
+  .q{ margin-bottom:10px; }
+  .q:last-child{ margin-bottom:0; }
+  .q .src{ font-family:var(--mono); font-size:10.5px; color:var(--muted); margin-bottom:2px; }
+  .q p{ font-family:var(--serif); font-size:13.5px; line-height:1.55; margin:0; }
+  .rm{ background:none; border:none; font-size:11.5px; color:var(--muted); cursor:pointer; font-family:var(--mono); padding:0; }
+  .rm:hover{ color:var(--red); }
+
+  .toast{ position:fixed; right:24px; bottom:24px; background:var(--ink); color:#fff; padding:12px 16px; border-radius:6px; font-size:13px; max-width:360px;
+    box-shadow:0 10px 30px rgba(0,0,0,.2); transform:translateY(150%); transition:transform .3s cubic-bezier(.2,.8,.3,1); z-index:40; line-height:1.45; }
+  .toast:not(.show){ opacity:0; visibility:hidden; transition:transform .3s, opacity .2s, visibility 0s linear .3s; }
+  .toast.show{ transform:none; }
+  .toast b{ color:var(--yellow); font-weight:600; }
+
+  .stack{ display:flex; flex-direction:column; gap:10px; }
+  .gap-b{ margin-bottom:14px; }
+
+  /* ---------- added after the first usability test ---------- */
+  .list-tools{ display:flex; gap:10px; align-items:center; }
+  .sort{ display:flex; gap:8px; align-items:center; font-size:12.5px; color:var(--ink-2); white-space:nowrap; }
+  .sort select, .status-ctl .other select{ padding:6px 8px; border:1px solid var(--line); border-radius:4px; background:var(--white); font-size:13px; cursor:pointer; }
+  .chip.mine:not(.on){ border-color:#EAD57E; background:#FFFBEA; }
+  .tbl.v3 td.cb{ text-align:left; padding-left:12px; padding-right:0; }
+  .who{ display:flex; gap:10px; align-items:center; }
+  .tbl.v3 .cand-name, .tbl.v3 .cand-meta{ white-space:nowrap; }
+  .face{ width:30px; height:30px; border-radius:50%; background:var(--line-2); border:1px solid var(--line); color:var(--ink-2); font-size:11px; font-weight:600;
+    display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; font-family:var(--sans); letter-spacing:.02em; }
+  .face.lg{ width:48px; height:48px; font-size:16px; }
+  .ago{ font-size:11.5px; color:var(--muted); margin-top:1px; }
+  .rec-who{ display:flex; gap:14px; align-items:flex-start; }
+  .in-words{ font-family:var(--serif); font-style:italic; font-size:14.5px; line-height:1.55; color:var(--ink); margin:12px 0 0; max-width:620px; }
+  .in-words span{ display:block; font-family:var(--mono); font-style:normal; font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin-top:6px; }
+  .status-ctl.v3{ gap:10px; }
+  .status-ctl .st-k{ font-family:var(--mono); font-size:10.5px; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); }
+  .status-ctl .other{ gap:6px; font-size:12px; color:var(--muted); }
+  .status-ctl .other select{ padding:4px 6px; font-size:12px; }
+  .iv-summary.v3{ grid-template-columns:200px 200px 1fr; }
+  .ov-track{ display:block; height:8px; background:var(--line-2); border-radius:0 4px 4px 0; position:relative; margin-top:14px; }
+  .ov-track > span{ position:absolute; left:0; top:0; bottom:0; background:var(--ink); border-radius:0 4px 4px 0; }
+  .ov-note{ font-size:12px; color:var(--muted); margin-top:8px; }
+  .ov-rows{ display:flex; flex-direction:column; gap:8px; }
+  .ov-row{ display:grid; grid-template-columns:170px minmax(0,1fr) 90px; gap:14px; align-items:center; font-size:13px; }
+  .ov-row .nm{ display:flex; gap:8px; align-items:center; font-weight:500; }
+  .ov-row .nm i{ width:12px; height:12px; border-radius:2px; display:block; }
+  .ov-row .ov-track{ margin-top:0; height:10px; }
+  .ov-row .t-mono{ text-align:right; color:var(--ink); }
+  .cmp-meta{ font-size:12px; color:var(--muted); margin-top:4px; }
+  .cmp-col .sec.words p{ font-family:var(--serif); font-style:italic; font-size:13.5px; line-height:1.55; margin:0; }
+
+  @media(max-width:1360px){
+    .tbl.v3 th, .tbl.v3 td{ padding-left:10px; padding-right:10px; }
+    .tbl.v3 td.cb{ padding-left:10px; }
+    .tbl.v3 .face{ display:none; }
+  }
+
+  /* ---------- added after round 2 of testing ---------- */
+  .ovn{ font-family:var(--mono); font-size:13px; font-weight:600; color:var(--ink); }
+  .newdot.sm{ font-size:11.5px; margin-top:2px; }
+  .late-bar .lb-what{ color:var(--ink-2); }
+  .late-bar .lb-what a{ color:var(--ink); }
+  .late-bar > span:not(.k):not(.goal){ display:inline-flex; gap:6px; align-items:center; flex-wrap:wrap; }
+  details.other{ font-size:12px; color:var(--muted); text-align:right; }
+  details.other summary{ cursor:pointer; list-style:none; text-decoration:underline; text-underline-offset:3px; }
+  details.other summary::-webkit-details-marker{ display:none; }
+  details.other select{ margin-top:6px; padding:4px 6px; font-size:12px; border:1px solid var(--line); border-radius:4px; background:var(--white); }
+  .wait-line{ align-items:flex-start; }
+  .wait-line .k{ padding-top:2px; }
+  .wl-txt{ display:flex; flex-direction:column; gap:3px; flex:1; min-width:220px; }
+  .wl-sub{ font-size:12.5px; color:var(--ink-2); line-height:1.5; }
+  .wl-act{ display:flex; flex-direction:column; align-items:flex-end; gap:4px; margin-left:auto; }
+  .wl-act small{ font-size:11.5px; color:var(--muted); }
+  .wait-line .wl-act .btn{ margin-left:0; }
+  .wait-line.you{ border-left-color:var(--yellow-ink); background:#FFFCEE; }
+  .decide{ margin-top:10px; background:var(--surface); border:1px solid var(--ink-2); border-radius:6px; overflow:hidden; }
+  .dec-row{ display:flex; gap:20px; align-items:center; justify-content:space-between; flex-wrap:wrap; padding:14px 16px; }
+  .dec-k{ font-family:var(--mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin-bottom:3px; }
+  .dec-q{ font-size:15px; font-weight:500; }
+  .dec-acts{ display:flex; gap:8px; flex-wrap:wrap; }
+  .btn.big{ padding:9px 16px; font-size:14px; }
+  .dec-done{ display:flex; gap:12px; align-items:center; flex-wrap:wrap; padding:10px 16px; background:#E4F1E4; border-bottom:1px solid #BFDDBF; font-size:13px; color:#1D3F1D; }
+  .dec-done .k{ font-family:var(--mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; font-weight:700; color:#1D5E1D; }
+  .linkbtn{ margin-left:auto; background:none; border:none; padding:0; font:inherit; font-weight:600; text-decoration:underline; text-underline-offset:3px; cursor:pointer; color:inherit; }
+  .pc{ background:var(--surface); border:1px solid var(--line); border-radius:6px; margin-bottom:16px; }
+  .pc-h{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; padding:14px 18px; border-bottom:1px solid var(--line-2); }
+  .pc-h h3{ margin:0; font-size:15px; font-weight:600; }
+  .pc-recs, .cmp-recs{ display:flex; gap:6px; flex-wrap:wrap; }
+  .pc-cols{ display:grid; grid-template-columns:1fr 1fr; }
+  .pc-cols > div{ padding:14px 18px 16px; }
+  .pc-cols > div + div{ border-left:1px solid var(--line-2); }
+  .pc ul{ list-style:none; margin:0; padding:0; }
+  .pc li{ padding:7px 0; border-top:1px solid var(--line-2); }
+  .pc li:first-child{ border-top:none; padding-top:2px; }
+  .pc li p{ margin:0; font-family:var(--serif); font-size:14px; line-height:1.5; }
+  .pc li span{ font-family:var(--mono); font-size:10.5px; color:var(--muted); }
+  .pc-bad li p, .serif.con, .bad-sec .q p{ font-weight:600; }
+  .pc-bad{ background:#FDF8F6; }
+  .sec-h{ font-size:13px; font-family:var(--mono); letter-spacing:.07em; text-transform:uppercase; color:var(--muted); font-weight:500; margin:22px 0 10px; }
+  .cmp-act{ display:flex; gap:6px; flex-wrap:wrap; margin-top:12px; }
+  .cmp-act .btn{ padding:6px 10px; font-size:12.5px; }
+
+  /* morning email (concept) */
+  .email-link{ margin:14px 4px 0; display:flex; justify-content:space-between; align-items:center; gap:8px; padding:9px 10px; border:1px solid var(--line);
+    border-radius:4px; background:var(--surface); font-size:12.5px; font-weight:500; color:var(--ink); cursor:pointer; text-align:left; }
+  .email-link:hover{ border-color:var(--ink-2); }
+  .email-overlay{ position:fixed; inset:0; background:rgba(28,27,23,.42); display:flex; align-items:center; justify-content:center; padding:24px; z-index:60; }
+  .email-overlay[hidden]{ display:none; }
+  .email-modal{ background:var(--white); border:1px solid var(--line); border-radius:6px; width:100%; max-width:580px; max-height:88vh; overflow:auto;
+    box-shadow:0 24px 60px rgba(0,0,0,.25); }
+  .e-bar{ display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 16px; background:#FFF7D1; border-bottom:1px solid #EAD57E;
+    font-family:var(--mono); font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--yellow-ink); }
+  .e-bar button{ background:none; border:none; font:inherit; color:inherit; cursor:pointer; padding:0; }
+  .e-head{ padding:18px 24px 14px; border-bottom:1px solid var(--line); background:var(--surface); }
+  .e-row{ display:flex; gap:10px; font-size:12.5px; color:var(--ink-2); padding:1px 0; }
+  .e-row b{ width:44px; flex-shrink:0; font-family:var(--mono); font-size:10.5px; font-weight:500; letter-spacing:.05em; text-transform:uppercase; color:var(--muted); padding-top:1px; }
+  .e-subj{ font-size:17px; font-weight:600; margin:10px 0 0; letter-spacing:-.01em; }
+  .e-body{ padding:18px 24px 22px; font-family:var(--serif); font-size:14.5px; line-height:1.6; }
+  .e-body p{ margin:0 0 12px; }
+  .e-tbl{ width:100%; border-collapse:collapse; margin:6px 0 14px; font-family:var(--sans); font-size:13.5px; }
+  .e-tbl td{ padding:12px 0; border-top:1px solid var(--line-2); vertical-align:middle; }
+  .e-tbl td:first-child{ width:42px; }
+  .e-tbl tr:last-child td{ border-bottom:1px solid var(--line-2); }
+  .e-meta{ font-size:12.5px; color:var(--ink-2); margin-top:2px; }
+  .e-cta{ text-align:right; white-space:nowrap; }
+  .e-cta a{ font-family:var(--sans); font-size:12.5px; font-weight:600; color:var(--ink); background:var(--yellow); padding:6px 11px; border-radius:4px; text-decoration:none; }
+  .e-small{ font-family:var(--sans); font-size:12.5px !important; color:var(--muted); }
+
+  @media(max-width:980px){
+    .app{ grid-template-columns:minmax(0,1fr); }
+    .side{ position:static; height:auto; flex-direction:row; flex-wrap:wrap; align-items:center; gap:10px; }
+    .side .org, .side .nav-label, .side-foot{ display:none !important; }
+    .nav{ display:flex; gap:6px; }
+    .bulk{ left:50%; gap:10px; padding-left:14px; }
+    .bulk .msg small{ display:none; }
+    .search input{ width:140px; }
+    .top{ flex-wrap:wrap; height:auto; padding:10px 16px; gap:10px; }
+    .page{ padding:20px 16px 120px; }
+    .head-row, .stack{ flex-wrap:wrap; }
+    .iv-summary, .iv-summary.v3, .docs, .iv-notes, .pc-cols{ grid-template-columns:1fr; }
+    .pc-cols > div + div{ border-left:none; border-top:1px solid var(--line-2); }
+    .wl-act{ align-items:flex-start; margin-left:0; }
+    .email-link{ margin:0; }
+    .head-row{ align-items:flex-start; }
+    .status-ctl.v3{ align-items:flex-start; }
+    .iv-summary > div + div, .iv-notes > div + div{ border-left:none; border-top:1px solid var(--line-2); }
+    .iv-scores, .avg-rows{ grid-template-columns:1fr 1fr; }
+    .cmp-cols{ grid-template-columns:1fr !important; }
+    .tbl .hide-sm{ display:none; }
+  }
+  @media(max-width:600px){
+    .avg-rows{ grid-template-columns:minmax(0,1fr); }
+    .avg-row{ grid-template-columns:110px minmax(0,1fr) 56px; }
+    .iv-scores{ grid-template-columns:minmax(0,1fr); }
+    .wait-line .btn{ margin-left:0; }
+    .list-tools{ flex-wrap:wrap; }
+    .ov-row{ grid-template-columns:minmax(0,1fr) 80px; }
+    .ov-row .ov-track{ grid-column:1 / -1; grid-row:2; }
+    .e-head, .e-body{ padding-left:16px; padding-right:16px; }
+    .email-overlay{ padding:10px; }
+    /* the bulk bar grew a 3rd button (Archive); on a narrow phone all three plus the
+       message no longer fit on one line at the old fixed, centered width */
+    .bulk{ left:10px; right:10px; bottom:16px; transform:translateY(140%); width:auto;
+      white-space:normal; flex-wrap:wrap; justify-content:center; padding:10px 12px; gap:8px 10px; }
+    .bulk.show{ transform:translateY(0); }
+    .bulk .msg{ flex:1 1 100%; text-align:center; }
+  }
+  @media (prefers-reduced-motion: reduce){ *,*::before,*::after{ animation-duration:.01ms!important; animation-iteration-count:1!important; transition-duration:.01ms!important; scroll-behavior:auto!important; } }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <aside class="side">
+    <div class="brand">docket<em>.</em></div>
+    <div class="org">Halden Group &middot; Talent</div>
+    <div class="nav-label">Workspace</div>
+    <nav class="nav stack" style="gap:2px;">
+      <a class="on" href="#/" id="navCands"><span>Candidates</span><span class="count" id="navCount">9</span></a>
+      <span class="off">Requisitions <span class="soon">Soon</span></span>
+      <span class="off">Reports <span class="soon">Soon</span></span>
+    </nav>
+    <button class="email-link" id="emailPreviewBtn" type="button"><span>Preview morning email</span><span aria-hidden="true">&rarr;</span></button>
+    <div class="side-foot">
+      <div class="me"><div class="avatar">JP</div><div><b>Jordan Park</b><small>Hiring manager</small></div></div>
+      <a class="back-cs" href="docket.html">&larr; Back to case study</a>
+    </div>
+  </aside>
+
+  <main>
+    <div class="top">
+      <div class="crumb"><span class="req">REQ-2291</span><span>Senior Product Designer</span></div>
+      <label class="search">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="7" cy="7" r="5"/><path d="m11 11 3.5 3.5"/></svg>
+        <input id="q" type="search" placeholder="Search candidates" aria-label="Search candidates">
+      </label>
+    </div>
+    <div class="page" id="view"></div>
+  </main>
+</div>
+
+<div class="bulk" id="bulk" role="region" aria-label="Selection">
+  <div class="msg" id="bulkMsg"></div>
+  <button class="btn ghost" id="bulkClear">Clear</button>
+  <button class="btn" id="bulkArchive">Archive</button>
+  <button class="btn primary" id="bulkGo">Compare</button>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="email-overlay" id="emailOverlay" hidden>
+  <div class="email-modal" role="dialog" aria-modal="true" aria-labelledby="emailSubj">
+    <div class="e-bar"><span>Concept &middot; what Jordan would get at 8:00 AM</span><button type="button" id="emailClose">Close &times;</button></div>
+    <div id="emailContent"></div>
+  </div>
+</div>
+
+<script>
+/* ================= data (all fictional) ================= */
+/* ?before shows the prototype as it was before the research (v1). Everything gated on BEFORE
+   was added after: "who's late" from the research, the rest from the first usability test. */
+const BEFORE = /[?&]before\b/.test(location.search);
+// ?test is the link for usability testers: no morning-email button, no case-study link.
+const TEST = /[?&]test\b/.test(location.search);
+const TODAY = new Date(2026, 8, 25); // the prototype's "today"
+const PANEL = BEFORE ? 'Cross-functional panel' : 'Team panel'; // tester didn't know "cross-functional"
+const ROUNDS = ['Recruiter screen','Portfolio review','Design exercise', PANEL];
+const CRIT = [
+  {k:0, label:'Design craft'},
+  {k:1, label:'Communication'},
+  {k:2, label:'Collaboration'},
+  {k:3, label:'Role experience'}
+];
+// "Awaiting you" was renamed after testing: next to the Waiting on column it read as the same thing twice.
+const STATUS = {
+  awaiting:{label: BEFORE ? 'Awaiting you' : 'Ready for review'}, scheduling:{label:'Scheduling'}, interviewing:{label:'Interviewing'},
+  passed:{label:'Passed panel'}, offer:{label:'Offer extended'}, nmf:{label:'Not moving forward'}, withdrew:{label:'Withdrew'}
+};
+// Brett asked for a way to delete candidates. Hiring records have to be kept, so Archive moves them to Hidden instead.
+if (!BEFORE) STATUS.archived = {label:'Archived'};
+const ACTIVE = s => !['offer','nmf','withdrew','archived'].includes(s);
+const STATUS_ORDER = Object.keys(STATUS); // used to sort by pipeline stage
+// finalists: still active and already at (or booked for) the last round
+const isFinalist = c => ACTIVE(c.status) && c.iv.some(x => x.r === ROUNDS.length - 1 && (x.done || x.sched || x.owed));
+const FILTERS = BEFORE ? [
+  {id:'all', label:'All', match:()=>true},
+  {id:'awaiting', label:'Awaiting you', match:c=>c.status==='awaiting'},
+  {id:'process', label:'In process', match:c=>c.status==='scheduling'||c.status==='interviewing'},
+  {id:'passed', label:'Passed panel', match:c=>c.status==='passed'},
+  {id:'offer', label:'Offer extended', match:c=>c.status==='offer'},
+  {id:'closed', label:'Hidden', match:c=>c.status==='nmf'||c.status==='withdrew'}
+] : [
+  {id:'all', label:'All', match:()=>true},
+  {id:'mine', label:'Waiting on you', match:c=>!!(c.wait && c.wait.you)},
+  {id:'final', label:'Finalists', match:isFinalist},
+  {id:'process', label:'In process', match:c=>['awaiting','scheduling','interviewing'].includes(c.status)},
+  {id:'passed', label:'Passed panel', match:c=>c.status==='passed'},
+  {id:'offer', label:'Offer extended', match:c=>c.status==='offer'},
+  {id:'closed', label:'Hidden', match:c=>['nmf','withdrew','archived'].includes(c.status)}
+];
+const SAM = {who:'Sam Ortiz', role:'Recruiter'};
+const JP  = {who:'Jordan Park', role:'Design manager'};
+const RAE = {who:'Rae Lindqvist', role:'Staff designer'};
+const MW  = {who:'Marcus Webb', role:'Engineering lead'};
+// Ratings are 1 to 5 since the first usability test (they were 1 to 4 in v1, still shown under ?before).
+const SCALE = BEFORE ? 4 : 5;
+const TO5 = {1:1, 2:2, 3:4, 4:5}; // the sample ratings were written on the old 1 to 4 scale
+const iv = (r, p, date, s, rec, well, concern) => ({r, who:p.who, role:p.role, date, s: BEFORE ? s : s.map(v => v == null ? null : TO5[v]), rec, well, concern, done:true});
+const sched = (r, when) => ({r, sched:when});
+
+const C = [
+  { id:'CAND-0412', name:'Maya Chen', years:8, prev:'Figma', city:'Oakland, CA', status:'awaiting', updated:'2h ago', newNotes:1,
+    next:{text:`${PANEL}, Thu Oct 1, 2:00 PM`, by:'Sam Ortiz', when:'Sep 23'},
+    roles:[['Senior Product Designer','Figma','2021 to now','Led file history and version restore. Owned the design from research through launch.'],
+           ['Product Designer','Asana','2017 to 2021','Designed rules and automations for team admins.']],
+    edu:'BFA, Interaction Design, California College of the Arts',
+    why:'I\'ve spent the last few years on creative tools, and the part I liked most was the unglamorous part: permissions, history, who changed what. Halden\'s admin products are that problem at a bigger scale.',
+    iv:[ iv(0,SAM,'Sep 14',[null,4,null,3],'Yes','Clear on why she\'s leaving: wants to own a product area end to end, not a component library.','Comp expectations sit at the top of the band. Flagged, not a blocker.'),
+         iv(1,JP,'Sep 18',[4,4,3,3],'Strong yes','Walked through the version-history project without notes. Showed the three directions she killed and why.','Less B2B admin experience than we want. Most of her work is creative tooling.'),
+         iv(2,RAE,'Sep 22',[4,3,4,3],'Yes','Asked about the permissions model before drawing anything. Right instinct for this product.','Ran out of time before edge cases. Hard to judge how she handles empty and error states.'),
+         sched(3,'Thu, Oct 1') ] },
+
+  { id:'CAND-0398', name:'Priya Nair', years:10, prev:'Linear', city:'Brooklyn, NY', status:'awaiting', updated:'5h ago', newNotes:2,
+    next:{text:'Final decision needed from hiring manager', by:'Sam Ortiz', when:'Sep 24'},
+    roles:[['Principal Designer','Linear','2020 to now','Designed audit logs and workspace admin from zero.'],
+           ['Senior Designer','Zendesk','2015 to 2020','Owned agent permissions and role management.']],
+    edu:'BA, Cognitive Science, UC San Diego',
+    why:'Most of my career has been admin surfaces that nobody sees until something goes wrong. I\'d like to do that work somewhere it\'s treated as the product, not an afterthought.',
+    iv:[ iv(0,SAM,'Sep 9',[null,4,null,4],'Yes','Has shipped two B2B admin products from zero. Knows the space cold.','Wants a principal title. This req is senior.'),
+         iv(1,JP,'Sep 12',[3,4,4,4],'Yes','Strongest systems thinking this round. Her audit-log case study is basically our problem.','Visual craft is solid but not a standout.'),
+         iv(2,RAE,'Sep 16',[3,4,4,4],'Yes','Drove the session. Wrote the constraints on the board before sketching.','Went straight to a table. Didn\'t explore alternatives first.'),
+         iv(3,MW,'Sep 23',[3,4,4,4],'Strong yes','Engineers wanted to keep talking to her. Asked good questions about data retention.','Might get frustrated by our release pace.') ] },
+
+  { id:'CAND-0405', name:'Leo Brandt', years:6, prev:'Stripe', city:'Chicago, IL', status:'passed', updated:'Sep 18', newNotes:0,
+    next:{text:'Waiting on references', by:'Sam Ortiz', when:'Sep 19'},
+    roles:[['Product Designer','Stripe','2020 to now','Designed dispute and compliance workflows for finance teams.'],
+           ['Product Designer','Braintree','2018 to 2020','Merchant onboarding and verification.']],
+    edu:'BDes, Industrial Design, University of Illinois',
+    why:'I like products where getting it wrong has a cost. Hiring is one of them, and I think careful, boring clarity is what a tool like this needs.',
+    iv:[ iv(0,SAM,'Sep 5',[null,3,null,4],'Yes','Payments and compliance background maps well to permissions work.','Answers ran long. Needed redirecting twice.'),
+         iv(1,JP,'Sep 8',[4,3,3,4],'Yes','Dense, careful work. Every screen had a reason.','Struggled to say what he would do differently next time.'),
+         iv(2,RAE,'Sep 11',[4,3,3,4],'Strong yes','Best handling of edge cases this round, by a lot.','Worked mostly alone. Checked in with us late.'),
+         iv(3,MW,'Sep 17',[4,3,2,4],'Yes','Very strong with engineers on feasibility.','PM on the panel felt he brushed off a product question.') ] },
+
+  { id:'CAND-0421', name:'Tomás Alvarez', years:5, prev:'Duolingo', city:'Pittsburgh, PA', status:'interviewing', updated:'1d ago', newNotes:0,
+    next:{text:'Design exercise, Mon Oct 5, 10:00 AM', by:'Sam Ortiz', when:'Sep 24'},
+    roles:[['Product Designer','Duolingo','2021 to now','Onboarding and habit features. Ran most of his own research.'],
+           ['UX Designer','Agency work','2019 to 2021','Consumer apps for retail clients.']],
+    edu:'BS, Human-Computer Interaction, Carnegie Mellon',
+    why:'I\'ve only worked on consumer products so far and I want to learn how design works when the user is doing their job, not killing time.',
+    iv:[ iv(0,SAM,'Sep 19',[null,4,null,2],'Yes','Warm, clear, great at explaining past decisions.','Mostly consumer work. This would be his first enterprise role.'),
+         iv(1,JP,'Sep 24',[3,4,4,2],'Yes','Research-heavy process and strong at showing why.','Final UI is less polished than the process around it.'),
+         sched(2,'Mon, Oct 5') ] },
+
+  { id:'CAND-0417', name:'Hannah Okafor', years:7, prev:'Atlassian', city:'Austin, TX', status:'interviewing', updated:'2d ago', newNotes:0,
+    next:{text:'Design exercise being scheduled', by:'Sam Ortiz', when:'Sep 22'},
+    roles:[['Senior Designer','Atlassian','2019 to now','Jira admin and project permissions.'],
+           ['Designer','IBM','2016 to 2019','Internal enterprise tools.']],
+    edu:'BA, Graphic Design, University of Texas',
+    why:'I\'ve designed for admins for years and I want to design for the people who hire, since it\'s such a high-stakes moment for everyone involved.',
+    iv:[ iv(0,SAM,'Sep 17',[null,4,null,4],'Yes','Very direct, very prepared. Knew our product already.','Currently in two other late-stage processes.'),
+         iv(1,JP,'Sep 21',[3,3,4,4],'Yes','Admin and permissions depth is exactly the domain.','Portfolio leans on process docs more than final screens.') ] },
+
+  { id:'CAND-0430', name:'Devon Ruiz', years:5, prev:'Notion', city:'Denver, CO', status:'scheduling', updated:'3d ago', newNotes:0,
+    next:{text:'Portfolio review being scheduled', by:'Sam Ortiz', when:'Sep 21'},
+    roles:[['Product Designer','Notion','2021 to now','Templates and team workspace setup.'],
+           ['Product Designer','Mailchimp','2019 to 2021','Audience management.']],
+    edu:'BFA, Design, University of Colorado',
+    why:'Setting up a team in a tool is where most people give up. I want to work on the moments where things either click or don\'t.',
+    iv:[ iv(0,SAM,'Sep 20',[null,3,null,3],'Yes','Solid fundamentals. Relocating in November.','Availability is tight until after the move.') ] },
+
+  { id:'CAND-0377', name:'Aisha Rahman', years:9, prev:'Shopify', city:'Toronto, ON', status:'offer', updated:'Sep 20', newNotes:0,
+    next:{text:'Offer sent, response due Fri Oct 2', by:'Sam Ortiz', when:'Sep 20'},
+    roles:[['Staff Designer','Shopify','2019 to now','Staff and permissions for merchant teams.'],
+           ['Senior Designer','Wealthsimple','2016 to 2019','Account and compliance flows.']],
+    edu:'BA, Design, OCAD University',
+    why:'I want to work on tools where the user is under real pressure to make a good decision, and hiring is exactly that.',
+    iv:[ iv(0,SAM,'Aug 28',[null,4,null,4],'Yes','Strong, calm, clear about what she wants next.','Would need to relocate or go remote.'),
+         iv(1,JP,'Sep 2',[4,4,4,4],'Strong yes','Best portfolio this cycle.','None worth noting.'),
+         iv(2,RAE,'Sep 5',[4,4,3,4],'Strong yes','Clean, fast, and explained tradeoffs out loud.','Pushed back hard on the brief. Mostly fair.'),
+         iv(3,MW,'Sep 10',[4,4,4,4],'Strong yes','Engineers asked to fast-track.','None worth noting.') ] },
+
+  { id:'CAND-0389', name:'Ben Whitaker', years:4, prev:'Dropbox', city:'Seattle, WA', status:'nmf', updated:'Sep 15', newNotes:0,
+    next:null,
+    roles:[['Product Designer','Dropbox','2020 to now','Sharing and link settings.'],
+           ['Junior Designer','Agency work','2019 to 2020','Marketing sites.']],
+    edu:'BA, Visual Communication, University of Washington',
+    why:'I\'m looking for a team where I can grow into more complex systems work.',
+    iv:[ iv(0,SAM,'Sep 3',[null,3,null,2],'Yes','Friendly and eager.','Earlier in career than the req asks for.'),
+         iv(1,JP,'Sep 9',[2,3,3,2],'No','Good visual instincts.','Couldn\'t explain the reasoning behind key decisions.') ] },
+
+  { id:'CAND-0402', name:'Grace Kim', years:6, prev:'Airtable', city:'San Francisco, CA', status:'withdrew', updated:'Sep 12', newNotes:0,
+    next:null,
+    roles:[['Product Designer','Airtable','2020 to now','Interfaces and permissions.'],
+           ['Product Designer','Box','2018 to 2020','Enterprise admin console.']],
+    edu:'BA, Design Media Arts, UCLA',
+    why:'The admin side of software is where I do my best work.',
+    iv:[ iv(0,SAM,'Sep 6',[null,4,null,4],'Yes','Great fit on paper and in conversation.','Accepted another offer before the portfolio review.') ] }
+];
+C.forEach(c => c.log = []);
+
+/* ---- Who's late: added after the research (see case study, "What the research changed").
+   ?before shows the prototype as it was before this change. ---- */
+const GOAL_DAYS = 2; // team turnaround goal; SHRM suggests hiring managers review resumes within 48 hours
+const owed = (r, p, date) => ({r, who:p.who, role:p.role, date, owed:true});
+if (!BEFORE){
+  byIdRaw('CAND-0412').wait = {you:true, what:'Your review of the latest notes', since:'Sep 24', days:1};
+  byIdRaw('CAND-0398').wait = {you:true, what:'Your final decision', since:'Sep 23', days:2};
+  const h = byIdRaw('CAND-0417');
+  h.iv.push(owed(2, RAE, 'Sep 22'));
+  h.next = {text:'Waiting on design exercise feedback', by:'Sam Ortiz', when:'Sep 22'};
+  h.wait = {who:'Rae Lindqvist', short:'Rae L.', what:'Design exercise feedback', since:'Sep 22', days:3};
+}
+function byIdRaw(id){ return C.find(c => c.id === id); }
+
+/* ================= helpers ================= */
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+const byId = id => C.find(c => c.id === id);
+const pill = s => `<span class="pill st-${s}">${STATUS[s].label}</span>`;
+const doneCount = c => c.iv.filter(x => x.done).length;
+const schedIv = c => c.iv.find(x => x.sched);
+function pips(c){
+  let h = '<span class="pips" aria-hidden="true">';
+  for (let r = 0; r < ROUNDS.length; r++){
+    const x = c.iv.find(v => v.r === r);
+    h += `<i class="${x ? (x.done ? 'done' : x.owed ? 'owed' : 'sched') : ''}"></i>`;
+  }
+  return h + '</span>';
+}
+function avg(c, k){
+  const vals = c.iv.filter(x => x.done && x.s[k] != null).map(x => x.s[k]);
+  if (!vals.length) return {v:null, n:0};
+  return {v: vals.reduce((a,b)=>a+b,0) / vals.length, n: vals.length};
+}
+const fmt = v => v == null ? 'n/a' : (Math.round(v*10)/10).toFixed(1);
+const MONTHS = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+const toDate = str => { const m = /^([A-Z][a-z]{2}) (\d{1,2})$/.exec(str || ''); return m ? new Date(2026, MONTHS[m[1]], +m[2]) : null; };
+// most recent interview that actually happened (a held interview with feedback still owed counts)
+function lastIv(c){
+  const ds = c.iv.filter(x => x.done || x.owed).map(x => toDate(x.date)).filter(Boolean);
+  return ds.length ? new Date(Math.max(...ds)) : null;
+}
+const daysAgo = d => Math.round((TODAY - d) / 864e5);
+const agoTxt = n => n <= 0 ? 'today' : n === 1 ? '1 day ago' : n + ' days ago';
+const shortDate = d => d.toLocaleDateString('en-US', {month:'short', day:'numeric'});
+// Overall = the four criterion averages added up, out of 20 (16 under ?before's 1 to 4 scale). Added after testing: a tester wanted one number
+// to compare by. It only shows once every criterion has at least one rating, and the breakdown stays next to it.
+const MAX_SCORE = CRIT.length * SCALE;
+function overall(c){
+  const a = CRIT.map(cr => avg(c, cr.k));
+  return a.some(x => x.v == null) ? null : a.reduce((t, x) => t + x.v, 0);
+}
+const initials = n => n.split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase();
+const face = (c, cls = '') => `<span class="face ${cls}" aria-hidden="true">${initials(c.name)}</span>`;
+function waitState(w){ return !w ? '' : w.days > GOAL_DAYS ? 'late' : w.days === GOAL_DAYS ? 'due' : 'ok'; }
+const dayTxt = n => n === 1 ? '1 day' : n + ' days';
+function waitCell(c){
+  const w = c.wait;
+  if (!w) return '<span class="muted" style="font-size:12.5px;">Nobody</span>';
+  const st = waitState(w);
+  const who = w.you ? 'You' : esc(w.short || w.who);
+  const tail = st === 'late' ? '<span class="flag">Late</span>' : st === 'due' ? ' &middot; due today' : '';
+  return `<span class="wt ${st}"><b>${who}</b> &middot; <span class="d">${dayTxt(w.days)}</span>${tail}</span>`;
+}
+const recCls = r => r === 'Strong yes' ? 'sy' : r === 'Yes' ? 'y' : 'n';
+
+let filter = 'all';
+let query = '';
+const sel = new Set();
+let colorMap = {};
+const SERIES = ['var(--s1)','var(--s2)','var(--s3)'];
+
+/* ================= list ================= */
+// sort (added after testing)
+const by = (key, dir = -1) => (a, b) => {
+  const x = key(a), y = key(b);
+  if (x == null && y == null) return 0;
+  if (x == null) return 1;
+  if (y == null) return -1;
+  return dir * (x - y);
+};
+// urgency: late first, then due today, then anything else someone is waiting on (added after round 2: Conner wanted "due today" first)
+const urgency = c => { const st = waitState(c.wait); return !c.wait ? -1 : st === 'late' ? 1000 + c.wait.days : st === 'due' ? 500 + c.wait.days : c.wait.days; };
+const SORTS = [
+  {id:'urgent', label:'Most urgent first', fn:(a, b) => urgency(b) - urgency(a)},
+  {id:'default', label:'Pipeline order'},
+  {id:'status', label:'Status', fn:by(c => STATUS_ORDER.indexOf(c.status), 1)},
+  {id:'recent', label:'Last interview: newest', fn:by(c => lastIv(c) && +lastIv(c))},
+  {id:'oldest', label:'Last interview: oldest', fn:by(c => lastIv(c) && +lastIv(c), 1)},
+  {id:'done', label:'Interviews completed', fn:by(c => doneCount(c))},
+  {id:'score', label:'Overall score', fn:by(c => overall(c))},
+  {id:'name', label:'Name: A to Z', fn:(a, b) => a.name.localeCompare(b.name)}
+];
+let sortBy = BEFORE ? 'default' : 'urgent';
+
+// which column maps to which sort id, and (for Last interview) its reverse
+const HEAD_SORT = { name:{id:'name'}, status:{id:'status'}, wait:{id:'urgent'}, done:{id:'done'}, score:{id:'score'}, last:{id:'recent', rev:'oldest'} };
+function sortTh(key, label, extraClass){
+  if (BEFORE) return `<th class="${extraClass||''}">${label}</th>`;
+  const map = HEAD_SORT[key];
+  const rev = map.rev && sortBy === map.rev;
+  const active = sortBy === map.id || rev;
+  const arrow = !active ? '\u2195' : rev ? '\u2191' : '\u2193';
+  return `<th class="sortable ${active?'active':''} ${extraClass||''}" data-sort="${key}" tabindex="0" role="button"
+    aria-sort="${active ? (rev?'ascending':'descending') : 'none'}" aria-label="Sort by ${esc(label)}">${label}<span class="arw">${arrow}</span></th>`;
+}
+function onHeadSort(key){
+  const map = HEAD_SORT[key]; if (!map) return;
+  sortBy = (map.rev && sortBy === map.id) ? map.rev : map.id;
+  renderList();
+}
+function lastCell(c){
+  const d = lastIv(c);
+  if (!d) return '<span class="muted" style="font-size:12.5px;">None yet</span>';
+  return `<span class="t-mono" style="color:var(--ink);">${shortDate(d)}</span><div class="ago">${agoTxt(daysAgo(d))}</div>`;
+}
+
+function renderList(){
+  const q = query.trim().toLowerCase();
+  const f = FILTERS.find(x => x.id === filter) || FILTERS[0];
+  let rows = C.filter(c => f.match(c) && (!q || c.name.toLowerCase().includes(q) || c.prev.toLowerCase().includes(q)));
+  const srt = SORTS.find(x => x.id === sortBy);
+  if (!BEFORE && srt && srt.fn) rows = rows.slice().sort(srt.fn);
+  const chips = FILTERS.map(x => {
+    const n = C.filter(c => x.match(c)).length;
+    return `<button class="chip ${x.id===filter?'on':''} ${x.id==='mine'?'mine':''} ${x.id==='final'?'final':''}" data-f="${x.id}">${x.label}<span class="n">${n}</span></button>`;
+  }).join('');
+  const tools = BEFORE ? '' : `
+      <div class="list-tools">
+        <label class="sort">Sort by
+          <select id="sortSel" aria-label="Sort candidates">${SORTS.map(o => `<option value="${o.id}" ${o.id===sortBy?'selected':''}>${o.label}</option>`).join('')}</select>
+        </label>
+        <button class="btn" id="cmpTop" disabled>Compare</button>
+      </div>`;
+  const cols = 8;
+
+  $('#view').innerHTML = `
+    <div class="head-row">
+      <div><h1>Candidates</h1><div class="sub">Everyone in the pipeline for this role, in one place.</div></div>
+      ${tools}
+    </div>
+    <div class="chips">${chips}</div>
+    ${lateBar()}
+    <div class="tbl-wrap">
+      <table class="tbl ${BEFORE ? '' : 'v3'}">
+        <thead><tr>
+          <th class="cb"><span class="sr" style="position:absolute;left:-9999px;">Select</span></th>
+          ${sortTh('name','Candidate')}${sortTh('status','Status')}${BEFORE ? '' : sortTh('wait','Waiting on')}${sortTh('done','Interviews')}${BEFORE ? '<th>Notes</th>' : sortTh('score','Overall')}<th class="hide-sm">Next step</th>${sortTh('last','Last interview','hide-sm')}
+        </tr></thead>
+        <tbody>
+          ${rows.length ? rows.map(c => `
+            <tr tabindex="0" data-id="${c.id}" class="${sel.has(c.id)?'sel':''}">
+              <td class="cb"><input type="checkbox" data-cb="${c.id}" ${sel.has(c.id)?'checked':''} aria-label="Select ${esc(c.name)}"></td>
+              <td>${BEFORE ? '' : `<div class="who">${face(c)}<div>`}<div class="cand-name">${esc(c.name)}</div><div class="cand-meta">${c.years} yrs &middot; ex-${esc(c.prev)}</div>${BEFORE ? '' : `${c.newNotes ? `<div class="newdot sm">${c.newNotes} new note${c.newNotes === 1 ? '' : 's'}</div>` : ''}</div></div>`}</td>
+              <td>${pill(c.status)}</td>
+              ${BEFORE ? '' : `<td>${waitCell(c)}</td>`}
+              <td style="white-space:nowrap;">${pips(c)}<span class="t-mono">${doneCount(c)}/${ROUNDS.length}</span></td>
+              ${BEFORE ? `<td>${c.newNotes ? `<span class="newdot">${c.newNotes} new</span>` : `<span class="t-mono muted">${doneCount(c)} logged</span>`}</td>`
+                       : `<td style="white-space:nowrap;">${overall(c) == null ? '<span class="muted" style="font-size:12.5px;">Not yet</span>' : `<span class="ovn">${fmt(overall(c))}</span><span class="t-mono muted"> /${MAX_SCORE}</span>`}</td>`}
+              <td class="hide-sm" style="font-size:13px; color:var(--ink-2); max-width:260px;">${c.next ? esc(c.next.text) : '<span class="muted">None</span>'}</td>
+              <td class="hide-sm">${BEFORE ? `<span class="t-mono">${esc(c.updated)}</span>` : lastCell(c)}</td>
+            </tr>`).join('') : `<tr><td colspan="${cols}" class="empty">No candidates match.</td></tr>`}
+        </tbody>
+      </table>
+    </div>`;
+  const ss = document.getElementById('sortSel');
+  if (ss) ss.addEventListener('change', e => { sortBy = e.target.value; renderList(); });
+  const ct = document.getElementById('cmpTop');
+  if (ct) ct.addEventListener('click', goCompare);
+  document.querySelectorAll('.tbl th.sortable').forEach(el => {
+    el.addEventListener('click', () => onHeadSort(el.dataset.sort));
+    el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); onHeadSort(el.dataset.sort); } });
+  });
+  updateBulk();
+}
+
+function lateBar(){
+  if (BEFORE) return '';
+  const late = C.filter(c => waitState(c.wait) === 'late');
+  if (!late.length) return '';
+  // same format as the Waiting on column (round 2: Conner said the two looked different)
+  return `<div class="late-bar"><span class="k">${late.length} late</span>${late.map(c =>
+    `<span>${waitCell(c)} <span class="lb-what">owes ${esc(c.wait.what.toLowerCase())} on <a href="#/c/${c.id}">${esc(c.name)}</a></span></span>`).join('')}
+    <span class="goal">Team goal: ${GOAL_DAYS} days</span></div>`;
+}
+
+function updateBulk(){
+  const b = $('#bulk'), n = sel.size, onList = currentView === 'list';
+  const ct = document.getElementById('cmpTop');
+  if (ct){
+    // with nothing picked, the header button is a shortcut that compares the finalists.
+    // once anything is checked, the bulk bar below takes over (it can also archive).
+    if (n === 0){
+      const fins = C.filter(isFinalist).length;
+      ct.hidden = false;
+      ct.disabled = fins < 2; ct.textContent = fins < 2 ? 'Compare' : `Compare ${Math.min(fins,3)} finalists \u2192`;
+      ct.classList.toggle('primary', !ct.disabled);
+    } else {
+      ct.hidden = true;
+    }
+  }
+  b.classList.toggle('show', onList && n > 0);
+  if (n === 0) return;
+  const go = $('#bulkGo');
+  if (n < 2){ $('#bulkMsg').innerHTML = `${n} selected<small>Pick ${2-n} more to compare</small>`; go.disabled = true; go.textContent = 'Compare'; }
+  else if (n > 3){ $('#bulkMsg').innerHTML = `${n} selected<small>Compare works with up to 3</small>`; go.disabled = true; go.textContent = 'Compare'; }
+  else { $('#bulkMsg').innerHTML = `${n} selected`; go.disabled = false; go.textContent = `Compare ${n} candidates \u2192`; }
+  const arch = $('#bulkArchive');
+  if (arch){
+    const selCands = C.filter(c => sel.has(c.id));
+    const allArchived = selCands.length > 0 && selCands.every(c => c.status === 'archived');
+    arch.textContent = allArchived ? 'Restore' : 'Archive';
+  }
+}
+
+/* ================= record ================= */
+function renderRecord(id, tab){
+  const c = byId(id);
+  if (!c){ location.hash = '#/'; return; }
+  c.newNotes = 0;
+  tab = tab || 'interviews';
+  const d = doneCount(c);
+  const options = '<option value="" selected disabled>Choose status</option>' + Object.keys(STATUS).filter(k => k !== c.status).map(k => `<option value="${k}">${STATUS[k].label}</option>`).join('');
+  const acts = activity(c);
+
+  let body = '';
+  if (tab === 'interviews'){
+    const avgs = CRIT.map(cr => ({cr, a: avg(c, cr.k)}));
+    body = `
+      ${BEFORE ? '' : prosCons(c)}
+      <div class="iv-summary ${BEFORE ? '' : 'v3'}">
+        <div>
+          <div class="k-label">Interviews</div>
+          <div class="big">${d}<small>of ${ROUNDS.length} done</small></div>
+          <div style="margin-top:12px;">${pips(c)}</div>
+        </div>
+        ${BEFORE ? '' : ovBlock(c)}
+        <div>
+          <div class="k-label">${BEFORE ? 'Average rating so far' : 'Average by criterion'} &middot; 1 to ${SCALE} scale</div>
+          <div class="avg-rows">
+            ${avgs.map(({cr,a}) => `
+              <div class="avg-row">
+                <span>${cr.label}</span>
+                <span class="avg-track"><span class="avg-fill" style="width:${a.v ? a.v/SCALE*100 : 0}%"></span></span>
+                <span class="t-mono">${fmt(a.v)} <span class="muted">(${a.n})</span></span>
+              </div>`).join('')}
+          </div>
+        </div>
+      </div>
+      ${BEFORE ? '' : '<h3 class="sec-h">Every interview, in full</h3>'}
+      ${ROUNDS.map((rname, r) => {
+        const x = c.iv.find(v => v.r === r);
+        if (!x) return `<div class="iv pending"><div class="iv-top"><span class="iv-round">0${r+1}</span><span class="iv-title">${rname}</span><span class="iv-date">Not booked yet</span></div></div>`;
+        if (x.owed) return `<div class="iv pending owed"><div class="iv-top"><span class="iv-round">0${r+1}</span><span class="iv-title">${rname}</span><span class="iv-who">${esc(x.who)}, ${esc(x.role)}</span><span class="iv-date">Held ${esc(x.date)} &middot; no feedback yet</span></div></div>`;
+        if (x.sched) return `<div class="iv pending"><div class="iv-top"><span class="iv-round">0${r+1}</span><span class="iv-title">${rname}</span><span class="iv-who">Not held yet</span><span class="iv-date">Scheduled ${esc(x.sched)}</span></div></div>`;
+        return `
+          <article class="iv">
+            <div class="iv-top">
+              <span class="iv-round">0${r+1}</span>
+              <span class="iv-title">${rname}</span>
+              <span class="iv-who">${esc(x.who)}, ${esc(x.role)}</span>
+              <span class="iv-date">${esc(x.date)}</span>
+              <span class="rec ${recCls(x.rec)}">${x.rec}</span>
+            </div>
+            <div class="iv-scores">
+              ${CRIT.map(cr => {
+                const v = x.s[cr.k];
+                return `<div class="score"><div class="lbl">${cr.label}</div><div class="seg">${
+                  v == null ? '<span class="nr">Not rated this round</span>' :
+                  Array.from({length:SCALE}, (_, i) => `<i class="${i+1<=v?'f':''}"></i>`).join('') + `<span>${v}/${SCALE}</span>`
+                }</div></div>`;
+              }).join('')}
+            </div>
+            <div class="iv-notes">
+              <div><div class="note-k good">Went well</div><p class="serif">${esc(x.well)}</p></div>
+              <div><div class="note-k bad">Concerns</div><p class="serif ${BEFORE ? '' : 'con'}">${esc(x.concern)}</p></div>
+            </div>
+          </article>`;
+      }).join('')}`;
+  } else if (tab === 'docs'){
+    body = `
+      <div class="docs">
+        <div>
+          <div class="doc-k"><span>resume.pdf</span><span>uploaded by Sam Ortiz &middot; ${esc(c.iv[0].date)}</span></div>
+          <div class="paper">
+            <h2>${esc(c.name)}</h2>
+            <div class="r-sub">Product Designer &middot; ${esc(c.city)}</div>
+            <h4>Experience</h4>
+            ${c.roles.map(r => `<div class="r-role"><b>${esc(r[0])}</b>, ${esc(r[1])}<span>${esc(r[2])}</span><p>${esc(r[3])}</p></div>`).join('')}
+            <h4>Education</h4>
+            <p>${esc(c.edu)}</p>
+          </div>
+        </div>
+        <div>
+          <div class="doc-k"><span>cover-letter.pdf</span><span>uploaded by Sam Ortiz &middot; ${esc(c.iv[0].date)}</span></div>
+          <div class="paper letter">
+            <p>Dear hiring team,</p>
+            <p>${esc(c.why)}</p>
+            <p>I'd welcome the chance to walk through my work in more detail.</p>
+            <p>${esc(c.name)}</p>
+          </div>
+        </div>
+      </div>`;
+  } else {
+    body = `
+      <div class="timeline">
+        ${acts.map(a => `<div class="tl ${a.status?'status':''} ${a.fresh?'fresh':''}"><span class="when">${esc(a.t)}</span><span class="dot"></span><div class="what">${a.html}</div></div>`).join('')}
+      </div>`;
+  }
+
+  $('#view').innerHTML = `
+    <button class="backlink" data-go="#/">&larr; Candidates</button>
+    <div class="rec-head">
+      <div class="${BEFORE ? '' : 'rec-who'}">
+        ${BEFORE ? '' : face(c, 'lg')}
+        <div>
+          <h1>${esc(c.name)}</h1>
+          <div class="rec-meta">${c.id} &middot; ${c.years} yrs &middot; ex-${esc(c.prev)} &middot; ${esc(c.city)} &middot; Recruiter: Sam Ortiz</div>
+          ${BEFORE ? '' : `<p class="in-words">&ldquo;${esc(c.why)}&rdquo;<span>In their words, from the cover letter</span></p>`}
+        </div>
+      </div>
+      ${BEFORE ? `<div class="status-ctl">
+        <div class="row">${pill(c.status)}
+          <label class="row" style="gap:6px; font-size:12.5px; color:var(--ink-2);">Move to
+            <select id="statusSel" aria-label="Change status">${options}</select>
+          </label>
+        </div>
+      </div>` : statusCtl(c, options)}
+    </div>
+    ${BEFORE ? '' : waitLine(c) + decisionPanel(c)}
+    <div class="next-line">
+      <span class="k">Next step</span>
+      <span class="v">${c.next ? esc(c.next.text) : 'None'}</span>
+      ${c.next ? `<span class="by">entered by ${esc(c.next.by)} &middot; ${esc(c.next.when)}</span>` : ''}
+    </div>
+    <div class="subtabs" role="tablist">
+      <button role="tab" class="${tab==='interviews'?'on':''}" data-go="#/c/${c.id}">${BEFORE ? 'Interviews' : 'Interviews &amp; notes'} <span class="n">${d}/${ROUNDS.length}</span></button>
+      <button role="tab" class="${tab==='docs'?'on':''}" data-go="#/c/${c.id}/docs">Resume &amp; cover letter</button>
+      <button role="tab" class="${tab==='activity'?'on':''}" data-go="#/c/${c.id}/activity">Activity <span class="n">${acts.length}</span></button>
+    </div>
+    ${body}`;
+
+  const setStatus = to => { if (changeStatus(c, to)) renderRecord(c.id, tab); };
+  const und = document.getElementById('undo');
+  if (und) und.addEventListener('click', () => { undoStatus(c); renderRecord(c.id, tab); });
+  $('#statusSel').addEventListener('change', e => setStatus(e.target.value));
+  const adv = document.getElementById('advance');
+  if (adv) adv.addEventListener('click', () => setStatus(adv.dataset.to));
+  const dec = document.getElementById('decline');
+  if (dec) dec.addEventListener('click', () => setStatus('nmf'));
+  const nudge = document.getElementById('nudge');
+  if (nudge) nudge.addEventListener('click', () => {
+    c.log.unshift({t:'Just now', fresh:true, html:`Jordan Park sent ${esc(c.wait.who)} a reminder<small>${esc(c.wait.what)}, waiting ${dayTxt(c.wait.days)}</small>`});
+    nudge.disabled = true; nudge.textContent = BEFORE ? 'Reminder sent' : `Reminder sent to ${c.wait.who.split(' ')[0]}`;
+    toast(`Reminder sent to <b>${esc(c.wait.who)}</b>. It's logged in Activity.`);
+  });
+}
+
+// The next step, named on a button (added after testing). Returns null when the hiring manager has nothing to move.
+function nextMove(c){
+  const done = doneCount(c);
+  if (c.status === 'awaiting' || c.status === 'interviewing'){
+    if (done >= ROUNDS.length) return {to:'passed', label:'Mark as passed panel'};
+    if (c.status === 'awaiting'){
+      const nx = ROUNDS.findIndex((_, r) => !c.iv.some(x => x.r === r && x.done));
+      return {to:'interviewing', label:`Move on to ${ROUNDS[nx]}`};
+    }
+    return null;
+  }
+  if (c.status === 'passed') return {to:'offer', label:'Extend offer'};
+  return null;
+}
+// Status sits top right. The decision itself is its own panel (round 2: Mazzy missed the button and couldn't tell what changed).
+function statusCtl(c, options){
+  return `<div class="status-ctl v3">
+      <div class="row"><span class="st-k">Status</span>${pill(c.status)}</div>
+      <details class="other"><summary>Other status</summary>
+        <select id="statusSel" aria-label="Change status">${options}</select>
+      </details>
+    </div>`;
+}
+const first = c => c.name.split(' ')[0];
+function decisionPanel(c){
+  const mv = nextMove(c), f = first(c), d = doneCount(c), N = ROUNDS.length;
+  let q;
+  if (c.status === 'awaiting' || c.status === 'interviewing'){
+    if (d >= N) q = `${f} has finished all ${N} interviews. Did ${f} pass the panel?`;
+    else if (c.status === 'awaiting') q = `${f} has finished ${d} of ${N} interviews. Move ${f} on to the ${ROUNDS[d]}?`;
+    else q = `Nothing needed from you right now. ${f} is still interviewing.`;
+  } else if (c.status === 'passed') q = `${f} passed every round. Ready to make an offer?`;
+  else if (c.status === 'scheduling') q = `Nothing needed from you right now. Sam Ortiz is booking the next interview.`;
+  else if (c.status === 'offer') q = `The offer is out. Nothing to decide right now.`;
+  else q = `${f} is no longer in the running.`;
+  const ch = c.change;
+  const done = ch ? `<div class="dec-done" role="status"><span class="k">Done</span><span>${f} moved from <b>${STATUS[ch.from].label}</b> to <b>${STATUS[ch.to].label}</b>. Sam Ortiz can see it now, no message needed.</span><button class="linkbtn" id="undo">Undo</button></div>` : '';
+  return `<section class="decide">${done}
+      <div class="dec-row">
+        <div><div class="dec-k">Your decision</div><div class="dec-q">${q}</div></div>
+        ${mv || ACTIVE(c.status) ? `<div class="dec-acts">
+          ${mv ? `<button class="btn primary big" id="advance" data-to="${mv.to}">${mv.label} &rarr;</button>` : ''}
+          ${ACTIVE(c.status) ? '<button class="btn" id="decline">Not moving forward</button>' : ''}
+        </div>` : ''}
+      </div>
+    </section>`;
+}
+function changeStatus(c, to){
+  const from = c.status;
+  if (!to || to === from) return false;
+  c.change = {from, to, wait: c.wait};
+  c.status = to; c.updated = 'just now';
+  if (c.wait && c.wait.you) c.wait = null;
+  c.log.unshift({t:'Just now', status:true, fresh:true,
+    html:`Jordan Park moved status from <b>${STATUS[from].label}</b> to <b>${STATUS[to].label}</b><small>Visible to Sam Ortiz immediately. No message sent.</small>`});
+  toast(`${BEFORE ? 'Moved' : esc(first(c)) + ' moved'} to <b>${STATUS[to].label}</b>. Sam Ortiz can see it now, no message needed.`);
+  return true;
+}
+function undoStatus(c){
+  const ch = c.change; if (!ch) return;
+  c.status = ch.from; c.wait = ch.wait; c.change = null;
+  c.log.unshift({t:'Just now', status:true, fresh:true, html:`Jordan Park undid the change. Status is back to <b>${STATUS[ch.from].label}</b>`});
+  toast(`Undone. ${esc(first(c))} is back to <b>${STATUS[ch.from].label}</b>.`);
+}
+// Pros and cons first (round 2: Mazzy only found the concerns at the bottom of each interview)
+function prosCons(c){
+  const done = c.iv.filter(x => x.done);
+  if (!done.length) return '';
+  const tally = ['Strong yes','Yes','No','Strong no'].map(r => [r, done.filter(x => x.rec === r).length]).filter(x => x[1]);
+  const item = (x, t) => `<li><p>${esc(t)}</p><span>${esc(x.who.split(' ')[0])} &middot; ${ROUNDS[x.r]}</span></li>`;
+  return `<section class="pc">
+      <div class="pc-h"><h3>What interviewers said</h3>
+        <div class="pc-recs">${tally.map(t => `<span class="rec ${recCls(t[0])}">${t[1]} ${t[0]}</span>`).join('')}</div></div>
+      <div class="pc-cols">
+        <div><div class="note-k good">Went well</div><ul>${done.map(x => item(x, x.well)).join('')}</ul></div>
+        <div class="pc-bad"><div class="note-k bad">Concerns</div><ul>${done.map(x => item(x, x.concern)).join('')}</ul></div>
+      </div>
+    </section>`;
+}
+function ovBlock(c){
+  const ov = overall(c);
+  if (ov == null) return `<div>
+      <div class="k-label">Overall score</div>
+      <div class="big" style="color:var(--muted);">n/a</div>
+      <div class="ov-note">Shows once every criterion has at least one rating.</div>
+    </div>`;
+  return `<div>
+      <div class="k-label">Overall score</div>
+      <div class="big">${fmt(ov)}<small>of ${MAX_SCORE}</small></div>
+      <div class="ov-track"><span style="width:${ov / MAX_SCORE * 100}%"></span></div>
+      <div class="ov-note">All ${CRIT.length} ratings added up. The best possible is ${MAX_SCORE}.</div>
+    </div>`;
+}
+
+// Plain words (round 2: Mazzy couldn't tell whose side the hold-up was on, or what Send reminder does)
+function waitLine(c){
+  const w = c.wait;
+  if (BEFORE || !w) return '';
+  const st = waitState(w);
+  const lower = t => t.charAt(0).toLowerCase() + t.slice(1);
+  const days = `${dayTxt(w.days)} so far, since ${esc(w.since)}. Your team's goal is ${GOAL_DAYS} days${st === 'due' ? ', so it\'s due today' : st === 'late' ? ', so it\'s late' : ''}.`;
+  if (w.you) return `<div class="wait-line you ${st}">
+      <span class="k">${st === 'late' ? 'Late' : 'Waiting on you'}</span>
+      <div class="wl-txt"><span class="v">This one is on you: ${esc(lower(w.what))}.</span><span class="wl-sub">${days} Decide below.</span></div>
+    </div>`;
+  const ow = c.iv.find(x => x.owed), who1 = w.who.split(' ')[0];
+  return `<div class="wait-line ${st === 'late' ? 'late' : ''}">
+      <span class="k">${st === 'late' ? 'Late' : 'Waiting on'}</span>
+      <div class="wl-txt"><span class="v">The hold-up is on your team, not on ${esc(first(c))}.</span>
+        <span class="wl-sub"><b>${esc(w.who)}</b>${ow ? ` (${esc(ow.role)})` : ''} still owes ${esc(lower(w.what))}. ${days}</span></div>
+      <div class="wl-act"><button class="btn primary" id="nudge">Remind ${esc(who1)}</button><small>Sends ${esc(who1)} a reminder in Docket and by email.</small></div>
+    </div>`;
+}
+
+function activity(c){
+  const out = [];
+  c.iv.forEach(x => {
+    if (x.done) out.push({t:x.date, html:`${esc(x.who)} logged <b>${ROUNDS[x.r]}</b> notes and ratings<small>${x.rec}</small>`});
+    else if (x.owed) out.push({t:x.date, html:`${esc(x.who)} ran <b>${ROUNDS[x.r]}</b><small>Feedback not submitted yet</small>`});
+    else if (x.sched && c.next) out.push({t:c.next.when, html:`Sam Ortiz added next step: ${esc(c.next.text)}`});
+  });
+  out.unshift({t:c.iv[0].date, html:`Sam Ortiz added ${esc(c.name)} to REQ-2291<small>Resume and cover letter attached</small>`});
+  if (!c.log.length) out.push({t:c.updated, status:true, html:`Status set to <b>${STATUS[c.status].label}</b>`});
+  // newest first, changes made in this session on top
+  return c.log.concat(out.reverse());
+}
+
+/* ================= compare ================= */
+// Decide from Compare (round 2: Mazzy wanted to act where the decision happens)
+function cmpDecide(c){
+  const mv = nextMove(c);
+  if (!mv && !ACTIVE(c.status)) return `<div class="cmp-act"><span class="muted" style="font-size:12.5px;">${c.status === 'offer' ? 'Offer already out' : 'Hidden'}</span></div>`;
+  return `<div class="cmp-act">
+      ${mv ? `<button class="btn primary" data-adv="${c.id}" data-to="${mv.to}">${mv.label} &rarr;</button>` : '<span class="muted" style="font-size:12.5px;">Still interviewing</span>'}
+      ${ACTIVE(c.status) ? `<button class="btn" data-nmf="${c.id}">Not moving forward</button>` : ''}
+    </div>`;
+}
+function renderCompare(ids){
+  const cs = ids.map(byId).filter(Boolean);
+  if (cs.length < 2){ location.hash = '#/'; return; }
+  // colour follows the person, not their position: survivors keep their hue when someone is removed
+  cs.forEach(c => {
+    if (!colorMap[c.id]){
+      const used = Object.values(colorMap);
+      colorMap[c.id] = SERIES.find(s => !used.includes(s)) || SERIES[0];
+    }
+  });
+  // highest overall score first, ties by name, so every block on this page reads in the same order
+  if (!BEFORE) cs.sort((a, b) => ((overall(b) ?? -1) - (overall(a) ?? -1)) || a.name.localeCompare(b.name));
+
+  $('#view').innerHTML = `
+    <button class="backlink" data-go="#/">&larr; Candidates</button>
+    <div class="head-row"><div><h1>Comparing ${cs.length} candidates</h1><div class="sub">Same criteria, same scale, side by side.</div></div></div>
+    ${BEFORE ? '' : `<section class="card">
+      <h3>Overall score</h3>
+      <div class="desc">The four averages below, added up (out of ${MAX_SCORE}). Highest first.</div>
+      <div class="ov-rows">${cs.map(c => { const ov = overall(c); return `
+        <div class="ov-row"><span class="nm"><i style="background:${colorMap[c.id]}"></i>${esc(c.name)}</span>
+          <span class="ov-track"><span style="width:${ov == null ? 0 : ov / MAX_SCORE * 100}%; background:${colorMap[c.id]};"></span></span>
+          <span class="t-mono">${ov == null ? 'n/a' : `${fmt(ov)} <span class="muted">of ${MAX_SCORE}</span>`}</span></div>`; }).join('')}
+      </div>
+    </section>`}
+    <section class="card">
+      <h3>Average interviewer rating</h3>
+      <div class="desc">1 to ${SCALE} scale. Averages only include rounds where that criterion was rated. Hover or tab through a bar for detail.</div>
+      <div class="legend">${cs.map(c => `<span><i style="background:${colorMap[c.id]}"></i>${esc(c.name)} <span class="t-mono muted">${doneCount(c)} of ${ROUNDS.length} interviews</span></span>`).join('')}</div>
+      <div class="chart-box" id="chartBox">${chart(cs)}<div class="tip" id="tip"></div></div>
+      <button class="table-toggle" id="tblToggle" aria-expanded="false">Show as table</button>
+      <div id="tblView" hidden>
+        <table class="mini">
+          <thead><tr><th>Candidate</th>${CRIT.map(cr => `<th>${cr.label}</th>`).join('')}${BEFORE ? '' : `<th>Overall (of ${MAX_SCORE})</th>`}</tr></thead>
+          <tbody>${cs.map(c => `<tr><td><span class="sw" style="background:${colorMap[c.id]}"></span>${esc(c.name)}</td>${CRIT.map(cr => { const a = avg(c, cr.k); return `<td class="num">${fmt(a.v)} <span class="muted">(${a.n})</span></td>`; }).join('')}${BEFORE ? '' : `<td class="num">${fmt(overall(c))}</td>`}</tr>`).join('')}</tbody>
+        </table>
+      </div>
+    </section>
+    <div class="cmp-cols" style="grid-template-columns:repeat(${cs.length}, minmax(0,1fr));">
+      ${cs.map(c => {
+        const done = c.iv.filter(x => x.done);
+        const tally = ['Strong yes','Yes','No','Strong no'].map(r => [r, done.filter(x => x.rec === r).length]).filter(x => x[1]);
+        return `
+        <div class="cmp-col">
+          <div class="hd" style="border-top-color:${colorMap[c.id]}">
+            <div class="nm">${BEFORE ? '' : `<span class="who">${face(c)}`}<a href="#/c/${c.id}">${esc(c.name)}</a>${BEFORE ? '' : '</span>'}${cs.length > 2 ? `<button class="rm" data-rm="${c.id}" aria-label="Remove ${esc(c.name)} from comparison">Remove</button>` : ''}</div>
+            ${BEFORE ? '' : `<div class="cmp-meta">${c.years} yrs &middot; ex-${esc(c.prev)} &middot; ${esc(c.city)}</div>`}
+            <div class="facts">
+              <div>${pill(c.status)}</div>
+              <div>Interviews <span class="t-mono">${doneCount(c)}/${ROUNDS.length}</span></div>
+              ${BEFORE ? '' : `<div>Overall <span class="t-mono">${overall(c) == null ? 'n/a' : `${fmt(overall(c))} of ${MAX_SCORE}`}</span></div>`}
+              ${BEFORE ? `<div>Recommendations <span class="t-mono">${tally.map(t => `${t[1]} ${t[0]}`).join(' &middot; ')}</span></div>`
+                       : `<div class="cmp-recs">${tally.map(t => `<span class="rec ${recCls(t[0])}">${t[1]} ${t[0]}</span>`).join('')}</div>`}
+            </div>
+            ${BEFORE ? '' : cmpDecide(c)}
+          </div>
+          ${BEFORE ? '' : `<div class="sec words"><div class="note-k">In their words</div><p>&ldquo;${esc(c.why)}&rdquo;</p></div>`}
+          <div class="sec"><div class="note-k good">Went well</div>
+            ${done.map(x => `<div class="q"><div class="src">${esc(x.who)} &middot; ${ROUNDS[x.r]}</div><p>${esc(x.well)}</p></div>`).join('')}
+          </div>
+          <div class="sec ${BEFORE ? '' : 'bad-sec'}"><div class="note-k bad">Concerns</div>
+            ${done.map(x => `<div class="q"><div class="src">${esc(x.who)} &middot; ${ROUNDS[x.r]}</div><p>${esc(x.concern)}</p></div>`).join('')}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+
+  wireChart(cs);
+  $('#tblToggle').addEventListener('click', e => {
+    const t = $('#tblView'); t.hidden = !t.hidden;
+    e.target.textContent = t.hidden ? 'Show as table' : 'Hide table';
+    e.target.setAttribute('aria-expanded', String(!t.hidden));
+  });
+}
+
+function chart(cs){
+  const W = 1040, H = BEFORE ? 300 : 250, m = {l:34, r:8, t:14, b:42};
+  const pw = W - m.l - m.r, ph = H - m.t - m.b, gw = pw / CRIT.length, n = cs.length;
+  const bw = Math.min(34, (gw * .62 - (n-1)*2) / n), total = n*bw + (n-1)*2;
+  const y = v => m.t + ph - (v/SCALE) * ph;
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Grouped bar chart of average interviewer ratings by criterion">`;
+  for (let v = 0; v <= SCALE; v++){
+    s += `<line x1="${m.l}" x2="${W-m.r}" y1="${y(v)}" y2="${y(v)}" stroke="${v===0?'#C3C2B7':'#E1E0D9'}" stroke-width="1"/>`;
+    s += `<text x="${m.l-10}" y="${y(v)+4}" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11" fill="#898781">${v}</text>`;
+  }
+  CRIT.forEach((cr, g) => {
+    const gx = m.l + g*gw + (gw - total)/2;
+    cs.forEach((c, i) => {
+      const a = avg(c, cr.k), x = gx + i*(bw+2);
+      if (a.v != null){
+        const top = y(a.v), base = y(0), r = Math.min(4, base - top);
+        s += `<path class="bar" d="M${x},${base} L${x},${top+r} Q${x},${top} ${x+r},${top} L${x+bw-r},${top} Q${x+bw},${top} ${x+bw},${top+r} L${x+bw},${base} Z" fill="${colorMap[c.id]}"/>`;
+      } else {
+        s += `<text x="${x+bw/2}" y="${y(0)-6}" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#898781">n/a</text>`;
+      }
+      s += `<rect class="hit" tabindex="0" x="${x-1}" y="${m.t}" width="${bw+2}" height="${ph}" data-c="${c.id}" data-k="${cr.k}" data-x="${x+bw/2}" data-y="${a.v!=null?y(a.v):y(0)}" aria-label="${esc(c.name)}, ${cr.label}: ${fmt(a.v)} average from ${a.n} ratings"/>`;
+    });
+    s += `<text x="${m.l + g*gw + gw/2}" y="${H - m.b + 22}" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="12.5" fill="#52514E">${cr.label}</text>`;
+  });
+  return s + '</svg>';
+}
+
+function wireChart(){
+  const box = $('#chartBox'), tip = $('#tip'), svg = box.querySelector('svg');
+  const show = el => {
+    const c = byId(el.dataset.c), k = +el.dataset.k, a = avg(c, k);
+    const bb = svg.getBoundingClientRect(), vb = svg.viewBox.baseVal, sc = bb.width / vb.width;
+    tip.innerHTML = `<b>${esc(c.name)}</b>${CRIT[k].label}: ${fmt(a.v)} <span>avg of ${a.n} rating${a.n===1?'':'s'}</span>`;
+    tip.style.left = (+el.dataset.x * sc) + 'px';
+    tip.style.top = (+el.dataset.y * sc) + 'px';
+    tip.classList.add('show');
+  };
+  const hide = () => tip.classList.remove('show');
+  box.querySelectorAll('.hit').forEach(el => {
+    el.addEventListener('mouseenter', () => show(el));
+    el.addEventListener('focus', () => show(el));
+    el.addEventListener('mouseleave', hide);
+    el.addEventListener('blur', hide);
+  });
+}
+
+/* ================= morning email (concept, from research theme 03) ================= */
+function renderEmail(){
+  const mine = C.filter(c => c.wait && c.wait.you).sort(by(c => c.wait.days));
+  const others = C.filter(c => c.wait && !c.wait.you && waitState(c.wait) === 'late');
+  const n = mine.length;
+  const subj = n ? `${n} candidate${n === 1 ? ' is' : 's are'} waiting on you` : 'Nothing is waiting on you today';
+  const row = c => {
+    const st = waitState(c.wait);
+    return `<tr>
+      <td>${face(c)}</td>
+      <td><b>${esc(c.name)}</b><div class="e-meta">${esc(c.wait.what)} &middot; <span class="wt ${st}"><span class="d">${dayTxt(c.wait.days)}</span>${st === 'due' ? ' &middot; due today' : st === 'late' ? ' &middot; late' : ''}</span></div></td>
+      <td class="e-cta"><a href="#/c/${c.id}" data-close-email>Open record</a></td>
+    </tr>`;
+  };
+  $('#emailContent').innerHTML = `
+    <div class="e-head">
+      <div class="e-row"><b>From</b><span>Docket &lt;digest@docket.app&gt;</span></div>
+      <div class="e-row"><b>To</b><span>Jordan Park</span></div>
+      <div class="e-row"><b>Sent</b><span>Fri, Sep 25, 8:00 AM</span></div>
+      <h2 class="e-subj" id="emailSubj">${subj}</h2>
+    </div>
+    <div class="e-body">
+      <p>Morning Jordan,</p>
+      <p>${n ? `Here's who's waiting on you for REQ-2291, Senior Product Designer. Your team's goal is ${GOAL_DAYS}&nbsp;days.` : 'Nobody is waiting on a decision from you this morning.'}</p>
+      ${n ? `<table class="e-tbl">${mine.map(row).join('')}</table>` : ''}
+      ${others.length ? `<p class="e-small">Also late, not on you: ${others.map(c => `${esc(c.wait.who)} owes ${esc(c.wait.what.toLowerCase())} on ${esc(c.name)} (${dayTxt(c.wait.days)}).`).join(' ')}</p>` : ''}
+      <p class="e-small">You get this because you're the hiring manager on REQ-2291. It only sends when something is waiting on you.</p>
+    </div>`;
+}
+function openEmail(){ renderEmail(); $('#emailOverlay').hidden = false; $('#emailClose').focus(); }
+function closeEmail(){ $('#emailOverlay').hidden = true; if (/^#\/email/.test(location.hash)) history.replaceState(null, '', '#/'); const b = document.getElementById('emailPreviewBtn'); if (b) b.focus(); }
+
+/* ================= routing ================= */
+let currentView = 'list';
+function route(){
+  const h = location.hash.replace(/^#\/?/, '');
+  const parts = h.split('/');
+  if (parts[0] === 'c' && parts[1]){ currentView = 'record'; renderRecord(parts[1], parts[2]); }
+  else if (parts[0] === 'compare' && parts[1]){ currentView = 'compare'; renderCompare(parts[1].split(',')); }
+  else { currentView = 'list'; renderList(); if (parts[0] === 'email' && !BEFORE) openEmail(); }
+  $('#navCands').classList.add('on');
+  updateBulk();
+  window.scrollTo(0, 0);
+}
+window.addEventListener('hashchange', route);
+
+/* ================= events ================= */
+document.addEventListener('click', e => {
+  const go = e.target.closest('[data-go]');
+  if (go){ location.hash = go.dataset.go; return; }
+  const chip = e.target.closest('[data-f]');
+  if (chip){ filter = chip.dataset.f; renderList(); return; }
+  const ad = e.target.closest('[data-adv], [data-nmf]');
+  if (ad){
+    const c = byId(ad.dataset.adv || ad.dataset.nmf);
+    if (c && changeStatus(c, ad.dataset.adv ? ad.dataset.to : 'nmf')) renderCompare(location.hash.split('/')[2].split(','));
+    return;
+  }
+  const rm = e.target.closest('[data-rm]');
+  if (rm){
+    const ids = location.hash.split('/')[2].split(',').filter(x => x !== rm.dataset.rm);
+    location.hash = '#/compare/' + ids.join(',');
+    return;
+  }
+  const ua = e.target.closest('[data-undo-arch]');
+  if (ua){
+    ua.dataset.undoArch.split(',').forEach(id => {
+      const c = byId(id);
+      if (c && c.status === 'archived') undoStatus(c);
+    });
+    if (currentView === 'list') renderList();
+    return;
+  }
+  if (e.target.matches('input[data-cb]')){
+    const id = e.target.dataset.cb;
+    e.target.checked ? sel.add(id) : sel.delete(id);
+    e.target.closest('tr').classList.toggle('sel', e.target.checked);
+    updateBulk();
+    return;
+  }
+  if (e.target.closest('td.cb')) return;
+  const row = e.target.closest('tbody tr[data-id]');
+  if (row){ location.hash = '#/c/' + row.dataset.id; }
+});
+document.addEventListener('keydown', e => {
+  const row = e.target.closest && e.target.closest('tbody tr[data-id]');
+  if (row && e.key === 'Enter' && e.target === row){ location.hash = '#/c/' + row.dataset.id; }
+});
+$('#q').addEventListener('input', e => {
+  query = e.target.value;
+  if (currentView !== 'list') location.hash = '#/'; else renderList();
+});
+$('#bulkClear').addEventListener('click', () => { sel.clear(); renderList(); });
+function goCompare(){
+  if (!BEFORE && sel.size === 0){
+    const fins = C.filter(isFinalist).slice(0, 3);
+    if (fins.length < 2) return;
+    colorMap = {};
+    location.hash = '#/compare/' + fins.map(c => c.id).join(',');
+    return;
+  }
+  if (sel.size < 2 || sel.size > 3) return;
+  colorMap = {};
+  const ids = C.filter(c => sel.has(c.id)).map(c => c.id);
+  location.hash = '#/compare/' + ids.join(',');
+}
+$('#bulkGo').addEventListener('click', goCompare);
+const bulkArchBtn = $('#bulkArchive');
+if (bulkArchBtn){
+  if (BEFORE) bulkArchBtn.remove();
+  else bulkArchBtn.addEventListener('click', () => {
+    const selCands = C.filter(c => sel.has(c.id));
+    if (!selCands.length) return;
+    const ids = selCands.map(c => c.id);
+    const allArchived = selCands.every(c => c.status === 'archived');
+    if (allArchived){
+      selCands.forEach(c => (c.change && c.change.to === 'archived') ? undoStatus(c) : changeStatus(c, 'awaiting'));
+      toast(`Restored ${ids.length} candidate${ids.length === 1 ? '' : 's'}.`);
+    } else {
+      selCands.forEach(c => { if (c.status !== 'archived') changeStatus(c, 'archived'); });
+      toast(`Archived ${ids.length} candidate${ids.length === 1 ? '' : 's'}. You'll find them under <b>Hidden</b>.<button class="t-undo" data-undo-arch="${ids.join(',')}">Undo</button>`);
+    }
+    sel.clear();
+    renderList();
+  });
+}
+
+let toastT;
+function toast(html){
+  const t = $('#toast'); t.innerHTML = html; t.classList.add('show');
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 3800);
+}
+
+if (TEST){ document.querySelectorAll('.back-cs').forEach(a => a.remove()); }
+const eb = document.getElementById('emailPreviewBtn');
+if (BEFORE || TEST) eb.remove();
+if (!BEFORE) {
+  eb.addEventListener('click', openEmail);
+  $('#emailClose').addEventListener('click', closeEmail);
+  $('#emailOverlay').addEventListener('click', e => {
+    if (e.target.id === 'emailOverlay') closeEmail();
+    else if (e.target.closest('[data-close-email]')) $('#emailOverlay').hidden = true;
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#emailOverlay').hidden) closeEmail(); });
+}
+$('#navCount').textContent = C.length;
+route();
+</script>
+</body>
+</html>

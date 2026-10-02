@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Docket · All Screens</title>
+<meta name="viewport" content="width=1600">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F6F5F1; --side:#EFEDE7; --surface:#FCFCFB; --white:#FFFFFF;
+    --ink:#1C1B17; --ink-2:#52514E; --muted:#898781;
+    --line:#E1E0D9; --line-2:#ECEBE6; --axis:#C3C2B7;
+    --yellow:#FDE68A; --yellow-ink:#6B5C05; --red:#B0402F;
+    --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a;
+    --sans:'IBM Plex Sans',system-ui,sans-serif; --serif:'IBM Plex Serif',Georgia,serif; --mono:'IBM Plex Mono',ui-monospace,monospace;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans); font-size:14px; -webkit-font-smoothing:antialiased; }
+  button,select,input{ font:inherit; color:inherit; }
+  a{ color:inherit; }
+  .mono{ font-family:var(--mono); }
+
+  .app{ display:grid; grid-template-columns:232px minmax(0,1fr); min-height:100vh; }
+  main{ min-width:0; }
+
+  /* ---------- sidebar ---------- */
+  .side{ background:var(--side); border-right:1px solid var(--line); padding:18px 12px; display:flex; flex-direction:column;
+    position:sticky; top:0; height:100vh; }
+  .brand{ font-family:var(--mono); font-weight:600; font-size:18px; padding:4px 10px 2px; letter-spacing:-.01em; }
+  .brand em{ font-style:normal; color:var(--red); }
+  .org{ font-family:var(--mono); font-size:10.5px; color:var(--muted); padding:0 10px 22px; }
+  .nav-label{ font-family:var(--mono); font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); padding:0 10px 8px; }
+  .nav a, .nav span.off{ display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px 10px; border-radius:4px;
+    text-decoration:none; font-weight:500; border:1px solid transparent; }
+  .nav a{ cursor:pointer; }
+  .nav a:hover{ background:rgba(28,27,23,.04); }
+  .nav a.on{ background:var(--surface); border-color:var(--line); }
+  .nav .count{ font-family:var(--mono); font-size:11px; color:var(--muted); }
+  .nav span.off{ color:var(--muted); opacity:.6; cursor:not-allowed; }
+  .nav .soon{ font-family:var(--mono); font-size:9.5px; letter-spacing:.06em; text-transform:uppercase; border:1px solid var(--line); padding:1px 5px; border-radius:2px; }
+  .side-foot{ margin-top:auto; border-top:1px solid var(--line); padding:14px 10px 2px; display:flex; flex-direction:column; gap:12px; }
+  .me{ display:flex; gap:10px; align-items:center; }
+  .avatar{ width:30px; height:30px; border-radius:50%; background:var(--ink); color:#fff; font-size:11px; font-weight:600;
+    display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .me b{ display:block; font-weight:600; font-size:13px; }
+  .me small{ color:var(--muted); font-size:12px; }
+  .back-cs{ font-family:var(--mono); font-size:11px; color:var(--muted); text-decoration:none; }
+  .back-cs:hover{ color:var(--red); }
+
+  /* ---------- top bar ---------- */
+  .top{ height:56px; border-bottom:1px solid var(--line); background:var(--surface); display:flex; align-items:center; gap:18px; padding:0 28px;
+    position:sticky; top:0; z-index:10; }
+  .crumb{ display:flex; align-items:center; gap:10px; font-weight:500; white-space:nowrap; overflow:hidden; }
+  .crumb .req{ font-family:var(--mono); font-size:11.5px; color:var(--ink-2); border:1px solid var(--line); padding:2px 6px; border-radius:3px; background:var(--white); }
+  .search{ margin-left:auto; position:relative; }
+  .search input{ width:240px; padding:7px 10px 7px 30px; border:1px solid var(--line); border-radius:4px; background:var(--white); font-size:13px; }
+  .search input:focus{ outline:2px solid var(--ink); outline-offset:-1px; }
+  .search svg{ position:absolute; left:9px; top:50%; transform:translateY(-50%); color:var(--muted); }
+  .notes-toggle{ display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--ink-2); cursor:pointer; user-select:none; white-space:nowrap;
+    background:none; border:1px solid var(--line); border-radius:4px; padding:6px 10px; }
+  .notes-toggle .sw{ width:26px; height:15px; border-radius:10px; background:var(--axis); position:relative; transition:background .2s; }
+  .notes-toggle .sw::after{ content:""; position:absolute; top:2px; left:2px; width:11px; height:11px; border-radius:50%; background:#fff; transition:left .2s; }
+  body.notes-on .notes-toggle .sw{ background:var(--yellow-ink); }
+  body.notes-on .notes-toggle .sw::after{ left:13px; }
+
+  .page{ padding:26px 28px 120px; max-width:1240px; }
+  h1{ font-size:24px; font-weight:600; margin:0; letter-spacing:-.01em; }
+  .sub{ color:var(--ink-2); margin-top:4px; }
+
+  /* ---------- design notes ---------- */
+  .dn{ display:none; background:#FFF7D1; border:1px solid #EAD57E; border-left:3px solid var(--yellow-ink); padding:9px 12px; font-size:12.5px;
+    line-height:1.5; color:#4A4104; border-radius:2px; }
+  .dn b{ font-family:var(--mono); font-size:10px; letter-spacing:.08em; text-transform:uppercase; display:block; margin-bottom:2px; color:var(--yellow-ink); }
+  body.notes-on .dn{ display:block; }
+  .side .dn{ margin:14px 4px 0; font-size:12px; }
+
+  /* ---------- status pills ---------- */
+  .pill{ display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:500; padding:3px 8px; border-radius:3px; white-space:nowrap; border:1px solid transparent; }
+  .pill::before{ content:""; width:6px; height:6px; border-radius:50%; background:currentColor; opacity:.8; }
+  .st-awaiting{ background:var(--yellow); color:var(--yellow-ink); }
+  .st-scheduling{ border-color:var(--line); color:var(--ink-2); background:var(--white); }
+  .st-interviewing{ border-color:#CFCDC4; color:var(--ink); background:var(--white); }
+  .st-passed{ background:#E4F1E4; color:#1D5E1D; }
+  .st-offer{ background:#CFE9CF; color:#124A12; font-weight:600; }
+  .st-nmf, .st-withdrew{ background:#EEEDE9; color:var(--muted); }
+
+  /* ---------- filters ---------- */
+  .head-row{ display:flex; align-items:flex-end; justify-content:space-between; gap:20px; margin-bottom:18px; }
+  .chips{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px; }
+  .chip{ border:1px solid var(--line); background:var(--white); border-radius:4px; padding:5px 10px; font-size:12.5px; cursor:pointer; display:flex; gap:7px; align-items:center; }
+  .chip .n{ font-family:var(--mono); font-size:11px; color:var(--muted); }
+  .chip.on{ background:var(--ink); color:#fff; border-color:var(--ink); }
+  .chip.on .n{ color:rgba(255,255,255,.65); }
+
+  /* ---------- table ---------- */
+  .tbl-wrap{ background:var(--surface); border:1px solid var(--line); border-radius:6px; overflow-x:auto; }
+  table.tbl{ width:100%; border-collapse:collapse; }
+  .tbl th{ text-align:left; font-family:var(--mono); font-size:10.5px; font-weight:500; letter-spacing:.06em; text-transform:uppercase; color:var(--muted);
+    padding:10px 14px; border-bottom:1px solid var(--line); background:var(--white); white-space:nowrap; }
+  .tbl td{ padding:12px 14px; border-bottom:1px solid var(--line-2); vertical-align:middle; }
+  .tbl tr:last-child td{ border-bottom:none; }
+  .tbl tbody tr{ cursor:pointer; transition:background .12s; }
+  .tbl tbody tr:hover{ background:#F7F6F2; }
+  .tbl tbody tr:focus-visible{ outline:2px solid var(--ink); outline-offset:-2px; }
+  .tbl tbody tr.sel{ background:#F3F1EA; }
+  .tbl .cb{ width:42px; }
+  .tbl input[type=checkbox]{ width:15px; height:15px; accent-color:var(--ink); cursor:pointer; }
+  .cand-name{ font-weight:600; }
+  .cand-meta{ font-size:12.5px; color:var(--ink-2); margin-top:1px; }
+  .muted{ color:var(--muted); }
+  .t-mono{ font-family:var(--mono); font-size:12px; color:var(--ink-2); font-variant-numeric:tabular-nums; }
+  .newdot{ display:inline-flex; align-items:center; gap:5px; color:var(--red); font-size:12.5px; font-weight:500; }
+  .newdot::before{ content:""; width:6px; height:6px; border-radius:50%; background:var(--red); }
+  .empty{ padding:40px; text-align:center; color:var(--muted); }
+
+  .pips{ display:inline-flex; gap:3px; vertical-align:middle; margin-right:8px; }
+  .pips i{ width:10px; height:10px; border:1px solid #A9A79F; border-radius:2px; display:block; }
+  .pips i.done{ background:var(--ink); border-color:var(--ink); }
+  .pips i.sched{ border:1px dashed var(--ink); }
+
+  /* ---------- compare bar ---------- */
+  .bulk{ position:fixed; left:calc(50% + 116px); bottom:24px; transform:translate(-50%, 140%); background:var(--ink); color:#fff;
+    border-radius:6px; padding:10px 10px 10px 18px; display:flex; align-items:center; gap:18px; box-shadow:0 10px 30px rgba(0,0,0,.18);
+    transition:transform .28s cubic-bezier(.2,.8,.3,1); z-index:30; white-space:nowrap; }
+  .bulk:not(.show){ opacity:0; visibility:hidden; transition:transform .28s, opacity .2s, visibility 0s linear .28s; }
+  .bulk.show{ transform:translate(-50%, 0); }
+  .bulk .msg{ font-size:13px; }
+  .bulk .msg small{ color:rgba(255,255,255,.6); margin-left:8px; }
+  .btn{ border:1px solid var(--line); background:var(--white); border-radius:4px; padding:7px 13px; font-size:13px; font-weight:500; cursor:pointer; }
+  .btn:hover{ border-color:var(--ink-2); }
+  .btn.primary{ background:var(--yellow); border-color:var(--yellow); color:var(--ink); font-weight:600; }
+  .btn.primary:hover{ background:#FCDC5C; }
+  .btn:disabled{ opacity:.45; cursor:not-allowed; }
+  .btn.ghost{ background:transparent; border-color:rgba(255,255,255,.25); color:#fff; }
+
+  /* ---------- record ---------- */
+  .backlink{ display:inline-flex; gap:6px; align-items:center; font-size:13px; color:var(--ink-2); text-decoration:none; margin-bottom:16px; cursor:pointer; background:none; border:none; padding:0; }
+  .backlink:hover{ color:var(--ink); }
+  .rec-head{ display:flex; justify-content:space-between; gap:24px; align-items:flex-start; flex-wrap:wrap; }
+  .rec-meta{ font-family:var(--mono); font-size:12px; color:var(--ink-2); margin-top:6px; }
+  .status-ctl{ display:flex; flex-direction:column; align-items:flex-end; gap:8px; }
+  .status-ctl .row{ display:flex; gap:8px; align-items:center; }
+  .status-ctl select{ padding:6px 8px; border:1px solid var(--line); border-radius:4px; background:var(--white); font-size:13px; cursor:pointer; }
+  .next-line{ margin-top:18px; display:flex; gap:12px; align-items:center; flex-wrap:wrap; background:var(--white); border:1px dashed #CFCDC4; border-radius:4px; padding:10px 14px; }
+  .next-line .k{ font-family:var(--mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
+  .next-line .v{ font-weight:500; }
+  .next-line .by{ font-family:var(--mono); font-size:11.5px; color:var(--muted); margin-left:auto; }
+
+  .subtabs{ display:flex; gap:22px; border-bottom:1px solid var(--line); margin:26px 0 22px; }
+  .subtabs button{ background:none; border:none; padding:10px 0; font-size:13.5px; font-weight:500; color:var(--ink-2); cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; display:flex; gap:7px; align-items:center; }
+  .subtabs button.on{ color:var(--ink); border-bottom-color:var(--ink); }
+  .subtabs .n{ font-family:var(--mono); font-size:11px; color:var(--muted); }
+
+  .iv-summary{ display:grid; grid-template-columns:220px 1fr; gap:0; background:var(--surface); border:1px solid var(--line); border-radius:6px; margin-bottom:16px; }
+  .iv-summary > div{ padding:18px 20px; }
+  .iv-summary > div + div{ border-left:1px solid var(--line); }
+  .k-label{ font-family:var(--mono); font-size:10.5px; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }
+  .big{ font-size:34px; font-weight:600; letter-spacing:-.02em; line-height:1; }
+  .big small{ font-size:15px; font-weight:500; color:var(--ink-2); letter-spacing:0; margin-left:4px; }
+  .avg-rows{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:10px 28px; }
+  .avg-row{ display:grid; grid-template-columns:120px 1fr 64px; gap:10px; align-items:center; font-size:13px; }
+  .avg-track{ height:8px; background:var(--line-2); border-radius:0 4px 4px 0; position:relative; }
+  .avg-fill{ position:absolute; left:0; top:0; bottom:0; background:var(--s1); border-radius:0 4px 4px 0; }
+  .avg-row .t-mono{ text-align:right; }
+
+  .iv{ background:var(--surface); border:1px solid var(--line); border-radius:6px; margin-bottom:12px; }
+  .iv-top{ display:flex; gap:14px; align-items:center; padding:14px 18px; border-bottom:1px solid var(--line-2); flex-wrap:wrap; }
+  .iv-round{ font-family:var(--mono); font-size:11px; color:var(--muted); width:22px; }
+  .iv-title{ font-weight:600; }
+  .iv-who{ color:var(--ink-2); font-size:13px; }
+  .iv-date{ margin-left:auto; font-family:var(--mono); font-size:12px; color:var(--ink-2); }
+  .rec{ font-size:12px; font-weight:600; padding:3px 8px; border-radius:3px; border:1px solid var(--line); background:var(--white); }
+  .rec.sy{ border-color:#1D5E1D; color:#1D5E1D; }
+  .rec.y{ color:#1D5E1D; }
+  .rec.n{ color:var(--red); }
+  .iv-scores{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:14px; padding:14px 18px; border-bottom:1px solid var(--line-2); }
+  .score .lbl{ font-size:12px; color:var(--ink-2); margin-bottom:6px; }
+  .seg{ display:flex; gap:2px; align-items:center; }
+  .seg i{ width:18px; height:6px; background:var(--line-2); display:block; }
+  .seg i:first-child{ border-radius:2px 0 0 2px; } .seg i:nth-child(4){ border-radius:0 2px 2px 0; }
+  .seg i.f{ background:var(--s1); }
+  .seg span{ font-family:var(--mono); font-size:11.5px; color:var(--ink-2); margin-left:8px; }
+  .seg .nr{ font-family:var(--mono); font-size:11.5px; color:var(--muted); margin-left:0; }
+  .iv-notes{ display:grid; grid-template-columns:1fr 1fr; }
+  .iv-notes > div{ padding:14px 18px 16px; }
+  .iv-notes > div + div{ border-left:1px solid var(--line-2); }
+  .note-k{ font-family:var(--mono); font-size:10.5px; letter-spacing:.07em; text-transform:uppercase; margin-bottom:6px; color:var(--muted); }
+  .note-k.good::before{ content:"+ "; color:#1D5E1D; font-weight:600; }
+  .note-k.bad::before{ content:"\2212 "; color:var(--red); font-weight:600; }
+  .serif{ font-family:var(--serif); font-size:14.5px; line-height:1.6; color:var(--ink); margin:0; }
+  .iv.pending{ background:transparent; border-style:dashed; border-color:#CFCDC4; }
+  .iv.pending .iv-top{ border-bottom:none; }
+  .iv.pending .iv-title{ color:var(--ink-2); }
+
+  .docs{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  .doc-k{ font-family:var(--mono); font-size:11px; color:var(--muted); margin-bottom:8px; display:flex; justify-content:space-between; }
+  .paper{ background:var(--white); border:1px solid var(--line); box-shadow:0 1px 0 var(--line), 0 6px 18px rgba(28,27,23,.05); padding:34px 38px; font-family:var(--serif); min-height:520px; }
+  .paper h2{ font-family:var(--serif); font-weight:500; font-size:22px; margin:0; }
+  .paper .r-sub{ color:var(--ink-2); font-size:13.5px; margin-top:4px; }
+  .paper h4{ font-family:var(--sans); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin:24px 0 10px; font-weight:600; border-bottom:1px solid var(--line-2); padding-bottom:6px; }
+  .r-role{ margin-bottom:14px; font-size:14px; }
+  .r-role span{ float:right; font-family:var(--mono); font-size:11.5px; color:var(--muted); }
+  .r-role p, .paper p{ margin:4px 0 0; font-size:14px; line-height:1.65; color:#2E2D28; }
+  .paper .letter p{ margin:0 0 14px; }
+
+  .timeline{ background:var(--surface); border:1px solid var(--line); border-radius:6px; padding:8px 0; }
+  .tl{ display:grid; grid-template-columns:130px 18px 1fr; gap:10px; padding:10px 20px; align-items:start; }
+  .tl .when{ font-family:var(--mono); font-size:12px; color:var(--muted); padding-top:1px; }
+  .tl .dot{ width:9px; height:9px; border-radius:50%; border:2px solid var(--ink-2); margin-top:4px; background:var(--surface); }
+  .tl.status .dot{ background:var(--yellow); border-color:var(--yellow-ink); }
+  .tl.fresh{ background:#FFFBEA; }
+  .tl .what{ line-height:1.5; }
+  .tl .what small{ display:block; color:var(--muted); font-size:12.5px; }
+
+  /* ---------- compare ---------- */
+  .card{ background:var(--surface); border:1px solid var(--line); border-radius:6px; padding:20px 22px; margin-bottom:16px; }
+  .card h3{ font-size:15px; font-weight:600; margin:0 0 4px; }
+  .card .desc{ color:var(--ink-2); font-size:13px; margin-bottom:14px; }
+  .legend{ display:flex; gap:18px; flex-wrap:wrap; margin-bottom:8px; }
+  .legend span{ display:inline-flex; align-items:center; gap:7px; font-size:13px; }
+  .legend i{ width:12px; height:12px; border-radius:2px; display:block; }
+  .chart-box{ position:relative; }
+  .chart-box svg{ width:100%; height:auto; display:block; overflow:visible; }
+  .chart-box .bar{ cursor:default; }
+  .chart-box .hit{ fill:transparent; outline:none; }
+  .chart-box .hit:focus-visible{ stroke:var(--ink); stroke-width:1.5; }
+  .tip{ position:absolute; pointer-events:none; background:var(--ink); color:#fff; font-size:12px; padding:7px 10px; border-radius:4px;
+    white-space:nowrap; transform:translate(-50%, calc(-100% - 10px)); opacity:0; transition:opacity .12s; z-index:5; }
+  .tip b{ display:block; font-weight:600; }
+  .tip span{ font-family:var(--mono); font-size:11.5px; color:rgba(255,255,255,.75); }
+  .tip.show{ opacity:1; }
+  table.mini{ width:100%; border-collapse:collapse; margin-top:16px; font-size:13px; }
+  .mini th{ text-align:left; font-family:var(--mono); font-size:10.5px; font-weight:500; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); padding:7px 10px; border-bottom:1px solid var(--line); }
+  .mini td{ padding:8px 10px; border-bottom:1px solid var(--line-2); }
+  .mini td.num{ font-family:var(--mono); font-variant-numeric:tabular-nums; }
+  .mini .sw{ display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:8px; vertical-align:-1px; }
+  .table-toggle{ background:none; border:none; padding:0; margin-top:12px; font-size:12.5px; color:var(--ink-2); text-decoration:underline; text-underline-offset:3px; cursor:pointer; }
+
+  .cmp-cols{ display:grid; gap:14px; }
+  .cmp-col{ background:var(--surface); border:1px solid var(--line); border-radius:6px; overflow:hidden; }
+  .cmp-col .hd{ padding:14px 16px; border-bottom:1px solid var(--line-2); border-top:3px solid; }
+  .cmp-col .hd .nm{ font-weight:600; font-size:15px; display:flex; justify-content:space-between; align-items:center; gap:8px; }
+  .cmp-col .hd .nm a{ text-decoration:none; }
+  .cmp-col .hd .nm a:hover{ text-decoration:underline; }
+  .cmp-col .facts{ display:flex; flex-direction:column; gap:6px; margin-top:10px; font-size:12.5px; color:var(--ink-2); }
+  .cmp-col .facts .t-mono{ color:var(--ink); }
+  .cmp-col .sec{ padding:12px 16px 14px; border-bottom:1px solid var(--line-2); }
+  .cmp-col .sec:last-child{ border-bottom:none; }
+  .q{ margin-bottom:10px; }
+  .q:last-child{ margin-bottom:0; }
+  .q .src{ font-family:var(--mono); font-size:10.5px; color:var(--muted); margin-bottom:2px; }
+  .q p{ font-family:var(--serif); font-size:13.5px; line-height:1.55; margin:0; }
+  .rm{ background:none; border:none; font-size:11.5px; color:var(--muted); cursor:pointer; font-family:var(--mono); padding:0; }
+  .rm:hover{ color:var(--red); }
+
+  .toast{ position:fixed; right:24px; bottom:24px; background:var(--ink); color:#fff; padding:12px 16px; border-radius:6px; font-size:13px; max-width:360px;
+    box-shadow:0 10px 30px rgba(0,0,0,.2); transform:translateY(150%); transition:transform .3s cubic-bezier(.2,.8,.3,1); z-index:40; line-height:1.45; }
+  .toast:not(.show){ opacity:0; visibility:hidden; transition:transform .3s, opacity .2s, visibility 0s linear .3s; }
+  .toast.show{ transform:none; }
+  .toast b{ color:var(--yellow); font-weight:600; }
+
+  .stack{ display:flex; flex-direction:column; gap:10px; }
+  .gap-b{ margin-bottom:14px; }
+
+  @media(max-width:980px){
+    .app{ grid-template-columns:minmax(0,1fr); }
+    .side{ position:static; height:auto; flex-direction:row; flex-wrap:wrap; align-items:center; gap:10px; }
+    .side .org, .side .nav-label, .side-foot, .side .dn{ display:none !important; }
+    .nav{ display:flex; gap:6px; }
+    .bulk{ left:50%; gap:10px; padding-left:14px; }
+    .bulk .msg small{ display:none; }
+    .search input{ width:140px; }
+    .top{ flex-wrap:wrap; height:auto; padding:10px 16px; gap:10px; }
+    .page{ padding:20px 16px 120px; }
+    .head-row, .stack{ flex-wrap:wrap; }
+    .stack > .dn{ flex:1 1 100% !important; }
+    .iv-summary, .docs, .iv-notes{ grid-template-columns:1fr; }
+    .iv-summary > div + div, .iv-notes > div + div{ border-left:none; border-top:1px solid var(--line-2); }
+    .iv-scores, .avg-rows{ grid-template-columns:1fr 1fr; }
+    .cmp-cols{ grid-template-columns:1fr !important; }
+    .tbl .hide-sm{ display:none; }
+  }
+
+  /* ---- board: every screen laid out as its own 1440px frame, no scripts ---- */
+  html,body{ background:#E6E4DE; }
+  .board{ width:1440px; margin:0 auto; padding:80px 0 160px; }
+  .board-title{ font-family:var(--mono); margin-bottom:64px; }
+  .board-title b{ display:block; font-size:28px; font-weight:600; color:var(--ink); }
+  .board-title span{ font-size:13px; color:var(--ink-2); }
+  .board-item{ margin-bottom:120px; }
+  .board-label{ display:flex; gap:14px; align-items:baseline; font-family:var(--mono); margin-bottom:16px; }
+  .board-label span{ font-size:13px; color:var(--muted); }
+  .board-label b{ font-size:16px; font-weight:600; color:var(--ink); }
+  .board-label em{ font-style:normal; font-size:13px; color:var(--ink-2); }
+  .frame{ width:1440px; position:relative; overflow:hidden; background:var(--bg); box-shadow:0 1px 0 rgba(0,0,0,.06), 0 12px 40px rgba(0,0,0,.08); }
+  .frame .app{ min-height:900px; }
+  .frame .side{ position:relative; top:auto; height:auto; }
+  .frame .top{ position:relative; }
+  .frame .page{ padding-bottom:110px; }
+  .frame .bulk{ position:absolute; bottom:28px; transform:translate(-50%,0); opacity:1; visibility:visible; }
+  .frame .toast{ position:absolute; right:28px; bottom:28px; transform:none; opacity:1; visibility:visible; }
+  .frame .dn{ display:none !important; }
+</style>
+</head>
+<body>
+<div class="board">
+  <div class="board-title"><b>docket. Prototype screens</b><span>6 screens, 1440px wide. Static copy of docket-prototype.html for importing into Figma.</span></div>
+
+  <section class="board-item">
+    <div class="board-label"><span>01</span><b>Candidates</b><em>Default list, all statuses</em></div>
+    <div class="frame"><div class="app">
+
+  <aside class="side">
+    <div class="brand">docket<em>.</em></div>
+    <div class="org">Halden Group · Talent</div>
+    <div class="nav-label">Workspace</div>
+    <nav class="nav stack" style="gap:2px;">
+      <a class="on" href="#/"><span>Candidates</span><span class="count">9</span></a>
+      <span class="off">Requisitions <span class="soon">Soon</span></span>
+      <span class="off">Reports <span class="soon">Soon</span></span>
+    </nav>
+    
+    <div class="side-foot">
+      <div class="me"><div class="avatar">JP</div><div><b>Jordan Park</b><small>Hiring manager</small></div></div>
+      
+    </div>
+  </aside>
+
+  <main>
+    <div class="top">
+      <div class="crumb"><span class="req">REQ-2291</span><span>Senior Product Designer</span></div>
+      <label class="search">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="7" cy="7" r="5"></circle><path d="m11 11 3.5 3.5"></path></svg>
+        <input type="search" placeholder="Search candidates" aria-label="Search candidates">
+      </label>
+      
+    </div>
+    <div class="page">
+    <div class="head-row">
+      <div><h1>Candidates</h1><div class="sub">Everyone in the pipeline for this role, in one place.</div></div>
+    </div>
+    <div class="chips"><button class="chip on" data-f="all">All<span class="n">9</span></button><button class="chip " data-f="awaiting">Awaiting you<span class="n">2</span></button><button class="chip " data-f="process">In process<span class="n">3</span></button><button class="chip " data-f="passed">Passed panel<span class="n">1</span></button><button class="chip " data-f="offer">Offer extended<span class="n">1</span></button><button class="chip " data-f="closed">Closed<span class="n">2</span></button></div>
+    <div class="stack gap-b" style="flex-direction:row; gap:10px;">
+      
+      
+    </div>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr>
+          <th class="cb"><span class="sr" style="position:absolute;left:-9999px;">Select</span></th>
+          <th>Candidate</th><th>Status</th><th>Interviews</th><th>Notes</th><th class="hide-sm">Next step</th><th class="hide-sm">Updated</th>
+        </tr></thead>
+        <tbody>
+          
+            <tr tabindex="0" data-id="CAND-0412" class="">
+              <td class="cb"><input type="checkbox" data-cb="CAND-0412" aria-label="Select Maya Chen"></td>
+              <td><div class="cand-name">Maya Chen</div><div class="cand-meta">8 yrs · ex-Figma</div></td>
+              <td><span class="pill st-awaiting">Awaiting you</span></td>
+              <td style="white-space:nowrap;"><span class="pips" aria-hidden="true"><i class="done"></i><i class="done"></i><i class="done"></i><i class="sched"></i></span><span class="t-mono">3/4</span></td>
+              <td><span class="newdot">1 new</span></td>
+              <td class="hide-sm" style="font-size:13px; color:var(--ink-2); max-width:260px;">Cross-functional panel, Thu Oct 1, 2:00 PM</td>
+              <td class="hide-sm t-mono">2h ago</td>
+            </tr>
+            <tr tabindex="0" data-id="CAND-0398" class="">
+              <td class="cb"><input type="checkbox" data-cb="CAND-0398" aria-label="Select Priya Nair"></td>
+              <td><div class="cand-name">Priya Nair</div><div class="cand-meta">10 yrs · ex-Linear</div></td>
+              <td><span class="pill st-awaiting">Awaiting you</span></td>
+              <td style="white-space:nowrap;"><span class="pips" aria-hidden="true"><i class="done"></i><i class="done"></i><i class="done"></i><i class="done"></i></span><span class="t-mono">4/4</span></td>
+              <td><span class="newdot">2 new</span></td>
+              <td class="hide-sm" style="font-size:13px; color:var(--ink-2); max-width:260px;">Final decision needed from hiring manager</td>
+              <td class="hide-sm t-mono">5h ago</td>
+            </tr>
+            <tr tabindex="0" data-id="CAND-0405" class="">
+              <td class="cb"><input type="checkbox" data-cb="CAND-0405" aria-label="Select Leo Brandt"></td>
+              <td><div class="cand-name">Leo Brandt</div><div class="cand-meta">6 yrs · ex-Stripe</div></td>
+              <td><span class="pill st-passed">Passed panel</span></td>
+              <td style="white-space:nowrap;"><span class="pips" aria-hidden="true"><i class="done"></i><i class="done"></i><i class="done"></i><i class="done"></i></span><span class="t-mono">4/4</span></td>
+              <td><span class="t-mono muted">4 logged</span></td>
+              <td class="hide-sm" style="font-size:13px; color:var(--ink-2); max-width:260px;">Waiting on references</td>
+              <td class="hide-sm t-mono">Sep 18</td>
+            </tr>
+            <tr tabindex="0" data-id="CAND-0421" class="">
+              <td class="cb"><input type="checkbox" data-cb="CAND-0421" aria-label="Select Tomás Alvarez"></td>
+              <td><div class="cand-name">Tomás Alvarez</div><div class="cand-meta">5 yrs · ex-Duolingo</div></td>
+              <td><span class="pill st-interviewing">Interviewing</span></td>
+              <td style="white-space:nowrap;"><span class="pips" aria-hidden="true"><i class="done"></i><i class="done"></i><i class="sched"></i><i class=""></i></span><span class="t-mono">2/4</span></td>
+              <td><span class="t-mono muted">2 logged</span></td>
+              <td class="hide-sm" style="font-size:13px; color:var(--ink-2); max-width:260px;">Design exercise, Mon Oct 5, 10:00 AM</td>
+              <td class="hide-sm t-mono">1d ago</td>
+            </tr>
+            <tr tabindex="0" data-id="CAND-0417" class="">
+              <td class="cb"><input type="checkbox" data-cb="CAND-0417" aria-label="Select Hannah Okafor"></td>
+              <td><div class="cand-name">Hannah Okafor</div><div class="cand-meta">7 yrs · ex-Atlassian</div></td>
+              <td><span class="pill st-interviewing">Interviewing</span></td>
+              <td style="white-space:nowrap;"><span class="pips" aria-hidden="true"><i class="done"></i><i class="done"></i><i class=""></i><i class=""></i></span><span class="t-mono">2/4</span></td>
+              <td><span class="t-mono muted">2 logged</span></td>
+              <td class="hide-sm" style="font-size:13px; color:var(--ink-2); max-width:260px;">Design exercise being scheduled</td>
+              <td class="hide-sm t-mono">2d ago</td>
+            </tr>
+            <tr tabindex="0" data-id="CAND-0430" class="">
+              <td class="cb"><input type="checkbox" data-cb="CAND-0430" aria-label="Select Devon Ruiz"></td>
+              <td><div class="cand-name">Devon Ruiz</div><div class="cand-meta">5 yrs · ex-Notion</div></td>
+              <td><span class="pill st-scheduling">Scheduling</span></td>
+              <td style="white-space:nowrap;"><span class="pips" aria-hidden="true"><i class="done"></i><i class=""></i><i class=""></i><i class=""></i></span><span class="t-mono">1/4</span></td>
+              <td><span class="t-mono muted">1 logged</span></td>
+              <td class="hide-sm" style="font-size:13px; color:var(--ink-2); max-width:260px;">Portfolio review being scheduled</td>
+              <td class="hide-sm t-mono">3d ago</td>
+            </tr>
+            <tr tabindex="0" data-id="CAND-0377" class="">
+              <td class="cb"><input type="checkbox" data-cb="CAND-0377" aria-label="Select Aisha Rahman"></td>
+              <td><div class="cand-name">Aisha Rahman</div><div class="cand-meta">9 yrs · ex-Shopify</div></td>
+              <td><span class="pill st-offer">Offer extended</span></td>
+              <td style="white-space:nowrap;"><span class="pips" aria-hidden="true"><i class="done"></i><i class="done"></i><i class="done"></i><i class="done"></i></span><span class="t-mono">4/4</span></td>
+              <td><span class="t-mono muted">4 logged</span></td>
+              <td class="hide-sm" style="font-size:13px; color:var(--ink-2); max-width:260px;">Offer sent, response due Fri Oct 2</td>
+              <td class="hide-sm t-mono">Sep 20</td>
+            </tr>
+            <tr tabindex="0" data-id="CAND-0389" class="">
+              <td class="cb"><input type="checkbox" data-cb="CAND-0389" aria-label="Select Ben Whitaker"></td>
+              <td><div class="cand-name">Ben Whitaker</div><div class="cand-meta">4 yrs · ex-Dropbox</div></td>
+              <td><span class="pill st-nmf">Not moving forward</span></td>
+              <td style="white-space:nowrap;"><span class="pips" aria-hidden="true"><i class="done"></i><i class="done"></i><i class=""></i><i class=""></i></span><span class="t-mono">2/4</span></td>
+              <td><span class="t-mono muted">2 logged</span></td>
+              <td class="hide-sm" style="font-size:13px; color:var(--ink-2); max-width:260px;"><span class="muted">None</span></td>
+              <td class="hide-sm t-mono">Sep 15</td>
+            </tr>
+            <tr tabindex="0" data-id="CAND-0402" class="">
+              <td class="cb"><input type="checkbox" data-cb="CAND-0402" aria-label="Select Grace Kim"></td>
+              <td><div class="cand-name">Grace Kim</div><div class="cand-meta">6 yrs · ex-Airtable</div></td>
+              <td><span class="pill st-withdrew">Withdrew</span></td>
+              <td style="white-space:nowrap;"><span class="pips" aria-hidden="true"><i class="done"></i><i class=""></i><i class=""></i><i class=""></i></span><span class="t-mono">1/4</span></td>
+              <td><span class="t-mono muted">1 logged</span></td>
+              <td class="hide-sm" style="font-size:13px; color:var(--ink-2); max-width:260px;"><span class="muted">None</span></td>
+              <td class="hide-sm t-mono">Sep 12</td>
+            </tr>
+        </tbody>
+      </table>
+    </div></div>
+  </main>
+</div></div>
+  </section>
+
+  <section class="board-item">
+    <div class="board-label"><span>02</span><b>Candidates, 3 selected</b><em>Compare appears as an action, not a tab</em></div>
+    <div class="frame"><div class="app">
+
+  <aside class="side">
+    <div class="brand">docket<em>.</em></div>
+    <div class="org">Halden Group · Talent</div>
+    <div class="nav-label">Workspace</div>
+    <nav class="nav stack" style="gap:2px;">
+      <a class="on" href="#/"><span>Candidates</span><span class="count">9</span></a>
+      <span class="off">Requisitions <span class="soon">Soon</span></span>
+      <span class="off">Reports <span class="soon">Soon</span></span>
+    </nav>
+    
+    <div class="side-foot">
+      <div class="me"><div class="avatar">JP</div><div><b>Jordan Park</b><small>Hiring manager</small></div></div>
+      
+    </div>
+  </aside>
+
+  <main>
+    <div class="top">
+      <div class="crumb"><span class="req">REQ-2291</span><span>Senior Product Designer</span></div>
+      <label class="search">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="7" cy="7" r="5"></circle><path d="m11 11 3.5 3.5"></path></svg>
+        <input type="search" placeholder="Search candidates" aria-label="Search candidates">
+      </label>
+      
+    </div>
+    <div class="page">
+    <div class="head-row">
+      <div><h1>Candidates</h1><div class="sub">Everyone in the pipeline for this role, in one place.</div></div>
+    </div>
+    <div class="chips"><button class="chip on" data-f="all">All<span class="n">9</span></button><button class="chip " data-f="awaiting">Awaiting you<span class="n">2</span></button><button class="chip " data-f="process">In process<span class="n">3</span></button><button class="chip " data-f="passed">Passed panel<span class="n">1</span></button><button class="chip " data-f="offer">Offer extended<span class="n">1</span></button><button class="chip " data-f="closed">Closed<span class="n">2</span></button></div>
+    <div class="stack gap-b" style="flex-direction:row; gap:10px;">
+      
+      
+    </div>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr>
+          <th class="cb"><span class="sr" style="position:absolute;left:-9999px;">Select</span></th>
+          <th>Candidate</th><th>Status</th><th>Interviews</th><th>Notes</th><th class="hide-sm">Next step</th><th class="hide-sm">Updated</th>
+        </tr></thead>
+        <tbody>
+          
+            <tr tabindex="0" data-id="CAND-0412" class="sel">
+              <td class="cb"><input type="checkbox" data-cb="CAND-0412" checked="" aria-label="Select Maya Chen"></td>
+              <td><div class="cand-name">Maya Chen</div><div class="cand-meta">8 yrs · ex-Figma</div></td>
+              <td><span class="pill st-awaiting">Awaiting you</span></td>
+              <td style="white-space:nowrap;"><span class="pips" aria-hidden="true"><i class="done"></i><i class="done"></i><i class="done"></i><i class="sched"></i></span><span class="t-mono">3/4</span></td>
+              <td><span class="newdot">1 new</span></td>
+              <td class="hide-sm" style="font-size:13px; color:var(--ink-2); max-width:260px;">Cross-functional panel, Thu Oct 1, 2:00 PM</td>
+              <td class="hide-sm t-mono">2h ago</td>
+            </tr>
+            <tr tabindex="0" data-id="CAND-0398" class="sel">
+              <td class="cb"><input type="checkbox" data-cb="CAND-0398" checked="" aria-label="Select Priya Nair"></td>
+              <td><div class="cand-name">Priya Nair</div><div class="cand-meta">10 yrs · ex-Linear</div></td>
+              <td><span class="pill st-awaiting">Awaiting you</span></td>
+              <td style="white-space:nowrap;"><span class="pips" aria-hidden="true"><i class="done"></i><i class="done"></i><i class="done"></i><i class="done"></i></span><span class="t-mono">4/4</span></td>
+              <td><span class="newdot">2 new</span></td>
+              <td class="hide-sm" style="font-size:13px; color:var(--ink-2); max-width:260px;">Final decision needed from hiring manager</td>
+              <td class="hide-sm t-mono">5h ago</td>
+            </tr>
+            <tr tabindex="0" data-id="CAND-0405" class="sel">
+              <td class="cb"><input type="checkbox" data-cb="CAND-0405" checked="" aria-label="Select Leo Brandt"></td>
+              <td><div class="cand-name">Leo Brandt</div><div class="cand-meta">6 yrs · ex-Stripe</div></td>
+              <td><span class="pill st-passed">Passed panel</span></td>
+              <td style="white-space:nowrap;"><span class="pips" aria-hidden="true"><i class="done"></i><i class="done"></i><i class="done"></i><i class="done"></i></span><span class="t-mono">4/4</span></td>
+              <td><span class="t-mono muted">4 logged</span></td>
+              <td class="hide-sm" style="font-size:13px; color:var(--ink-2); max-width:260px;">Waiting on references</td>
+              <td class="hide-sm t-mono">Sep 18</td>
+            </tr>
+            <tr tabindex="0" data-id="CAND-0421" class="">
+              <td class="cb"><input type="checkbox" data-cb="CAND-0421" aria-label="Select Tomás Alvarez"></td>
+              <td><div class="cand-name">Tomás Alvarez</div><div class="cand-meta">5 yrs · ex-Duolingo</div></td>
+              <td><span class="pill st-interviewing">Interviewing</span></td>
+              <td style="white-space:nowrap;"><span class="pips" aria-hidden="true"><i class="done"></i><i class="done"></i><i class="sched"></i><i class=""></i></span><span class="t-mono">2/4</span></td>
+              <td><span class="t-mono muted">2 logged</span></td>
+              <td class="hide-sm" style="font-size:13px; color:var(--ink-2); max-width:260px;">Design exercise, Mon Oct 5, 10:00 AM</td>
+              <td class="hide-sm t-mono">1d ago</td>
+            </tr>
+            <tr tabindex="0" data-id="CAND-0417" class="">
+              <td class="cb"><input type="checkbox" data-cb="CAND-0417" aria-label="Select Hannah Okafor"></td>
+              <td><div class="cand-name">Hannah Okafor</div><div class="cand-meta">7 yrs · ex-Atlassian</div></td>
+              <td><span class="pill st-interviewing">Interviewing</span></td>
+              <td style="white-space:nowrap;"><span class="pips" aria-hidden="true"><i class="done"></i><i class="done"></i><i class=""></i><i class=""></i></span><span class="t-mono">2/4</span></td>
+              <td><span class="t-mono muted">2 logged</span></td>
+              <td class="hide-sm" style="font-size:13px; color:var(--ink-2); max-width:260px;">Design exercise being scheduled</td>
+              <td class="hide-sm t-mono">2d ago</td>
+            </tr>
+            <tr tabindex="0" data-id="CAND-0430" class="">
+              <td class="cb"><input type="checkbox" data-cb="CAND-0430" aria-label="Select Devon Ruiz"></td>
+              <td><div class="cand-name">Devon Ruiz</div><div class="cand-meta">5 yrs · ex-Notion</div></td>
+              <td><span class="pill st-scheduling">Scheduling</span></td>
+              <td style="white-space:nowrap;"><span class="pips" aria-hidden="true"><i class="done"></i><i class=""></i><i class=""></i><i class=""></i></span><span class="t-mono">1/4</span></td>
+              <td><span class="t-mono muted">1 logged</span></td>
+              <td class="hide-sm" style="font-size:13px; color:var(--ink-2); max-width:260px;">Portfolio review being scheduled</td>
+              <td class="hide-sm t-mono">3d ago</td>
+            </tr>
+            <tr tabindex="0" data-id="CAND-0377" class="">
+              <td class="cb"><input type="checkbox" data-cb="CAND-0377" aria-label="Select Aisha Rahman"></td>
+              <td><div class="cand-name">Aisha Rahman</div><div class="cand-meta">9 yrs · ex-Shopify</div></td>
+              <td><span class="pill st-offer">Offer extended</span></td>
+              <td style="white-space:nowrap;"><span class="pips" aria-hidden="true"><i class="done"></i><i class="done"></i><i class="done"></i><i class="done"></i></span><span class="t-mono">4/4</span></td>
+              <td><span class="t-mono muted">4 logged</span></td>
+              <td class="hide-sm" style="font-size:13px; color:var(--ink-2); max-width:260px;">Offer sent, response due Fri Oct 2</td>
+              <td class="hide-sm t-mono">Sep 20</td>
+            </tr>
+            <tr tabindex="0" data-id="CAND-0389" class="">
+              <td class="cb"><input type="checkbox" data-cb="CAND-0389" aria-label="Select Ben Whitaker"></td>
+              <td><div class="cand-name">Ben Whitaker</div><div class="cand-meta">4 yrs · ex-Dropbox</div></td>
+              <td><span class="pill st-nmf">Not moving forward</span></td>
+              <td style="white-space:nowrap;"><span class="pips" aria-hidden="true"><i class="done"></i><i class="done"></i><i class=""></i><i class=""></i></span><span class="t-mono">2/4</span></td>
+              <td><span class="t-mono muted">2 logged</span></td>
+              <td class="hide-sm" style="font-size:13px; color:var(--ink-2); max-width:260px;"><span class="muted">None</span></td>
+              <td class="hide-sm t-mono">Sep 15</td>
+            </tr>
+            <tr tabindex="0" data-id="CAND-0402" class="">
+              <td class="cb"><input type="checkbox" data-cb="CAND-0402" aria-label="Select Grace Kim"></td>
+              <td><div class="cand-name">Grace Kim</div><div class="cand-meta">6 yrs · ex-Airtable</div></td>
+              <td><span class="pill st-withdrew">Withdrew</span></td>
+              <td style="white-space:nowrap;"><span class="pips" aria-hidden="true"><i class="done"></i><i class=""></i><i class=""></i><i class=""></i></span><span class="t-mono">1/4</span></td>
+              <td><span class="t-mono muted">1 logged</span></td>
+              <td class="hide-sm" style="font-size:13px; color:var(--ink-2); max-width:260px;"><span class="muted">None</span></td>
+              <td class="hide-sm t-mono">Sep 12</td>
+            </tr>
+        </tbody>
+      </table>
+    </div></div>
+  </main>
+</div>
+<div class="bulk show" role="region" aria-label="Selection">
+  <div class="msg">3 selected</div>
+  <button class="btn ghost">Clear</button>
+  <button class="btn primary">Compare 3 candidates →</button>
+</div></div>
+  </section>
+
+  <section class="board-item">
+    <div class="board-label"><span>03</span><b>Candidate record, Interviews</b><em>Maya Chen, 3 of 4 interviews done</em></div>
+    <div class="frame"><div class="app">
+
+  <aside class="side">
+    <div class="brand">docket<em>.</em></div>
+    <div class="org">Halden Group · Talent</div>
+    <div class="nav-label">Workspace</div>
+    <nav class="nav stack" style="gap:2px;">
+      <a class="on" href="#/"><span>Candidates</span><span class="count">9</span></a>
+      <span class="off">Requisitions <span class="soon">Soon</span></span>
+      <span class="off">Reports <span class="soon">Soon</span></span>
+    </nav>
+    
+    <div class="side-foot">
+      <div class="me"><div class="avatar">JP</div><div><b>Jordan Park</b><small>Hiring manager</small></div></div>
+      
+    </div>
+  </aside>
+
+  <main>
+    <div class="top">
+      <div class="crumb"><span class="req">REQ-2291</span><span>Senior Product Designer</span></div>
+      <label class="search">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="7" cy="7" r="5"></circle><path d="m11 11 3.5 3.5"></path></svg>
+        <input type="search" placeholder="Search candidates" aria-label="Search candidates">
+      </label>
+      
+    </div>
+    <div class="page">
+    <button class="backlink" data-go="#/">← Candidates</button>
+    <div class="rec-head">
+      <div>
+        <h1>Maya Chen</h1>
+        <div class="rec-meta">CAND-0412 · 8 yrs · ex-Figma · Oakland, CA · Recruiter: Sam Ortiz</div>
+      </div>
+      <div class="status-ctl">
+        <div class="row"><span class="pill st-awaiting">Awaiting you</span>
+          <label class="row" style="gap:6px; font-size:12.5px; color:var(--ink-2);">Move to
+            <select aria-label="Change status"><option value="" selected="" disabled="">Choose status</option><option value="scheduling">Scheduling</option><option value="interviewing">Interviewing</option><option value="passed">Passed panel</option><option value="offer">Offer extended</option><option value="nmf">Not moving forward</option><option value="withdrew">Withdrew</option></select>
+          </label>
+        </div>
+      </div>
+    </div>
+    <div class="next-line">
+      <span class="k">Next step</span>
+      <span class="v">Cross-functional panel, Thu Oct 1, 2:00 PM</span>
+      <span class="by">entered by Sam Ortiz · Sep 23</span>
+    </div>
+    
+    <div class="subtabs" role="tablist">
+      <button role="tab" class="on" data-go="#/c/CAND-0412">Interviews <span class="n">3/4</span></button>
+      <button role="tab" class="" data-go="#/c/CAND-0412/docs">Resume &amp; cover letter</button>
+      <button role="tab" class="" data-go="#/c/CAND-0412/activity">Activity <span class="n">6</span></button>
+    </div>
+    
+      
+      <div class="iv-summary">
+        <div>
+          <div class="k-label">Interviews</div>
+          <div class="big">3<small>of 4 done</small></div>
+          <div style="margin-top:12px;"><span class="pips" aria-hidden="true"><i class="done"></i><i class="done"></i><i class="done"></i><i class="sched"></i></span></div>
+        </div>
+        <div>
+          <div class="k-label">Average rating so far · 1 to 4 scale</div>
+          <div class="avg-rows">
+            
+              <div class="avg-row">
+                <span>Design craft</span>
+                <span class="avg-track"><span class="avg-fill" style="width:100%"></span></span>
+                <span class="t-mono">4.0 <span class="muted">(2)</span></span>
+              </div>
+              <div class="avg-row">
+                <span>Communication</span>
+                <span class="avg-track"><span class="avg-fill" style="width:91.66666666666666%"></span></span>
+                <span class="t-mono">3.7 <span class="muted">(3)</span></span>
+              </div>
+              <div class="avg-row">
+                <span>Collaboration</span>
+                <span class="avg-track"><span class="avg-fill" style="width:87.5%"></span></span>
+                <span class="t-mono">3.5 <span class="muted">(2)</span></span>
+              </div>
+              <div class="avg-row">
+                <span>Role experience</span>
+                <span class="avg-track"><span class="avg-fill" style="width:75%"></span></span>
+                <span class="t-mono">3.0 <span class="muted">(3)</span></span>
+              </div>
+          </div>
+        </div>
+      </div>
+      
+          <article class="iv">
+            <div class="iv-top">
+              <span class="iv-round">01</span>
+              <span class="iv-title">Recruiter screen</span>
+              <span class="iv-who">Sam Ortiz, Recruiter</span>
+              <span class="iv-date">Sep 14</span>
+              <span class="rec y">Yes</span>
+            </div>
+            <div class="iv-scores">
+              <div class="score"><div class="lbl">Design craft</div><div class="seg"><span class="nr">Not rated this round</span></div></div><div class="score"><div class="lbl">Communication</div><div class="seg"><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><span>4/4</span></div></div><div class="score"><div class="lbl">Collaboration</div><div class="seg"><span class="nr">Not rated this round</span></div></div><div class="score"><div class="lbl">Role experience</div><div class="seg"><i class="f"></i><i class="f"></i><i class="f"></i><i class=""></i><span>3/4</span></div></div>
+            </div>
+            <div class="iv-notes">
+              <div><div class="note-k good">Went well</div><p class="serif">Clear on why she's leaving: wants to own a product area end to end, not a component library.</p></div>
+              <div><div class="note-k bad">Concerns</div><p class="serif">Comp expectations sit at the top of the band. Flagged, not a blocker.</p></div>
+            </div>
+          </article>
+          <article class="iv">
+            <div class="iv-top">
+              <span class="iv-round">02</span>
+              <span class="iv-title">Portfolio review</span>
+              <span class="iv-who">Jordan Park, Design manager</span>
+              <span class="iv-date">Sep 18</span>
+              <span class="rec sy">Strong yes</span>
+            </div>
+            <div class="iv-scores">
+              <div class="score"><div class="lbl">Design craft</div><div class="seg"><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><span>4/4</span></div></div><div class="score"><div class="lbl">Communication</div><div class="seg"><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><span>4/4</span></div></div><div class="score"><div class="lbl">Collaboration</div><div class="seg"><i class="f"></i><i class="f"></i><i class="f"></i><i class=""></i><span>3/4</span></div></div><div class="score"><div class="lbl">Role experience</div><div class="seg"><i class="f"></i><i class="f"></i><i class="f"></i><i class=""></i><span>3/4</span></div></div>
+            </div>
+            <div class="iv-notes">
+              <div><div class="note-k good">Went well</div><p class="serif">Walked through the version-history project without notes. Showed the three directions she killed and why.</p></div>
+              <div><div class="note-k bad">Concerns</div><p class="serif">Less B2B admin experience than we want. Most of her work is creative tooling.</p></div>
+            </div>
+          </article>
+          <article class="iv">
+            <div class="iv-top">
+              <span class="iv-round">03</span>
+              <span class="iv-title">Design exercise</span>
+              <span class="iv-who">Rae Lindqvist, Staff designer</span>
+              <span class="iv-date">Sep 22</span>
+              <span class="rec y">Yes</span>
+            </div>
+            <div class="iv-scores">
+              <div class="score"><div class="lbl">Design craft</div><div class="seg"><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><span>4/4</span></div></div><div class="score"><div class="lbl">Communication</div><div class="seg"><i class="f"></i><i class="f"></i><i class="f"></i><i class=""></i><span>3/4</span></div></div><div class="score"><div class="lbl">Collaboration</div><div class="seg"><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><span>4/4</span></div></div><div class="score"><div class="lbl">Role experience</div><div class="seg"><i class="f"></i><i class="f"></i><i class="f"></i><i class=""></i><span>3/4</span></div></div>
+            </div>
+            <div class="iv-notes">
+              <div><div class="note-k good">Went well</div><p class="serif">Asked about the permissions model before drawing anything. Right instinct for this product.</p></div>
+              <div><div class="note-k bad">Concerns</div><p class="serif">Ran out of time before edge cases. Hard to judge how she handles empty and error states.</p></div>
+            </div>
+          </article><div class="iv pending"><div class="iv-top"><span class="iv-round">04</span><span class="iv-title">Cross-functional panel</span><span class="iv-who">Not held yet</span><span class="iv-date">Scheduled Thu, Oct 1</span></div></div></div>
+  </main>
+</div></div>
+  </section>
+
+  <section class="board-item">
+    <div class="board-label"><span>04</span><b>Candidate record, Resume & cover letter</b><em>Documents set in IBM Plex Serif</em></div>
+    <div class="frame"><div class="app">
+
+  <aside class="side">
+    <div class="brand">docket<em>.</em></div>
+    <div class="org">Halden Group · Talent</div>
+    <div class="nav-label">Workspace</div>
+    <nav class="nav stack" style="gap:2px;">
+      <a class="on" href="#/"><span>Candidates</span><span class="count">9</span></a>
+      <span class="off">Requisitions <span class="soon">Soon</span></span>
+      <span class="off">Reports <span class="soon">Soon</span></span>
+    </nav>
+    
+    <div class="side-foot">
+      <div class="me"><div class="avatar">JP</div><div><b>Jordan Park</b><small>Hiring manager</small></div></div>
+      
+    </div>
+  </aside>
+
+  <main>
+    <div class="top">
+      <div class="crumb"><span class="req">REQ-2291</span><span>Senior Product Designer</span></div>
+      <label class="search">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="7" cy="7" r="5"></circle><path d="m11 11 3.5 3.5"></path></svg>
+        <input type="search" placeholder="Search candidates" aria-label="Search candidates">
+      </label>
+      
+    </div>
+    <div class="page">
+    <button class="backlink" data-go="#/">← Candidates</button>
+    <div class="rec-head">
+      <div>
+        <h1>Maya Chen</h1>
+        <div class="rec-meta">CAND-0412 · 8 yrs · ex-Figma · Oakland, CA · Recruiter: Sam Ortiz</div>
+      </div>
+      <div class="status-ctl">
+        <div class="row"><span class="pill st-awaiting">Awaiting you</span>
+          <label class="row" style="gap:6px; font-size:12.5px; color:var(--ink-2);">Move to
+            <select aria-label="Change status"><option value="" selected="" disabled="">Choose status</option><option value="scheduling">Scheduling</option><option value="interviewing">Interviewing</option><option value="passed">Passed panel</option><option value="offer">Offer extended</option><option value="nmf">Not moving forward</option><option value="withdrew">Withdrew</option></select>
+          </label>
+        </div>
+      </div>
+    </div>
+    <div class="next-line">
+      <span class="k">Next step</span>
+      <span class="v">Cross-functional panel, Thu Oct 1, 2:00 PM</span>
+      <span class="by">entered by Sam Ortiz · Sep 23</span>
+    </div>
+    
+    <div class="subtabs" role="tablist">
+      <button role="tab" class="" data-go="#/c/CAND-0412">Interviews <span class="n">3/4</span></button>
+      <button role="tab" class="on" data-go="#/c/CAND-0412/docs">Resume &amp; cover letter</button>
+      <button role="tab" class="" data-go="#/c/CAND-0412/activity">Activity <span class="n">6</span></button>
+    </div>
+    
+      <div class="docs">
+        <div>
+          <div class="doc-k"><span>resume.pdf</span><span>uploaded by Sam Ortiz · Sep 14</span></div>
+          <div class="paper">
+            <h2>Maya Chen</h2>
+            <div class="r-sub">Product Designer · Oakland, CA</div>
+            <h4>Experience</h4>
+            <div class="r-role"><b>Senior Product Designer</b>, Figma<span>2021 to now</span><p>Led file history and version restore. Owned the design from research through launch.</p></div><div class="r-role"><b>Product Designer</b>, Asana<span>2017 to 2021</span><p>Designed rules and automations for team admins.</p></div>
+            <h4>Education</h4>
+            <p>BFA, Interaction Design, California College of the Arts</p>
+          </div>
+        </div>
+        <div>
+          <div class="doc-k"><span>cover-letter.pdf</span><span>uploaded by Sam Ortiz · Sep 14</span></div>
+          <div class="paper letter">
+            <p>Dear hiring team,</p>
+            <p>I've spent the last few years on creative tools, and the part I liked most was the unglamorous part: permissions, history, who changed what. Halden's admin products are that problem at a bigger scale.</p>
+            <p>I'd welcome the chance to walk through my work in more detail.</p>
+            <p>Maya Chen</p>
+          </div>
+        </div>
+      </div></div>
+  </main>
+</div></div>
+  </section>
+
+  <section class="board-item">
+    <div class="board-label"><span>05</span><b>Candidate record, Activity</b><em>After moving status: Handoff 02, no message sent</em></div>
+    <div class="frame"><div class="app">
+
+  <aside class="side">
+    <div class="brand">docket<em>.</em></div>
+    <div class="org">Halden Group · Talent</div>
+    <div class="nav-label">Workspace</div>
+    <nav class="nav stack" style="gap:2px;">
+      <a class="on" href="#/"><span>Candidates</span><span class="count">9</span></a>
+      <span class="off">Requisitions <span class="soon">Soon</span></span>
+      <span class="off">Reports <span class="soon">Soon</span></span>
+    </nav>
+    
+    <div class="side-foot">
+      <div class="me"><div class="avatar">JP</div><div><b>Jordan Park</b><small>Hiring manager</small></div></div>
+      
+    </div>
+  </aside>
+
+  <main>
+    <div class="top">
+      <div class="crumb"><span class="req">REQ-2291</span><span>Senior Product Designer</span></div>
+      <label class="search">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="7" cy="7" r="5"></circle><path d="m11 11 3.5 3.5"></path></svg>
+        <input type="search" placeholder="Search candidates" aria-label="Search candidates">
+      </label>
+      
+    </div>
+    <div class="page">
+    <button class="backlink" data-go="#/">← Candidates</button>
+    <div class="rec-head">
+      <div>
+        <h1>Maya Chen</h1>
+        <div class="rec-meta">CAND-0412 · 8 yrs · ex-Figma · Oakland, CA · Recruiter: Sam Ortiz</div>
+      </div>
+      <div class="status-ctl">
+        <div class="row"><span class="pill st-passed">Passed panel</span>
+          <label class="row" style="gap:6px; font-size:12.5px; color:var(--ink-2);">Move to
+            <select aria-label="Change status"><option value="" selected="" disabled="">Choose status</option><option value="awaiting">Awaiting you</option><option value="scheduling">Scheduling</option><option value="interviewing">Interviewing</option><option value="offer">Offer extended</option><option value="nmf">Not moving forward</option><option value="withdrew">Withdrew</option></select>
+          </label>
+        </div>
+      </div>
+    </div>
+    <div class="next-line">
+      <span class="k">Next step</span>
+      <span class="v">Cross-functional panel, Thu Oct 1, 2:00 PM</span>
+      <span class="by">entered by Sam Ortiz · Sep 23</span>
+    </div>
+    
+    <div class="subtabs" role="tablist">
+      <button role="tab" class="" data-go="#/c/CAND-0412">Interviews <span class="n">3/4</span></button>
+      <button role="tab" class="" data-go="#/c/CAND-0412/docs">Resume &amp; cover letter</button>
+      <button role="tab" class="on" data-go="#/c/CAND-0412/activity">Activity <span class="n">6</span></button>
+    </div>
+    
+      
+      <div class="timeline">
+        <div class="tl status fresh"><span class="when">Just now</span><span class="dot"></span><div class="what">Jordan Park moved status from <b>Awaiting you</b> to <b>Passed panel</b><small>Visible to Sam Ortiz immediately. No message sent.</small></div></div><div class="tl  "><span class="when">Sep 23</span><span class="dot"></span><div class="what">Sam Ortiz added next step: Cross-functional panel, Thu Oct 1, 2:00 PM</div></div><div class="tl  "><span class="when">Sep 22</span><span class="dot"></span><div class="what">Rae Lindqvist logged <b>Design exercise</b> notes and ratings<small>Yes</small></div></div><div class="tl  "><span class="when">Sep 18</span><span class="dot"></span><div class="what">Jordan Park logged <b>Portfolio review</b> notes and ratings<small>Strong yes</small></div></div><div class="tl  "><span class="when">Sep 14</span><span class="dot"></span><div class="what">Sam Ortiz logged <b>Recruiter screen</b> notes and ratings<small>Yes</small></div></div><div class="tl  "><span class="when">Sep 14</span><span class="dot"></span><div class="what">Sam Ortiz added Maya Chen to REQ-2291<small>Resume and cover letter attached</small></div></div>
+      </div></div>
+  </main>
+</div>
+<div class="toast show" role="status" aria-live="polite">Moved to <b>Passed panel</b>. Sam Ortiz can see it now, no message needed.</div></div>
+  </section>
+
+  <section class="board-item">
+    <div class="board-label"><span>06</span><b>Compare</b><em>3 candidates, hover state on a bar</em></div>
+    <div class="frame"><div class="app">
+
+  <aside class="side">
+    <div class="brand">docket<em>.</em></div>
+    <div class="org">Halden Group · Talent</div>
+    <div class="nav-label">Workspace</div>
+    <nav class="nav stack" style="gap:2px;">
+      <a class="on" href="#/"><span>Candidates</span><span class="count">9</span></a>
+      <span class="off">Requisitions <span class="soon">Soon</span></span>
+      <span class="off">Reports <span class="soon">Soon</span></span>
+    </nav>
+    
+    <div class="side-foot">
+      <div class="me"><div class="avatar">JP</div><div><b>Jordan Park</b><small>Hiring manager</small></div></div>
+      
+    </div>
+  </aside>
+
+  <main>
+    <div class="top">
+      <div class="crumb"><span class="req">REQ-2291</span><span>Senior Product Designer</span></div>
+      <label class="search">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="7" cy="7" r="5"></circle><path d="m11 11 3.5 3.5"></path></svg>
+        <input type="search" placeholder="Search candidates" aria-label="Search candidates">
+      </label>
+      
+    </div>
+    <div class="page">
+    <button class="backlink" data-go="#/">← Candidates</button>
+    <div class="head-row"><div><h1>Comparing 3 candidates</h1><div class="sub">Same criteria, same scale, side by side.</div></div></div>
+    <div class="stack gap-b" style="flex-direction:row; gap:10px;">
+      
+      
+    </div>
+    <section class="card">
+      <h3>Average interviewer rating</h3>
+      <div class="desc">1 to 4 scale. Averages only include rounds where that criterion was rated. Hover or tab through a bar for detail.</div>
+      <div class="legend"><span><i style="background:var(--s1)"></i>Maya Chen <span class="t-mono muted">3 of 4 interviews</span></span><span><i style="background:var(--s2)"></i>Priya Nair <span class="t-mono muted">4 of 4 interviews</span></span><span><i style="background:var(--s3)"></i>Leo Brandt <span class="t-mono muted">4 of 4 interviews</span></span></div>
+      <div class="chart-box"><svg viewBox="0 0 1040 300" role="img" aria-label="Grouped bar chart of average interviewer ratings by criterion"><line x1="34" x2="1032" y1="258" y2="258" stroke="#C3C2B7" stroke-width="1"></line><text x="24" y="262" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11" fill="#898781">0</text><line x1="34" x2="1032" y1="197" y2="197" stroke="#E1E0D9" stroke-width="1"></line><text x="24" y="201" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11" fill="#898781">1</text><line x1="34" x2="1032" y1="136" y2="136" stroke="#E1E0D9" stroke-width="1"></line><text x="24" y="140" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11" fill="#898781">2</text><line x1="34" x2="1032" y1="75" y2="75" stroke="#E1E0D9" stroke-width="1"></line><text x="24" y="79" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11" fill="#898781">3</text><line x1="34" x2="1032" y1="14" y2="14" stroke="#E1E0D9" stroke-width="1"></line><text x="24" y="18" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="11" fill="#898781">4</text><path class="bar" d="M105.75,258 L105.75,18 Q105.75,14 109.75,14 L135.75,14 Q139.75,14 139.75,18 L139.75,258 Z" fill="var(--s1)"></path><rect class="hit" tabindex="0" x="104.75" y="14" width="36" height="244" data-c="CAND-0412" data-k="0" data-x="122.75" data-y="14" aria-label="Maya Chen, Design craft: 4.0 average from 2 ratings"></rect><path class="bar" d="M141.75,258 L141.75,79 Q141.75,75 145.75,75 L171.75,75 Q175.75,75 175.75,79 L175.75,258 Z" fill="var(--s2)"></path><rect class="hit" tabindex="0" x="140.75" y="14" width="36" height="244" data-c="CAND-0398" data-k="0" data-x="158.75" data-y="75" aria-label="Priya Nair, Design craft: 3.0 average from 3 ratings"></rect><path class="bar" d="M177.75,258 L177.75,18 Q177.75,14 181.75,14 L207.75,14 Q211.75,14 211.75,18 L211.75,258 Z" fill="var(--s3)"></path><rect class="hit" tabindex="0" x="176.75" y="14" width="36" height="244" data-c="CAND-0405" data-k="0" data-x="194.75" data-y="14" aria-label="Leo Brandt, Design craft: 4.0 average from 3 ratings"></rect><text x="158.75" y="280" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="12.5" fill="#52514E">Design craft</text><path class="bar" d="M355.25,258 L355.25,38.33333333333334 Q355.25,34.33333333333334 359.25,34.33333333333334 L385.25,34.33333333333334 Q389.25,34.33333333333334 389.25,38.33333333333334 L389.25,258 Z" fill="var(--s1)"></path><rect class="hit" tabindex="0" x="354.25" y="14" width="36" height="244" data-c="CAND-0412" data-k="1" data-x="372.25" data-y="34.33333333333334" aria-label="Maya Chen, Communication: 3.7 average from 3 ratings"></rect><path class="bar" d="M391.25,258 L391.25,18 Q391.25,14 395.25,14 L421.25,14 Q425.25,14 425.25,18 L425.25,258 Z" fill="var(--s2)"></path><rect class="hit" tabindex="0" x="390.25" y="14" width="36" height="244" data-c="CAND-0398" data-k="1" data-x="408.25" data-y="14" aria-label="Priya Nair, Communication: 4.0 average from 4 ratings"></rect><path class="bar" d="M427.25,258 L427.25,79 Q427.25,75 431.25,75 L457.25,75 Q461.25,75 461.25,79 L461.25,258 Z" fill="var(--s3)"></path><rect class="hit" tabindex="0" x="426.25" y="14" width="36" height="244" data-c="CAND-0405" data-k="1" data-x="444.25" data-y="75" aria-label="Leo Brandt, Communication: 3.0 average from 4 ratings"></rect><text x="408.25" y="280" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="12.5" fill="#52514E">Communication</text><path class="bar" d="M604.75,258 L604.75,48.5 Q604.75,44.5 608.75,44.5 L634.75,44.5 Q638.75,44.5 638.75,48.5 L638.75,258 Z" fill="var(--s1)"></path><rect class="hit" tabindex="0" x="603.75" y="14" width="36" height="244" data-c="CAND-0412" data-k="2" data-x="621.75" data-y="44.5" aria-label="Maya Chen, Collaboration: 3.5 average from 2 ratings"></rect><path class="bar" d="M640.75,258 L640.75,18 Q640.75,14 644.75,14 L670.75,14 Q674.75,14 674.75,18 L674.75,258 Z" fill="var(--s2)"></path><rect class="hit" tabindex="0" x="639.75" y="14" width="36" height="244" data-c="CAND-0398" data-k="2" data-x="657.75" data-y="14" aria-label="Priya Nair, Collaboration: 4.0 average from 3 ratings"></rect><path class="bar" d="M676.75,258 L676.75,99.33333333333334 Q676.75,95.33333333333334 680.75,95.33333333333334 L706.75,95.33333333333334 Q710.75,95.33333333333334 710.75,99.33333333333334 L710.75,258 Z" fill="var(--s3)"></path><rect class="hit" tabindex="0" x="675.75" y="14" width="36" height="244" data-c="CAND-0405" data-k="2" data-x="693.75" data-y="95.33333333333334" aria-label="Leo Brandt, Collaboration: 2.7 average from 3 ratings"></rect><text x="657.75" y="280" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="12.5" fill="#52514E">Collaboration</text><path class="bar" d="M854.25,258 L854.25,79 Q854.25,75 858.25,75 L884.25,75 Q888.25,75 888.25,79 L888.25,258 Z" fill="var(--s1)"></path><rect class="hit" tabindex="0" x="853.25" y="14" width="36" height="244" data-c="CAND-0412" data-k="3" data-x="871.25" data-y="75" aria-label="Maya Chen, Role experience: 3.0 average from 3 ratings"></rect><path class="bar" d="M890.25,258 L890.25,18 Q890.25,14 894.25,14 L920.25,14 Q924.25,14 924.25,18 L924.25,258 Z" fill="var(--s2)"></path><rect class="hit" tabindex="0" x="889.25" y="14" width="36" height="244" data-c="CAND-0398" data-k="3" data-x="907.25" data-y="14" aria-label="Priya Nair, Role experience: 4.0 average from 4 ratings"></rect><path class="bar" d="M926.25,258 L926.25,18 Q926.25,14 930.25,14 L956.25,14 Q960.25,14 960.25,18 L960.25,258 Z" fill="var(--s3)"></path><rect class="hit" tabindex="0" x="925.25" y="14" width="36" height="244" data-c="CAND-0405" data-k="3" data-x="943.25" data-y="14" aria-label="Leo Brandt, Role experience: 4.0 average from 4 ratings"></rect><text x="907.25" y="280" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="12.5" fill="#52514E">Role experience</text></svg><div class="tip show" style="left: 699.492px; top: 14.8885px;"><b>Priya Nair</b>Collaboration: 4.0 <span>avg of 3 ratings</span></div></div>
+      <button class="table-toggle" aria-expanded="false">Show as table</button>
+      <div hidden="">
+        <table class="mini">
+          <thead><tr><th>Candidate</th><th>Design craft</th><th>Communication</th><th>Collaboration</th><th>Role experience</th></tr></thead>
+          <tbody><tr><td><span class="sw" style="background:var(--s1)"></span>Maya Chen</td><td class="num">4.0 <span class="muted">(2)</span></td><td class="num">3.7 <span class="muted">(3)</span></td><td class="num">3.5 <span class="muted">(2)</span></td><td class="num">3.0 <span class="muted">(3)</span></td></tr><tr><td><span class="sw" style="background:var(--s2)"></span>Priya Nair</td><td class="num">3.0 <span class="muted">(3)</span></td><td class="num">4.0 <span class="muted">(4)</span></td><td class="num">4.0 <span class="muted">(3)</span></td><td class="num">4.0 <span class="muted">(4)</span></td></tr><tr><td><span class="sw" style="background:var(--s3)"></span>Leo Brandt</td><td class="num">4.0 <span class="muted">(3)</span></td><td class="num">3.0 <span class="muted">(4)</span></td><td class="num">2.7 <span class="muted">(3)</span></td><td class="num">4.0 <span class="muted">(4)</span></td></tr></tbody>
+        </table>
+      </div>
+    </section>
+    
+    <div class="cmp-cols" style="grid-template-columns:repeat(3, minmax(0,1fr));">
+      
+        <div class="cmp-col">
+          <div class="hd" style="border-top-color:var(--s1)">
+            <div class="nm"><a href="#/c/CAND-0412">Maya Chen</a><button class="rm" data-rm="CAND-0412" aria-label="Remove Maya Chen from comparison">Remove</button></div>
+            <div class="facts">
+              <div><span class="pill st-awaiting">Awaiting you</span></div>
+              <div>Interviews <span class="t-mono">3/4</span></div>
+              <div>Recommendations <span class="t-mono">1 Strong yes · 2 Yes</span></div>
+            </div>
+          </div>
+          <div class="sec"><div class="note-k good">Went well</div>
+            <div class="q"><div class="src">Sam Ortiz · Recruiter screen</div><p>Clear on why she's leaving: wants to own a product area end to end, not a component library.</p></div><div class="q"><div class="src">Jordan Park · Portfolio review</div><p>Walked through the version-history project without notes. Showed the three directions she killed and why.</p></div><div class="q"><div class="src">Rae Lindqvist · Design exercise</div><p>Asked about the permissions model before drawing anything. Right instinct for this product.</p></div>
+          </div>
+          <div class="sec"><div class="note-k bad">Concerns</div>
+            <div class="q"><div class="src">Sam Ortiz · Recruiter screen</div><p>Comp expectations sit at the top of the band. Flagged, not a blocker.</p></div><div class="q"><div class="src">Jordan Park · Portfolio review</div><p>Less B2B admin experience than we want. Most of her work is creative tooling.</p></div><div class="q"><div class="src">Rae Lindqvist · Design exercise</div><p>Ran out of time before edge cases. Hard to judge how she handles empty and error states.</p></div>
+          </div>
+        </div>
+        <div class="cmp-col">
+          <div class="hd" style="border-top-color:var(--s2)">
+            <div class="nm"><a href="#/c/CAND-0398">Priya Nair</a><button class="rm" data-rm="CAND-0398" aria-label="Remove Priya Nair from comparison">Remove</button></div>
+            <div class="facts">
+              <div><span class="pill st-awaiting">Awaiting you</span></div>
+              <div>Interviews <span class="t-mono">4/4</span></div>
+              <div>Recommendations <span class="t-mono">1 Strong yes · 3 Yes</span></div>
+            </div>
+          </div>
+          <div class="sec"><div class="note-k good">Went well</div>
+            <div class="q"><div class="src">Sam Ortiz · Recruiter screen</div><p>Has shipped two B2B admin products from zero. Knows the space cold.</p></div><div class="q"><div class="src">Jordan Park · Portfolio review</div><p>Strongest systems thinking this round. Her audit-log case study is basically our problem.</p></div><div class="q"><div class="src">Rae Lindqvist · Design exercise</div><p>Drove the session. Wrote the constraints on the board before sketching.</p></div><div class="q"><div class="src">Marcus Webb · Cross-functional panel</div><p>Engineers wanted to keep talking to her. Asked good questions about data retention.</p></div>
+          </div>
+          <div class="sec"><div class="note-k bad">Concerns</div>
+            <div class="q"><div class="src">Sam Ortiz · Recruiter screen</div><p>Wants a principal title. This req is senior.</p></div><div class="q"><div class="src">Jordan Park · Portfolio review</div><p>Visual craft is solid but not a standout.</p></div><div class="q"><div class="src">Rae Lindqvist · Design exercise</div><p>Went straight to a table. Didn't explore alternatives first.</p></div><div class="q"><div class="src">Marcus Webb · Cross-functional panel</div><p>Might get frustrated by our release pace.</p></div>
+          </div>
+        </div>
+        <div class="cmp-col">
+          <div class="hd" style="border-top-color:var(--s3)">
+            <div class="nm"><a href="#/c/CAND-0405">Leo Brandt</a><button class="rm" data-rm="CAND-0405" aria-label="Remove Leo Brandt from comparison">Remove</button></div>
+            <div class="facts">
+              <div><span class="pill st-passed">Passed panel</span></div>
+              <div>Interviews <span class="t-mono">4/4</span></div>
+              <div>Recommendations <span class="t-mono">1 Strong yes · 3 Yes</span></div>
+            </div>
+          </div>
+          <div class="sec"><div class="note-k good">Went well</div>
+            <div class="q"><div class="src">Sam Ortiz · Recruiter screen</div><p>Payments and compliance background maps well to permissions work.</p></div><div class="q"><div class="src">Jordan Park · Portfolio review</div><p>Dense, careful work. Every screen had a reason.</p></div><div class="q"><div class="src">Rae Lindqvist · Design exercise</div><p>Best handling of edge cases this round, by a lot.</p></div><div class="q"><div class="src">Marcus Webb · Cross-functional panel</div><p>Very strong with engineers on feasibility.</p></div>
+          </div>
+          <div class="sec"><div class="note-k bad">Concerns</div>
+            <div class="q"><div class="src">Sam Ortiz · Recruiter screen</div><p>Answers ran long. Needed redirecting twice.</p></div><div class="q"><div class="src">Jordan Park · Portfolio review</div><p>Struggled to say what he would do differently next time.</p></div><div class="q"><div class="src">Rae Lindqvist · Design exercise</div><p>Worked mostly alone. Checked in with us late.</p></div><div class="q"><div class="src">Marcus Webb · Cross-functional panel</div><p>PM on the panel felt he brushed off a product question.</p></div>
+          </div>
+        </div>
+    </div></div>
+  </main>
+</div></div>
+  </section>
+</div>
+</body>
+</html>

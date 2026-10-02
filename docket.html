@@ -1,0 +1,2242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Docket · UX Case Study · Alisa Utesheva</title>
+<link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="img/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="img/favicon-180.png">
+<meta name="description" content="Docket: a B2B case study on handing candidates from recruiter to hiring manager without losing context, by Alisa Utesheva.">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@400;500&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F3EFE6;
+    --paper-2:#FFFFFF;
+    --paper-3:#EAE4D6;
+    --ink:#26251F;
+    --muted:#6F6C62;
+    --line: rgba(38,37,31,.13);
+    --yellow:#FDE68A;
+    --yellow-ink:#6B5C05;
+    --red:#B0402F;
+  }
+  *{box-sizing:border-box;}
+  html,body{ margin:0; padding:0; width:100%; height:auto; min-height:100%; background:var(--paper); color:var(--ink);
+    font-family:'IBM Plex Sans',sans-serif; -webkit-font-smoothing:antialiased; }
+  html{ overflow-x:hidden; overflow-y:auto; scroll-behavior:smooth; scroll-snap-type:y mandatory; }
+  body{ overflow:visible; position:relative; }
+  /* faint paper grain, not a flat fill - the thing that reads as "template" is a
+     perfectly clean color field. a little noise makes it feel like a surface. */
+  body::before{
+    content:""; position:fixed; inset:0; pointer-events:none; z-index:1; opacity:.5; mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.15  0 0 0 0 0.14  0 0 0 0 0.12  0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .deck{ position:relative; z-index:2; }
+  .mono{ font-family:'IBM Plex Mono',monospace; }
+  em{ font-style:normal; color:var(--red); }
+
+  .deck{ width:100%; height:auto; overflow:visible; }
+  .slide-shell{ width:100%; min-height:100vh; display:flex; align-items:center; justify-content:center;
+    scroll-snap-align:start; border-top:1px solid var(--line); background:var(--paper); overflow:clip; }
+  .slide-shell:first-child{ border-top:none; }
+  .slide-shell.alt{ background:var(--paper-3); }
+  .slide-shell.white{ background:var(--paper-2); }
+
+  .slide{ position:relative; max-width:1180px; width:100%; margin:0 auto;
+    padding:clamp(64px,11vw,120px) clamp(24px,8vw,96px); }
+  .deck .slide-shell .slide{ opacity:0; transform:translateY(22px);
+    transition:opacity .8s cubic-bezier(.16,.84,.44,1), transform .8s cubic-bezier(.16,.84,.44,1); }
+  .deck .slide-shell .slide.seen{ opacity:1; transform:none; }
+
+  .eyebrow{ font-family:'IBM Plex Mono',monospace; font-weight:600; letter-spacing:.1em; text-transform:uppercase;
+    font-size:11px; color:var(--red); margin-bottom:16px; }
+  .eyebrow::before{ content:"\00BB "; opacity:.6; }
+  h1,h2,h3{ font-family:'IBM Plex Mono',monospace; margin:0; font-weight:700; letter-spacing:-.01em; }
+  h1{ text-wrap:balance; text-transform:uppercase; } h2{ text-wrap:balance; }
+  p,li{ text-wrap:pretty; }
+  .lead{ font-size:16px; line-height:1.7; color:var(--muted); max-width:620px; }
+
+  /* tags read as a filed label, not a chip component - square corners, a ruled
+     top edge instead of a solid fill, like something stamped onto a form. */
+  .tag{ display:inline-flex; align-items:center; gap:6px; font-family:'IBM Plex Mono',monospace; font-size:10px;
+    font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--yellow-ink);
+    padding:4px 10px 3px; border-top:2px solid var(--yellow-ink); background:var(--yellow); border-radius:0; }
+  .tag.outline{ background:transparent; border:1px solid var(--line); border-top:2px solid var(--muted); color:var(--muted); }
+  .stamp{ display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:700;
+    letter-spacing:.06em; color:var(--red); border:2px double var(--red); border-radius:0; padding:4px 10px;
+    transform:rotate(-3deg); opacity:.85; }
+
+  .persona-photo{ width:100%; height:190px; object-fit:cover; object-position:50% 25%; display:block;
+    border:1px solid var(--line); filter:grayscale(92%) contrast(1.06) brightness(1.02); margin-bottom:12px; }
+
+  .ba{ display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+  .ba p{ font-size:13.5px; line-height:1.6; color:var(--muted); margin:10px 0 0; }
+  .ba p b{ display:inline-flex; width:18px; height:18px; border-radius:50%; background:var(--red); color:#fff; font-size:10px;
+    align-items:center; justify-content:center; font-family:'IBM Plex Mono',monospace; margin-right:2px; }
+  .ba-k{ font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
+  .ba-k.after{ color:var(--red); }
+  .rq.tasks li::before{ content:"T" counter(rq); }
+
+  /* ---- cover: legal pad ---- */
+  .slide.cover{ padding-top:clamp(96px,12vh,130px); padding-bottom:clamp(72px,10vh,110px); }
+  .cover-grid{ display:grid; grid-template-columns:minmax(0,520px) minmax(0,1fr); align-items:center; }
+  .pad{ position:relative; z-index:2; transform:rotate(-1.4deg); background:#FBEB9C;
+    box-shadow:0 1px 0 rgba(38,37,31,.08), 6px 10px 0 -2px #F2DD82, 7px 11px 0 -1px rgba(38,37,31,.08), 0 26px 50px -22px rgba(38,37,31,.45); }
+  .pad-top{ height:34px; background:#3B352C; display:flex; justify-content:space-around; align-items:flex-end;
+    border-bottom:2px dashed rgba(251,235,156,.35); }
+  .pad-top i{ width:26px; height:6px; margin-bottom:9px; background:linear-gradient(#C9C3B4,#8E887A); border-radius:1px; }
+  .pad-body{ position:relative; padding:26px 34px 30px 74px;
+    background-image:linear-gradient(90deg, transparent 56px, rgba(176,64,47,.55) 56px, rgba(176,64,47,.55) 57px, transparent 57px, transparent 60px, rgba(176,64,47,.4) 60px, rgba(176,64,47,.4) 61px, transparent 61px),
+      repeating-linear-gradient(180deg, transparent 0 31px, rgba(70,110,150,.22) 31px 32px);
+    background-position:0 0, 0 26px; }
+  .pad-head{ display:flex; justify-content:space-between; align-items:center; gap:12px; height:32px; }
+  .pad-head .tag{ background:transparent; border-top:none; padding:0; }
+  .pad-date{ font-family:'Caveat',cursive; font-size:19px; color:#5B5134; }
+  .pad-title{ font-family:'IBM Plex Mono',monospace; text-transform:none; font-size:clamp(58px,7vw,88px); line-height:96px; letter-spacing:-.03em; margin:0; }
+  .pad-title em{ font-style:normal; }
+  .pad-desc{ font-size:15.5px; line-height:32px; color:#3D3827; margin:0 0 32px; max-width:none; }
+  .pad-list{ list-style:none; margin:0; padding:0; }
+  .pad-list li{ font-family:'Caveat',cursive; font-size:23px; line-height:32px; height:32px; color:#2E3C58; display:flex; align-items:center; gap:10px; }
+  .pad-list li:not(.done){ color:#6E6754; }
+  .pad-list .ck{ width:22px; height:22px; flex-shrink:0; fill:none; stroke:var(--red); stroke-width:2.6; stroke-linecap:round; stroke-linejoin:round; }
+  .pad-list li:not(.done) .ck{ stroke:#6E6754; }
+  .pad-meta{ display:flex; flex-wrap:wrap; gap:4px 26px; margin-top:32px; line-height:32px; font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink); }
+  .pad-meta b{ font-weight:400; opacity:.55; margin-right:6px; }
+  .clip-shot{ position:relative; z-index:1; margin:-40px -20px 0 -36px; transform:rotate(2.2deg); background:#fff; padding:10px;
+    border:1px solid var(--line); box-shadow:0 30px 60px -26px rgba(38,37,31,.5), 0 6px 14px rgba(38,37,31,.08); }
+  .clip-shot img{ display:block; width:100%; height:auto; border:1px solid rgba(38,37,31,.08); }
+  .clip-shot .clip{ position:absolute; top:-34px; right:64px; width:22px; height:54px; fill:none; stroke:#8E887A; stroke-width:3.2; stroke-linecap:round; }
+  .scrawl{ position:absolute; right:-6px; bottom:-86px; font-family:'Caveat',cursive; font-size:26px; line-height:1.05; color:var(--red); transform:rotate(-3deg); text-align:left; padding-left:64px; }
+  .scrawl svg{ position:absolute; left:0; top:-30px; width:58px; height:52px; fill:none; stroke:var(--red); stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; }
+  @media(max-width:900px){
+    .cover-grid{ grid-template-columns:1fr; gap:56px; }
+    .pad{ transform:rotate(-.8deg); }
+    .pad-body{ padding:22px 20px 26px 60px; background-position:-12px 0, 0 22px; }
+    .pad-title{ line-height:64px; font-size:52px; }
+    .pad-desc{ font-size:14.5px; }
+    .clip-shot{ margin:0; transform:rotate(1.2deg); }
+    .scrawl{ position:static; margin-top:14px; font-size:21px; }
+    .scrawl{ padding-left:0; } .scrawl svg{ display:none; }
+    .pad-date{ display:none; }
+    .pad-list li{ height:auto; min-height:32px; line-height:1.3; align-items:flex-start; padding:4px 0; }
+    .pad-list .ck{ margin-top:4px; }
+  }
+  @media(min-width:901px) and (max-height:820px){
+    .slide.cover{ padding-top:84px; padding-bottom:40px; }
+    .cover-grid{ transform:scale(.82); transform-origin:50% 45%; }
+  }
+  .a11y{ margin-top:18px; background:var(--paper-2); border:1px solid var(--line); padding:14px 18px; }
+  .a11y b{ font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+  .a11y ul{ margin:8px 0 0; padding-left:18px; } .a11y li{ font-size:13.5px; line-height:1.55; padding:2px 0; }
+  .met-tbl{ width:100%; border-collapse:collapse; background:var(--paper-2); border:1px solid var(--line); box-shadow:3px 4px 0 rgba(38,37,31,.05); }
+  .met-tbl th{ text-align:left; font-family:'IBM Plex Mono',monospace; font-size:10.5px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); padding:10px 16px; border-bottom:1px solid var(--line); }
+  .met-tbl td{ padding:11px 16px; border-bottom:1px solid var(--line); font-size:13.5px; line-height:1.5; vertical-align:top; }
+  .met-tbl td:first-child{ font-weight:600; width:30%; } .met-tbl td:last-child{ font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--muted); width:25%; }
+  .met-tbl tr:last-child td{ border-bottom:none; }
+  .impact{ display:grid; grid-template-columns:repeat(4,1fr); margin-top:18px; border:1px solid var(--line); background:#FFFBEA; }
+  .impact > div{ padding:14px 16px; } .impact > div + div{ border-left:1px solid var(--line); }
+  .impact b{ display:block; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--yellow-ink); margin-bottom:5px; }
+  .impact p{ margin:0; font-size:13.5px; line-height:1.5; }
+  @media(max-width:900px){ .impact{ grid-template-columns:1fr 1fr; } .impact > div:nth-child(3){ border-left:none; } .impact > div:nth-child(n+3){ border-top:1px solid var(--line); }
+    .met-tbl, .met-tbl tbody, .met-tbl tr, .met-tbl td{ display:block; width:auto!important; } .met-tbl tr:first-child{ display:none; }
+    .met-tbl tr{ border-bottom:1px solid var(--line); padding:6px 0; } .met-tbl td{ border:none; padding:4px 14px; } }
+  /* ---- usability testing results ---- */
+  .test-tbl td:first-child{ width:190px; }
+  .test-tbl.chg td:first-child{ width:auto; } .test-tbl.chg, .test-tbl.t3{ table-layout:fixed; } .test-tbl.t3 td:first-child{ width:auto; }
+  .heard.h3{ grid-template-columns:repeat(3,1fr); } .heard.h4{ grid-template-columns:repeat(4,1fr); gap:20px; }
+  .test-tbl td{ font-size:13px; color:var(--ink); }
+  .res{ display:block; font-family:'IBM Plex Mono',monospace; font-size:10.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; margin-bottom:4px; }
+  .res.ok{ color:#2F6B2F; } .res.mid{ color:var(--yellow-ink); } .res.bad{ color:var(--red); } .res.na{ color:var(--muted); } .heard li.ph-li{ color:var(--muted); font-style:italic; } .res.r2{ margin-top:10px; padding-top:8px; border-top:1px dashed var(--line); }
+  .heard{ display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:20px; }
+  .heard b{ font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.1em; text-transform:uppercase; }
+  .heard ul{ margin:8px 0 0; padding:0; list-style:none; }
+  .heard li{ font-size:13.5px; line-height:1.55; padding:7px 0; border-bottom:1px solid var(--line); }
+  .fine{ font-size:12.5px; color:var(--muted); margin:14px 0 0; }
+  .ks-frame img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:top left; display:block; }
+  @media(max-width:900px){ .heard, .heard.h3, .heard.h4{ grid-template-columns:1fr; } .test-tbl{ display:block; overflow-x:auto; } }
+  .refl{ display:grid; grid-template-columns:repeat(3,1fr); background:var(--paper-2); border:1px solid var(--line); box-shadow:3px 4px 0 rgba(38,37,31,.06); }
+  .refl > div{ padding:22px 24px 24px; }
+  .refl > div + div{ border-left:1px solid var(--line); }
+  .refl b{ font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); display:block; margin-bottom:10px; }
+  .refl p{ font-size:14.5px; line-height:1.7; margin:0; }
+  @media(max-width:900px){ .ba, .refl{ grid-template-columns:1fr; } .refl > div + div{ border-left:none; border-top:1px solid var(--line); } }
+
+  .persona-full{ background:var(--paper-2); border:1px solid var(--line); box-shadow:3px 4px 0 rgba(38,37,31,.06);
+    display:grid; grid-template-columns:220px 1fr; margin-bottom:22px; }
+  .persona-full .pf-photo{ padding:22px; border-right:1px solid var(--line); display:flex; flex-direction:column; gap:10px; }
+  .persona-full .pf-photo .persona-photo{ height:auto; aspect-ratio:3/4; margin-bottom:0; }
+  .persona-full .pf-detail{ padding:24px 28px 26px; }
+  .persona-full .pf-detail h3{ font-size:23px; margin:4px 0 10px; }
+  .pf-oneline{ font-size:14.5px; line-height:1.6; color:var(--muted); margin:0 0 20px; max-width:640px; }
+  .pf-lists{ display:grid; grid-template-columns:1fr 1fr; gap:26px; margin-bottom:20px; }
+  .pf-lists .does{ border-top:1px solid var(--line); padding-top:10px; }
+  .persona-full blockquote{ margin:0 0 8px; font-family:'IBM Plex Serif',Georgia,serif; font-size:14px; line-height:1.55;
+    border-left:3px solid var(--yellow-ink); padding-left:12px; }
+  .persona-full .who{ font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--muted); }
+  .persona-full .who a{ color:inherit; }
+  @media(max-width:860px){ .persona-full{ grid-template-columns:1fr; }
+    .persona-full .pf-photo{ border-right:none; border-bottom:1px solid var(--line); flex-direction:row; align-items:center; }
+    .persona-full .pf-photo .persona-photo{ width:110px; aspect-ratio:1; flex-shrink:0; }
+    .pf-lists{ grid-template-columns:1fr; gap:8px; } }
+
+  .storyboard{ display:grid; grid-template-columns:repeat(3,1fr); background:var(--paper-2); border:1px solid var(--line);
+    box-shadow:3px 4px 0 rgba(38,37,31,.06); margin-top:8px; }
+  .sb-panel{ padding:20px 22px 22px; border-right:1px solid var(--line); border-bottom:1px solid var(--line); position:relative; }
+  .sb-panel:nth-child(3n){ border-right:none; }
+  .sb-panel:nth-last-child(-n+3){ border-bottom:none; }
+  .sb-panel .num{ font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:700; letter-spacing:.08em;
+    text-transform:uppercase; color:var(--muted); display:block; margin-bottom:9px; }
+  .sb-panel p{ font-size:13.5px; line-height:1.6; margin:0; color:var(--ink); }
+  .sb-panel.highlight{ background:var(--paper-3); }
+  .sb-panel.highlight .num{ color:var(--red); }
+  .sb-panel.highlight::before{ content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--red); }
+  @media(max-width:900px){ .storyboard{ grid-template-columns:1fr; }
+    .sb-panel{ border-right:none !important; border-bottom:1px solid var(--line) !important; }
+    .sb-panel:last-child{ border-bottom:none !important; } }
+
+  .pending-card{ border:1px dashed rgba(38,37,31,.4); border-radius:0; padding:22px 24px 22px 26px;
+    background:var(--paper-2); position:relative; box-shadow:3px 4px 0 rgba(38,37,31,.06); }
+  .pending-card::before{ content:""; position:absolute; left:0; top:10px; bottom:10px; width:3px; background:var(--muted); opacity:.3; }
+  .pending-card b{ font-size:12px; font-family:'IBM Plex Mono',monospace; letter-spacing:.06em; text-transform:uppercase;
+    color:var(--muted); display:block; margin-bottom:8px; }
+  .pending-card p{ font-size:14px; line-height:1.65; color:var(--muted); margin:0; }
+
+  .grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:28px; }
+  .grid-3{ display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+  .card{ background:var(--paper-2); border:1px solid var(--line); border-radius:0; padding:20px 22px;
+    box-shadow:3px 4px 0 rgba(38,37,31,.05); }
+  .card:nth-child(odd){ transform:rotate(-.35deg); }
+  .card:nth-child(even){ transform:rotate(.35deg); }
+  .card h3{ font-size:15px; margin-bottom:8px; font-family:'IBM Plex Mono',monospace; }
+  .card p{ font-size:13.5px; line-height:1.6; color:var(--muted); margin:0; }
+
+  .ph-photo{ width:100%; aspect-ratio:4/3; border-radius:0; border:1.5px dashed rgba(38,37,31,.4);
+    background:var(--paper-2); display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:6px; text-align:center; }
+  .ph-photo b{ font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); }
+  .ph-photo code{ font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--muted); }
+
+  /* ---- the actual product mock: candidate handoff screen, live markup ---- */
+  .mock-deck{ background:var(--paper); border:1px solid var(--line); border-radius:6px; padding:20px; position:relative; }
+  .mock-tab{ font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.1em; color:#8a5a1f;
+    background:#f7e9c8; border:1px solid #e3c988; display:inline-block; padding:3px 8px; border-radius:2px; margin-bottom:12px; }
+  .mock-stamp{ position:absolute; top:16px; right:18px; }
+  .mock-screen{ background:#fff; border:1px solid var(--line); border-radius:6px; overflow:hidden; }
+  .mock-head{ display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid var(--line); }
+  .mock-head .t{ font-size:13px; font-weight:600; }
+  .mock-head .s{ font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--muted); }
+  .mock-screen table{ width:100%; border-collapse:collapse; }
+  .mock-screen th{ text-align:left; font-size:10px; letter-spacing:.05em; text-transform:uppercase; color:#9c998f;
+    font-weight:600; padding:8px 16px; border-bottom:1px solid var(--line); }
+  .mock-screen td{ padding:10px 16px; font-size:12.5px; border-bottom:1px solid #f4f3ef; vertical-align:middle; }
+  .mock-screen .name{ font-weight:600; }
+  .mock-screen .role{ color:var(--muted); font-size:11.5px; }
+  .mock-redact{ display:inline-block; background:#26251f; height:9px; width:54px; border-radius:2px; }
+  .mock-badge{ font-family:'IBM Plex Mono',monospace; font-size:10px; font-weight:600; padding:3px 7px; border-radius:3px; }
+  .mock-badge.yellow{ background:var(--yellow); color:var(--yellow-ink); }
+  .mock-badge.gray{ background:#f0efeb; color:var(--muted); }
+  .mock-badge.outline{ border:1px solid #d8d5cc; color:var(--muted); }
+  .mock-note{ display:inline-flex; align-items:center; gap:4px; font-size:11px; color:var(--red); }
+  .mock-dot{ width:6px; height:6px; border-radius:50%; background:var(--red); display:inline-block; }
+  .swatch-row{ display:flex; gap:14px; margin-top:18px; flex-wrap:wrap; }
+  .swatch{ width:56px; }
+  .swatch .sw{ width:56px; height:40px; border-radius:5px; border:1px solid var(--line); }
+  .swatch .lbl{ font-family:'IBM Plex Mono',monospace; font-size:8.5px; color:var(--muted); margin-top:5px; text-align:center; }
+
+  /* ---- margin notes: little legal-pad notes, one real thought each ---- */
+  .jot{ position:absolute; width:214px; z-index:3; padding:22px 16px 14px 30px; font-family:'IBM Plex Mono',monospace;
+    font-size:11.5px; line-height:20px; color:#3A3620;
+    background-color:#FFF4B0;
+    background-image:linear-gradient(90deg, transparent 21px, rgba(176,64,47,.35) 21px, rgba(176,64,47,.35) 22px, transparent 22px),
+      repeating-linear-gradient(180deg, transparent 0 21px, rgba(90,110,160,.18) 21px 22px);
+    background-position:0 0, 0 12px;
+    box-shadow:0 1px 1px rgba(38,37,31,.08), 4px 7px 14px rgba(38,37,31,.12); transform:rotate(2.2deg); }
+  .jot::before{ content:""; position:absolute; top:-9px; left:50%; width:74px; height:20px; transform:translateX(-50%) rotate(-3deg);
+    background:rgba(234,228,214,.78); box-shadow:0 1px 2px rgba(38,37,31,.08); }
+  .jot b{ display:block; font-size:9.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--red); line-height:20px; }
+  .jot.l{ transform:rotate(-2deg); }
+  @media(max-width:1180px){
+    .jot{ position:relative; top:auto !important; right:auto !important; bottom:auto !important; left:auto !important;
+      width:auto; max-width:300px; margin:30px 0 0 6px; transform:rotate(-1deg); }
+  }
+
+
+  /* ---- red marker: handwritten notes that point at something real ---- */
+  .mnote{ font-family:'Caveat','Segoe Print','Bradley Hand',cursive; font-weight:600; color:var(--red); font-size:23px; line-height:1.05;
+    letter-spacing:0; text-transform:none; }
+  .mnote.inline{ display:inline-block; margin-left:10px; font-size:21px; transform:rotate(-2deg); vertical-align:-2px; }
+  .mnote.block{ display:block; margin-top:8px; font-size:21px; transform:rotate(-1.5deg); transform-origin:left center; }
+  .mnote.side{ position:absolute; width:170px; transform:rotate(-3deg); padding-left:66px; }
+  .mnote .marr{ position:absolute; left:0; top:4px; width:58px; height:30px; fill:none; stroke:var(--red); stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; }
+  .mcircle.sm{ left:-10px !important; top:-8px !important; width:80px !important; height:32px !important; }
+  .mcircle{ position:absolute; left:0; top:0; width:170px; height:100px; fill:none; stroke:var(--red); stroke-width:2.4; stroke-linecap:round; pointer-events:none; opacity:.9; }
+  @media(max-width:1180px){
+    .mnote.side{ position:relative; left:auto !important; top:auto !important; display:block; width:auto; padding-left:0; margin-top:14px; transform:rotate(-1.5deg); }
+    .mnote.side .marr{ display:none; } .mnote.side br{ display:none; }
+  }
+
+  /* ---- research: stat sheet, evidence cards, hypothesis, plan ---- */
+  .rs-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:24px; margin-bottom:28px; }
+  .rs-head .stamp{ flex-shrink:0; margin-top:6px; }
+  .stat-sheet{ display:grid; grid-template-columns:repeat(4,1fr); background:var(--paper-2); border:1px solid var(--line);
+    box-shadow:3px 4px 0 rgba(38,37,31,.06); }
+  .stat{ padding:22px 22px 20px; position:relative; }
+  .stat + .stat{ border-left:1px solid var(--line); }
+  .stat .n{ font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:clamp(40px,5vw,58px); line-height:1; letter-spacing:-.03em; }
+  .stat .n small{ font-size:.42em; letter-spacing:0; margin-left:2px; opacity:.55; }
+  .stat .bar{ height:4px; background:var(--paper-3); margin:14px 0 14px; position:relative; }
+  .stat .bar i{ position:absolute; left:0; top:0; bottom:0; background:var(--ink); }
+  .stat.key .n{ color:var(--red); } .stat.key .bar i{ background:var(--red); }
+  .stat p{ font-size:13px; line-height:1.55; color:var(--muted); margin:0; }
+  .stat p b{ color:var(--ink); font-weight:600; }
+  .src{ font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--muted); margin-top:12px; line-height:1.5; }
+  .src a{ color:inherit; text-decoration:underline; text-underline-offset:2px; text-decoration-color:rgba(38,37,31,.3); }
+  .src a:hover{ color:var(--red); text-decoration-color:var(--red); }
+  .takeaway{ margin-top:26px; display:grid; grid-template-columns:auto 1fr; gap:18px; align-items:start; max-width:780px; }
+  .takeaway .k{ font-family:'IBM Plex Mono',monospace; font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--paper-2); background:var(--ink); padding:5px 9px 4px; white-space:nowrap; }
+  .takeaway p{ margin:0; font-size:15px; line-height:1.65; }
+
+  .ev-grid{ display:grid; grid-template-columns:1.25fr 1fr; gap:22px; align-items:stretch; }
+  .ev{ background:var(--paper-2); border:1px solid var(--line); box-shadow:3px 4px 0 rgba(38,37,31,.06); padding:24px 26px; display:flex; flex-direction:column; }
+  .ev .who{ font-family:'IBM Plex Mono',monospace; font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }
+  .ev h3{ font-size:18px; line-height:1.3; margin-bottom:10px; }
+  .ev > p{ font-size:14px; line-height:1.65; color:var(--muted); margin:0; }
+  .ev-nums{ display:grid; grid-template-columns:repeat(3,1fr); border-top:1px solid var(--line); border-bottom:1px solid var(--line); margin:20px 0 4px; }
+  .ev-nums div{ padding:14px 12px 12px 0; }
+  .ev-nums div + div{ padding-left:14px; border-left:1px solid var(--line); }
+  .ev-nums b{ display:block; font-family:'IBM Plex Mono',monospace; font-size:28px; font-weight:700; letter-spacing:-.02em; line-height:1.1; }
+  .ev-nums span{ font-size:12px; color:var(--muted); line-height:1.45; display:block; margin-top:4px; }
+  .ev .src{ margin-top:auto; padding-top:14px; }
+  .scatter{ margin:18px 0 6px; display:flex; flex-wrap:wrap; gap:8px; }
+  .scatter span{ font-family:'IBM Plex Mono',monospace; font-size:11px; border:1px dashed rgba(38,37,31,.35); padding:5px 9px; color:var(--ink); background:var(--paper); }
+  .scatter span:nth-child(odd){ transform:rotate(-1.2deg); } .scatter span:nth-child(even){ transform:rotate(1deg); }
+  .means{ margin-top:22px; border-top:2px solid var(--ink); padding-top:14px; display:grid; grid-template-columns:repeat(2,1fr); gap:22px; }
+  .means h4{ font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.08em; text-transform:uppercase; margin:0 0 6px; }
+  .means h4.keep{ color:#2F6B2F; } .means h4.test{ color:var(--red); }
+  .means p{ font-size:13.5px; line-height:1.6; color:var(--muted); margin:0; }
+
+  .hyp{ background:var(--paper-2); border:1px solid var(--line); border-left:4px solid var(--red); padding:24px 28px; position:relative;
+    box-shadow:3px 4px 0 rgba(38,37,31,.06); margin-bottom:26px; }
+  .hyp .lbl{ font-family:'IBM Plex Mono',monospace; font-size:10px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--red); margin-bottom:8px; }
+  .hyp p{ font-size:clamp(17px,2vw,21px); line-height:1.45; margin:0; font-weight:500; max-width:780px; }
+  .hyp .stamp{ position:absolute; right:22px; top:-14px; background:var(--paper-2); }
+  .plan{ display:grid; grid-template-columns:1.3fr 1fr; gap:28px; }
+  .rq{ list-style:none; margin:0; padding:0; counter-reset:rq; border-top:1px solid var(--line); }
+  .rq li{ counter-increment:rq; display:grid; grid-template-columns:34px 1fr; gap:8px; padding:12px 0; border-bottom:1px solid var(--line); font-size:14.5px; line-height:1.5; }
+  .rq li::before{ content:"Q" counter(rq); font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:700; color:var(--muted); padding-top:3px; }
+  .rq li small{ display:block; color:var(--muted); font-size:12.5px; margin-top:2px; }
+  .who-tbl{ width:100%; border-collapse:collapse; background:var(--paper-2); border:1px solid var(--line); box-shadow:3px 4px 0 rgba(38,37,31,.05); }
+  .who-tbl td{ padding:12px 16px; border-bottom:1px solid var(--line); font-size:13.5px; line-height:1.55; vertical-align:top; }
+  .who-tbl tr:last-child td{ border-bottom:none; }
+  .who-tbl td:first-child{ font-family:'IBM Plex Mono',monospace; font-size:10.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); width:92px; padding-top:14px; }
+  .who-tbl .status{ font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:700; color:var(--red); }
+  .sub-h{ font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; margin:0 0 12px; color:var(--ink); }
+  @media(max-width:900px){
+    .stat-sheet{ grid-template-columns:1fr 1fr; }
+    .stat:nth-child(3){ border-left:none; } .stat:nth-child(n+3){ border-top:1px solid var(--line); }
+    .ev-grid, .plan, .means{ grid-template-columns:1fr; }
+    .rs-head{ flex-direction:column; gap:10px; }
+  }
+
+  /* ---- users page ---- */
+  .users{ display:grid; grid-template-columns:1.25fr 1fr; gap:22px; align-items:stretch; }
+  .user{ background:var(--paper-2); border:1px solid var(--line); box-shadow:3px 4px 0 rgba(38,37,31,.06); padding:24px 26px 22px; }
+  .user.primary{ border-top:4px solid var(--red); }
+  .user .role-k{ font-family:'IBM Plex Mono',monospace; font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+  .user.primary .role-k{ color:var(--red); }
+  .user h3{ font-size:22px; margin:6px 0 10px; }
+  .user > p{ font-size:14px; line-height:1.65; color:var(--muted); margin:0 0 18px; }
+  .user .eg{ font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink); background:var(--paper); border:1px dashed rgba(38,37,31,.3); padding:6px 10px; display:inline-block; margin-bottom:18px; }
+  .does{ border-top:1px solid var(--line); padding-top:12px; }
+  .does b{ font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); display:block; margin-bottom:6px; }
+  .does ul{ margin:0; padding:0; list-style:none; }
+  .does li{ font-size:13.5px; line-height:1.5; padding:5px 0 5px 18px; position:relative; }
+  .does li::before{ content:"\2192"; position:absolute; left:0; color:var(--muted); }
+
+  /* ---- live prototype preview ---- */
+  .proto-live{ position:relative; display:block; width:100%; max-width:700px; aspect-ratio:16/10; border:1px solid var(--line); background:#F6F5F1;
+    overflow:hidden; box-shadow:3px 4px 0 rgba(38,37,31,.08); transition:transform .25s, box-shadow .25s; }
+  .proto-live:hover{ transform:translateY(-3px); box-shadow:4px 8px 0 rgba(38,37,31,.08); }
+  .proto-live iframe{ position:absolute; top:0; left:0; width:1440px; height:900px; border:0; transform-origin:0 0; pointer-events:none; }
+  .proto-live .open{ position:absolute; right:16px; bottom:16px; background:var(--ink); color:#fff; font-family:'IBM Plex Mono',monospace;
+    font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; padding:11px 16px; }
+  .proto-meta{ display:flex; gap:28px; flex-wrap:wrap; margin-top:16px; font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--muted); }
+  .proto-meta b{ color:var(--ink); font-weight:600; }
+
+  /* ---- project status ---- */
+  .who-tbl .done{ font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:700; color:#2F6B2F; }
+  @media(max-width:900px){ .users{ grid-template-columns:1fr; } }
+
+  /* ---- placeholder pages: dashed skeletons, clearly unfinished ---- */
+  .ph-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:24px; }
+  .ph-head .stamp{ flex-shrink:0; margin-top:6px; }
+  .skel{ border:1.5px dashed rgba(38,37,31,.3); background:rgba(255,255,255,.45); padding:18px 20px; }
+  .skel b{ font-family:'IBM Plex Mono',monospace; font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); display:block; margin-bottom:10px; }
+  .skel p{ font-size:13px; line-height:1.55; color:var(--muted); margin:0; }
+  .skel .ln{ height:9px; background:rgba(38,37,31,.08); margin:8px 0; }
+  .skel .ln.s{ width:55%; } .skel .ln.m{ width:78%; }
+  .skel-grid{ display:grid; gap:16px; }
+  .skel-grid.c2{ grid-template-columns:repeat(2,1fr); } .skel-grid.c3{ grid-template-columns:repeat(3,1fr); } .skel-grid.c4{ grid-template-columns:repeat(4,1fr); }
+  .skel .frame{ aspect-ratio:4/3; border:1px dashed rgba(38,37,31,.25); margin-bottom:10px; display:flex; align-items:center; justify-content:center;
+    font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--muted); }
+  .skel .n{ font-family:'IBM Plex Mono',monospace; font-size:30px; font-weight:700; color:rgba(38,37,31,.22); line-height:1; margin-bottom:8px; }
+
+  /* ---- competitors table ---- */
+  .cmp-tbl{ width:100%; border-collapse:collapse; background:var(--paper-2); border:1px solid var(--line); box-shadow:3px 4px 0 rgba(38,37,31,.05); font-size:13px; }
+  .cmp-tbl th{ text-align:left; font-family:'IBM Plex Mono',monospace; font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); padding:11px 14px; border-bottom:1px solid var(--line); }
+  .cmp-tbl td{ padding:12px 14px; border-bottom:1px solid var(--line); vertical-align:top; line-height:1.5; }
+  .cmp-tbl td:first-child{ font-weight:600; white-space:nowrap; }
+  .cmp-tbl tr.us td{ background:#FFFBEA; }
+  .cmp-tbl .tc{ font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--muted); border:1px dashed rgba(38,37,31,.3); padding:2px 6px; white-space:nowrap; }
+
+  /* ---- big idea ---- */
+  .vs{ display:grid; grid-template-columns:150px 1fr 1fr; background:var(--paper-2); border:1px solid var(--line); box-shadow:3px 4px 0 rgba(38,37,31,.06); }
+  .vs > div{ padding:12px 16px; border-bottom:1px solid var(--line); font-size:14px; line-height:1.5; }
+  .vs > div:nth-last-child(-n+3){ border-bottom:none; }
+  .vs .k{ font-family:'IBM Plex Mono',monospace; font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); padding-top:15px; }
+  .vs .hd{ font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; background:#F4EACB; color:#5E4B17; }
+  .vs .hd.us{ background:var(--ink); color:#fff; }
+  .vs .us{ background:#FFFBEA; font-weight:500; }
+
+  /* ---- design principles ---- */
+  .pr-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:18px; }
+  .pr{ background:var(--paper-2); border:1px solid var(--line); box-shadow:3px 4px 0 rgba(38,37,31,.05); padding:20px 22px; position:relative; }
+  .pr .n{ font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:700; color:var(--red); }
+  .pr h3{ font-size:17px; margin:6px 0 8px; }
+  .pr p{ font-size:13.5px; line-height:1.6; color:var(--muted); margin:0 0 12px; }
+  .pr .where{ font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--ink); border-top:1px solid var(--line); padding-top:9px; }
+  .pr .where.plan{ color:var(--red); }
+
+  /* ---- design system ---- */
+  .ds{ display:grid; grid-template-columns:1.1fr 1fr; gap:22px; }
+  .ds-box{ background:var(--paper-2); border:1px solid var(--line); box-shadow:3px 4px 0 rgba(38,37,31,.05); padding:20px 22px; }
+  .ds-row{ display:grid; grid-template-columns:120px 1fr; gap:14px; padding:10px 0; border-bottom:1px solid var(--line); align-items:center; }
+  .ds-row:last-child{ border-bottom:none; }
+  .ds-row .k{ font-family:'IBM Plex Mono',monospace; font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
+  .ds-row small{ display:block; font-size:12px; color:var(--muted); margin-top:3px; font-family:'IBM Plex Sans',sans-serif; }
+  .ds-pill{ display:inline-flex; align-items:center; gap:6px; font-family:'IBM Plex Sans',sans-serif; font-size:12px; font-weight:500; padding:3px 8px; border-radius:3px; border:1px solid transparent; margin:2px 4px 2px 0; white-space:nowrap; }
+  .ds-pill::before{ content:""; width:6px; height:6px; border-radius:50%; background:currentColor; opacity:.8; }
+  .ds-pill.aw{ background:#FDE68A; color:#6B5C05; } .ds-pill.pr1{ border-color:#E1E0D9; color:#52514E; background:#fff; }
+  .ds-pill.pr2{ border-color:#CFCDC4; color:#1C1B17; background:#fff; } .ds-pill.ok{ background:#E4F1E4; color:#1D5E1D; }
+  .ds-pill.of{ background:#CFE9CF; color:#124A12; font-weight:600; } .ds-pill.cl{ background:#EEEDE9; color:#898781; }
+  .ds-seg{ display:inline-flex; gap:2px; vertical-align:middle; } .ds-seg i{ width:18px; height:6px; background:#ECEBE6; display:block; } .ds-seg i.f{ background:#2a78d6; }
+  .ds-pips{ display:inline-flex; gap:3px; vertical-align:middle; } .ds-pips i{ width:10px; height:10px; border:1px solid #A9A79F; border-radius:2px; display:block; }
+  .ds-pips i.d{ background:#1C1B17; border-color:#1C1B17; } .ds-pips i.s{ border:1px dashed #1C1B17; }
+  .ds-rec{ display:inline-block; font-family:'IBM Plex Sans',sans-serif; font-size:12px; font-weight:600; padding:3px 8px; border-radius:3px; border:1px solid #E1E0D9; background:#fff; margin-right:4px; }
+  .ds-rec.sy{ border-color:#1D5E1D; color:#1D5E1D; } .ds-rec.y{ color:#1D5E1D; } .ds-rec.n{ color:var(--red); }
+  .ds-rule{ margin-top:14px; font-size:13px; line-height:1.55; background:#FFFBEA; border-left:3px solid #6B5C05; padding:10px 12px; }
+
+  /* ---- key screens: live screen + numbered callouts ---- */
+  .ks{ display:grid; grid-template-columns:minmax(0,1fr) 270px; gap:28px; align-items:start; }
+  .ks-frame{ position:relative; display:block; aspect-ratio:16/10; border:1px solid var(--line); background:#F6F5F1; overflow:hidden;
+    box-shadow:3px 4px 0 rgba(38,37,31,.08); }
+  .ks-frame iframe{ position:absolute; top:0; left:0; width:1440px; height:900px; border:0; transform-origin:0 0; pointer-events:none; }
+  .mk{ position:absolute; width:24px; height:24px; margin:-12px 0 0 -12px; border-radius:50%; background:var(--red); color:#fff; z-index:2;
+    font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center;
+    box-shadow:0 0 0 3px rgba(255,255,255,.9), 0 2px 6px rgba(0,0,0,.2); }
+  .ks-notes{ list-style:none; margin:0; padding:0; counter-reset:ks; }
+  .ks-notes li{ counter-increment:ks; display:grid; grid-template-columns:24px 1fr; gap:10px; padding:10px 0; border-bottom:1px solid var(--line); font-size:13.5px; line-height:1.5; }
+  .ks-notes li::before{ content:counter(ks); width:22px; height:22px; border-radius:50%; background:var(--red); color:#fff; font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px; font-weight:700; display:flex; align-items:center; justify-content:center; }
+  .ks-open{ display:inline-block; margin-top:14px; font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+    color:var(--ink); text-decoration:underline; text-underline-offset:3px; }
+  .ks-open:hover{ color:var(--red); }
+  .fig-soon{ display:inline-block; margin-left:10px; font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+    color:var(--muted); border:1px dashed rgba(38,37,31,.35); padding:10px 14px; vertical-align:middle; }
+
+  @media(max-width:900px){
+    .skel-grid.c3, .skel-grid.c4{ grid-template-columns:1fr 1fr; } .skel-grid.c2{ grid-template-columns:1fr; }
+    .pr-grid, .ds, .ks{ grid-template-columns:1fr; }
+    .vs{ grid-template-columns:90px 1fr 1fr; } .vs > div{ padding:10px; font-size:13px; }
+    .cmp-tbl{ display:block; overflow-x:auto; } .ph-head{ flex-direction:column; gap:10px; }
+  }
+
+  /* ---- research method steps ---- */
+  .steps{ display:grid; grid-template-columns:repeat(5,1fr); gap:0; background:var(--paper-2); border:1px solid var(--line); box-shadow:3px 4px 0 rgba(38,37,31,.05); }
+  .steps > div{ padding:16px 16px 18px; }
+  .steps > div + div{ border-left:1px solid var(--line); }
+  .steps .n{ font-family:'IBM Plex Mono',monospace; font-size:22px; font-weight:700; color:var(--red); line-height:1; }
+  .steps b{ display:block; font-family:'IBM Plex Mono',monospace; font-size:12.5px; margin:10px 0 6px; line-height:1.35; }
+  .steps p{ font-size:12.5px; line-height:1.5; color:var(--muted); margin:0; }
+  .limits{ margin-top:18px; font-size:13px; line-height:1.55; color:var(--muted); border-left:3px solid var(--muted); padding:4px 0 4px 12px; max-width:760px; }
+  .limits b{ color:var(--ink); }
+
+  /* ---- public perspectives table ---- */
+  .persp{ width:100%; border-collapse:collapse; background:var(--paper-2); border:1px solid var(--line); box-shadow:3px 4px 0 rgba(38,37,31,.05); }
+  .persp th{ text-align:left; font-family:'IBM Plex Mono',monospace; font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); padding:10px 14px; border-bottom:1px solid var(--line); }
+  .persp td{ padding:12px 14px; border-bottom:1px solid var(--line); vertical-align:top; font-size:13px; line-height:1.5; }
+  .persp tr:last-child td{ border-bottom:none; }
+  .persp td:first-child{ font-weight:600; width:150px; }
+  .persp td.q{ font-family:'IBM Plex Serif',Georgia,serif; font-size:13.5px; }
+  .persp td.s{ font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--muted); width:170px; }
+  .persp td.s a{ color:inherit; }
+
+  /* ---- synthesis: theme cards ---- */
+  .themes{ display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+  .theme{ background:var(--paper-2); border:1px solid var(--line); box-shadow:3px 4px 0 rgba(38,37,31,.06); padding:20px 22px; display:flex; flex-direction:column; }
+  .theme .n{ font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:700; color:var(--red); }
+  .theme h3{ font-size:17px; line-height:1.3; margin:6px 0 12px; }
+  .theme .cnt{ font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--muted); display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+  .theme .cnt .bar{ flex:1; height:5px; background:var(--paper-3); position:relative; }
+  .theme .cnt .bar i{ position:absolute; left:0; top:0; bottom:0; background:var(--ink); }
+  .theme blockquote{ margin:0 0 10px; font-family:'IBM Plex Serif',Georgia,serif; font-size:14.5px; line-height:1.55; border-left:3px solid var(--yellow-ink); padding-left:12px; }
+  .theme .who{ font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--muted); margin-bottom:12px; }
+  .theme .who a{ color:inherit; }
+  .theme > p{ font-size:13px; line-height:1.55; color:var(--muted); margin:auto 0 0; padding-top:10px; border-top:1px solid var(--line); }
+
+  /* ---- implications ---- */
+  .shift{ display:grid; grid-template-columns:repeat(3,1fr); background:var(--paper-2); border:1px solid var(--line); box-shadow:3px 4px 0 rgba(38,37,31,.06); margin-bottom:22px; }
+  .shift > div{ padding:16px 18px; }
+  .shift > div + div{ border-left:1px solid var(--line); }
+  .shift b{ display:block; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-bottom:6px; }
+  .shift > div:last-child{ background:#FFFBEA; } .shift > div:last-child b{ color:var(--yellow-ink); }
+  .shift p{ margin:0; font-size:14px; line-height:1.55; }
+  .impl{ display:grid; grid-template-columns:repeat(2,1fr); gap:0 28px; }
+  .impl > div{ padding:12px 0; border-bottom:1px solid var(--line); }
+  .impl h4{ margin:0 0 4px; font-family:'IBM Plex Mono',monospace; font-size:13px; display:flex; justify-content:space-between; gap:10px; }
+  .impl h4 span{ font-size:9.5px; letter-spacing:.08em; text-transform:uppercase; font-weight:700; color:var(--red); border:1px solid rgba(176,64,47,.4); padding:2px 6px; white-space:nowrap; }
+  .impl h4 span.in{ color:#2F6B2F; border-color:rgba(47,107,47,.4); }
+  .impl h4 span.w{ color:var(--muted); border-color:var(--line); }
+  .impl p{ margin:0; font-size:13px; line-height:1.55; color:var(--muted); }
+
+  .theme > p a, .impl p a{ color:var(--ink); text-decoration:underline; text-underline-offset:2px; text-decoration-color:rgba(38,37,31,.35); }
+  .theme > p a:hover, .impl p a:hover{ color:var(--red); }
+  /* ---- source log ---- */
+  .srclog{ columns:2; column-gap:32px; font-size:12px; line-height:1.45; }
+  .srclog h4{ font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin:0 0 8px; break-after:avoid; }
+  .srclog ol{ margin:0 0 18px; padding-left:22px; }
+  .srclog li{ margin-bottom:6px; break-inside:avoid; }
+  .srclog a{ color:var(--ink); }
+  .srclog small{ color:var(--muted); font-family:'IBM Plex Mono',monospace; font-size:10px; }
+  @media(max-width:900px){
+    .steps, .themes, .shift, .impl{ grid-template-columns:1fr; }
+    .steps > div + div, .shift > div + div{ border-left:none; border-top:1px solid var(--line); }
+    .persp{ display:block; overflow-x:auto; } .srclog{ columns:1; }
+  }
+
+  /* ---- task flow: two swimlanes, numbered steps, handoff dividers ---- */
+  .flow{ margin-top:10px; }
+  .flow-lane-label{ font-family:'IBM Plex Mono',monospace; font-size:10px; font-weight:700; letter-spacing:.1em;
+    text-transform:uppercase; color:var(--muted); margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+  .flow-lane-label::before{ content:""; width:8px; height:8px; border-radius:50%; background:var(--yellow-ink); flex-shrink:0; }
+  .flow-lane[data-role="hm"] .flow-lane-label::before{ background:var(--red); }
+  .flow-steps{ display:flex; gap:16px; flex-wrap:wrap; }
+  .flow-step{ flex:1 1 220px; background:var(--paper-2); border:1px solid var(--line); padding:16px 18px;
+    box-shadow:3px 4px 0 rgba(38,37,31,.05); }
+  .flow-num{ font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:700; color:var(--muted); display:block; margin-bottom:8px; }
+  .flow-step h3{ font-size:14px; margin-bottom:6px; font-family:'IBM Plex Mono',monospace; }
+  .flow-step p{ font-size:12.5px; line-height:1.55; color:var(--muted); margin:0; }
+  .flow-handoff{ display:flex; align-items:center; gap:16px; margin:22px 0; padding:14px 18px;
+    border-top:1px dashed rgba(38,37,31,.35); border-bottom:1px dashed rgba(38,37,31,.35); background:rgba(38,37,31,.035); }
+  .flow-handoff .stamp{ flex-shrink:0; }
+  .flow-handoff p{ font-size:12.5px; color:var(--muted); margin:0; line-height:1.5; }
+  @media(max-width:700px){ .flow-handoff{ flex-direction:column; align-items:flex-start; gap:8px; } }
+
+  .proto-frame{ width:100%; max-width:560px; aspect-ratio:16/10; border-radius:10px; border:1.5px dashed rgba(38,37,31,.35);
+    background:rgba(38,37,31,.03); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; margin:0 auto; }
+  .proto-frame b{ font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+  .proto-frame p{ font-size:12.5px; color:var(--muted); max-width:340px; text-align:center; line-height:1.5; margin:0; }
+
+  .counter{ position:fixed; top:34px; right:44px; z-index:20; font-family:'IBM Plex Mono',monospace; font-size:12px;
+    letter-spacing:.08em; color:var(--ink); opacity:.55; }
+  .brandmark{ position:fixed; bottom:34px; left:44px; z-index:20; font-family:'Inter',sans-serif; font-weight:700;
+    font-size:14px; color:var(--ink); opacity:.6; }
+  .brandmark em{ color:var(--red); }
+  .progress-line{ position:fixed; top:0; left:0; height:3px; background:var(--red); z-index:30; transition:width .5s cubic-bezier(.22,.8,.3,1); }
+
+  .portfolio-nav{ position:fixed; top:22px; left:50%; transform:translateX(-50%); z-index:40; display:flex;
+    align-items:center; gap:32px; padding:11px 19px 11px 26px; background:rgba(255,255,255,.78); backdrop-filter:blur(20px);
+    border:1px solid var(--line); border-radius:100px; max-width:calc(100vw - 20px);
+    transition:opacity .4s ease, transform .4s ease; }
+  .portfolio-nav .nav-home{ font-weight:800; font-size:13px; letter-spacing:.02em; color:var(--ink); text-decoration:none; }
+  .portfolio-nav .nav-home img{ height:26px; width:auto; display:block; }
+  .portfolio-nav .nav-divider{ width:1px; height:14px; background:var(--line); flex-shrink:0; }
+  .portfolio-nav ul{ list-style:none; display:flex; gap:24px; margin:0; padding:0; flex-shrink:0; }
+  .portfolio-nav ul a{ color:var(--ink); opacity:.75; font-size:11.5px; font-weight:700; letter-spacing:.08em;
+    text-transform:uppercase; text-decoration:none; transition:opacity .2s; }
+  .portfolio-nav ul a:hover{ opacity:1; color:var(--red); }
+  .portfolio-nav .nav-contact{ color:#fff; background:var(--ink); padding:9px 18px; border-radius:100px; font-size:11.5px;
+    font-weight:700; letter-spacing:.08em; text-transform:uppercase; text-decoration:none; flex-shrink:0; }
+  .portfolio-nav.nav-hidden{ opacity:0; transform:translateX(-50%) translateY(-14px); pointer-events:none; }
+  .portfolio-nav.nav-hidden.nav-peek{ opacity:1; transform:translateX(-50%) translateY(0); pointer-events:all; }
+  .nav-hover-zone{ position:fixed; top:0; left:0; right:0; height:90px; z-index:39; }
+  @media(max-width:920px){ .portfolio-nav{ gap:12px; padding:8px 13px 8px 14px; } .portfolio-nav ul{ gap:14px; }
+    .portfolio-nav ul a{ font-size:9px; } .portfolio-nav .nav-contact{ padding:8px 13px; font-size:9px; } }
+  @media(max-width:600px){ .portfolio-nav li.sec{ display:none; } }
+
+  .slide-pager{ position:fixed; bottom:34px; right:44px; z-index:26; display:flex; gap:10px; align-items:center; }
+  .pager-btn{ width:44px; height:44px; border-radius:50%; padding:0; background:rgba(255,255,255,.85);
+    backdrop-filter:blur(20px); border:1px solid var(--line); color:var(--ink); display:flex; align-items:center;
+    justify-content:center; cursor:pointer; font-size:17px; line-height:1; font-family:inherit;
+    transition:background .2s, transform .2s, color .2s, opacity .2s; }
+  .pager-btn:hover:not(:disabled){ background:var(--ink); color:#fff; transform:scale(1.07); }
+  .pager-btn:disabled{ opacity:.28; cursor:default; }
+  .pager-btn svg{ display:block; width:16px; height:16px; flex:none; }
+  @media(max-width:700px){ .pager-btn svg{ width:14px; height:14px; } }
+  @media(max-width:700px){ .slide-pager{ bottom:22px; right:22px; gap:8px; } .pager-btn{ width:38px; height:38px; font-size:15px; } }
+
+  .chapters{ position:fixed; left:var(--rail-x,40px); top:50%; transform:translateY(-50%); z-index:22; display:none;
+    flex-direction:column; opacity:0; visibility:hidden; transition:opacity .45s ease, visibility 0s linear .45s; }
+  .chapters.on{ opacity:1; visibility:visible; transition:opacity .45s ease, visibility 0s linear 0s; }
+  .chapters a{ position:relative; display:block; padding:7px 0 7px 13px; border-left:1px solid var(--line);
+    font-family:'IBM Plex Mono',monospace; font-size:8px; font-weight:600; letter-spacing:.07em; text-transform:uppercase;
+    text-decoration:none; white-space:nowrap; color:var(--ink); opacity:.55; transition:opacity .25s,color .25s; }
+  .chapters a.active{ opacity:1; font-weight:800; color:var(--red); border-left-color:var(--red);
+    box-shadow:inset 2px 0 0 var(--red); }
+  .chapters .ch-head{ padding:0 0 10px 13px; font-size:8px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; opacity:.55; }
+  .chapters .ch-head small{ display:block; margin-top:3px; font-size:7.5px; font-weight:600; text-transform:none; opacity:.85; }
+  .chapters a[data-slide]{ display:grid; grid-template-columns:auto auto; column-gap:7px; align-items:baseline; }
+  .chapters .ch-count{ font-size:7px; font-weight:600; opacity:.6; font-variant-numeric:tabular-nums; }
+  .chapters .ch-ticks{ grid-column:1/-1; display:flex; gap:3px; margin-top:5px; }
+  .chapters .ch-ticks i{ display:block; width:9px; height:3px; border-radius:2px; background:currentColor; opacity:.25; cursor:pointer; transition:opacity .2s, transform .2s; }
+  .chapters .ch-ticks i.past{ opacity:.55; } .chapters .ch-ticks i.now{ opacity:1; transform:scaleY(1.7); }
+  .chapters .ch-next{ margin-top:14px; padding-top:9px; padding-bottom:9px; color:var(--red); opacity:.75; }
+  .chapters .ch-next b{ display:block; font-weight:800; margin-top:3px; }
+  @media(min-width:1240px) and (min-height:620px){ .chapters{ display:flex; } }
+
+  .scroll-cue{ position:fixed; left:50%; bottom:clamp(16px,3.2vh,32px); transform:translateX(-50%); display:flex;
+    flex-direction:column; align-items:center; gap:6px; font-family:'IBM Plex Mono',monospace; font-size:10px;
+    font-weight:700; letter-spacing:.15em; text-transform:uppercase; white-space:nowrap; color:var(--red); opacity:.85;
+    z-index:12; pointer-events:none; padding:11px 26px 9px; transition:opacity .45s ease, transform .45s ease; }
+  .scroll-cue.gone{ opacity:0; transform:translateX(-50%) translateY(10px); }
+  .cue-chev{ animation:cue-bob 2.1s ease-in-out infinite; }
+  @keyframes cue-bob{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(5px); } }
+
+  .page-veil{ position:fixed; inset:0; z-index:500; background:var(--paper); opacity:0; pointer-events:none;
+    transition:opacity .55s cubic-bezier(.65,0,.35,1); }
+  .page-veil.veil-in{ opacity:1; pointer-events:all; }
+
+  .cs-end{ display:flex; flex-wrap:wrap; gap:11px; margin-top:44px; }
+  .cs-end a{ display:inline-flex; align-items:center; gap:9px; padding:12px 21px; border-radius:100px; border:1px solid var(--line);
+    color:var(--ink); text-decoration:none; font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:700;
+    letter-spacing:.08em; text-transform:uppercase; line-height:1; transition:background .25s, transform .25s; }
+  .cs-end a:hover{ transform:translateY(-2px); background:rgba(38,37,31,.05); }
+  .cs-end a.next{ background:var(--ink); border-color:var(--ink); color:#fff; }
+
+  @media(max-width:700px){ .slide{ padding:82px 7vw; } .grid-2,.grid-3{ grid-template-columns:1fr; }
+    .counter{ top:22px; right:22px; } .brandmark{ bottom:22px; left:22px; } }
+
+  /* =====================================================================
+     THE DOCKET FILE: one set of paper objects used everywhere, instead of
+     generic white cards. Every slide is a page in a hiring file.
+     ===================================================================== */
+  :root{ --manila:#E6D6A8; --manila-ink:#5E4B17; --card:#FFFDF6; --rule-red:rgba(176,64,47,.5); }
+
+  /* 1. the eyebrow becomes a file-folder tab sitting on the top edge of the page */
+  .eyebrow{ position:relative; display:inline-block; background:var(--manila); color:var(--manila-ink);
+    padding:6px 16px 5px 14px; border-radius:7px 7px 0 0; margin-bottom:22px; font-size:10.5px; }
+  .eyebrow::before{ content:none; }
+  .eyebrow::after{ content:""; position:absolute; left:100%; bottom:0; width:3000px; height:2px; background:var(--manila); }
+  .slide.cover .eyebrow::after{ display:none; }
+
+  /* 2. standalone cards become index cards: cream stock, one red header rule, a slightly uneven set */
+  .pr, .theme, .ev, .user, .ds-box, .persona-full, .a11y{
+    background-color:var(--card) !important; border:1px solid rgba(94,75,23,.16) !important;
+    box-shadow:0 1px 1px rgba(38,37,31,.06), 0 14px 26px -18px rgba(38,37,31,.45) !important; }
+  .pr, .theme, .ev, .user{ background-image:linear-gradient(180deg, transparent 38px, var(--rule-red) 38px, var(--rule-red) 39px, transparent 39px) !important; }
+  .pr-grid > .pr:nth-child(4n+1), .themes > .theme:nth-child(3n+1){ transform:rotate(-.5deg); }
+  .pr-grid > .pr:nth-child(4n+2), .themes > .theme:nth-child(3n+2){ transform:rotate(.4deg); }
+  .pr-grid > .pr:nth-child(4n+3){ transform:rotate(.3deg); }
+  .pr-grid > .pr:nth-child(4n+4), .themes > .theme:nth-child(3n+3){ transform:rotate(-.3deg); }
+
+  /* 3. tables and ruled sheets become typed forms: manila header strip, double rule under it */
+  .persp, .who-tbl, .met-tbl, .cmp-tbl, .steps, .shift, .refl, .stat-sheet, .storyboard, .vs{
+    background-color:var(--card) !important; border:1px solid rgba(94,75,23,.18) !important;
+    box-shadow:0 1px 1px rgba(38,37,31,.06), 0 16px 30px -22px rgba(38,37,31,.5) !important; }
+  .persp th, .met-tbl th, .cmp-tbl th{ background:#F4EACB; border-bottom:3px double rgba(94,75,23,.35) !important; color:var(--manila-ink) !important; }
+
+  /* 4. emphasized words in headlines get a red marker underline, not just a color */
+  h1 em, h2 em{ color:var(--ink); background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 12' preserveAspectRatio='none'%3E%3Cpath d='M2 8 C 40 3, 80 11, 120 6 S 180 4, 198 7' fill='none' stroke='%23B0402F' stroke-width='3.2' stroke-linecap='round'/%3E%3C/svg%3E") left 100%/100% .32em no-repeat;
+    padding-bottom:.1em; }
+
+  /* 5. "So what" labels become a rubber stamp */
+  .takeaway .k{ background:transparent !important; color:var(--red) !important; border:2px double var(--red); transform:rotate(-3deg);
+    padding:4px 8px 3px !important; margin-top:2px; }
+
+  /* keyboard focus: one red ring, matching the stamps, on everything you can tab to */
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible{ outline:2px solid var(--red); outline-offset:3px; border-radius:2px; }
+  /* 7. typesetting: no one-word last lines anywhere */
+  td, th, h3, h4, blockquote, .mnote, small, .who, .where, figcaption, .hd, .us, .role{ text-wrap:pretty; }
+  .src{ text-wrap:balance; }
+  .eyebrow{ align-self:flex-start; }
+  @media(min-width:861px){ .nw{ white-space:nowrap; } }
+  @media(max-width:860px){ td, th, .hd, .us, .role, .mnote, .ds-row div, .t{ text-wrap:balance; } }
+  .mnote.inline{ white-space:nowrap; }
+  @media(max-width:600px){ .takeaway{ grid-template-columns:1fr; gap:12px; } .takeaway .k{ justify-self:start; } }
+  /* competitor table: on phones each tool becomes its own small card instead of a squeezed 4-column table */
+  @media(max-width:860px){
+    .cmp-tbl, .cmp-tbl tbody, .cmp-tbl tr, .cmp-tbl td{ display:block; width:auto; overflow:visible; }
+    .cmp-tbl tr:first-child{ display:none; }
+    .cmp-tbl tr{ border-bottom:1px solid var(--line); padding:6px 0 10px; }
+    .cmp-tbl tr:last-child{ border-bottom:none; }
+    .cmp-tbl td{ border:none; padding:4px 16px; white-space:normal; }
+    .cmp-tbl td:first-child{ font-size:15px; padding-top:10px; }
+    .cmp-tbl td[data-label]::before{ content:attr(data-label); display:block; font-family:'IBM Plex Mono',monospace; font-size:9.5px;
+      font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--manila-ink); margin-bottom:1px; }
+  }
+
+  /* 6. key screenshots get a white print border, like prints clipped into the file */
+  .ks-frame{ box-shadow:0 0 0 6px #fff, 0 0 0 7px rgba(94,75,23,.16), 0 18px 30px -18px rgba(38,37,31,.5); }
+
+  .pad-title em{ background:none; color:var(--red); padding:0; }
+  @media (prefers-reduced-motion: reduce){ .pr, .theme{ transform:none !important; } }
+  @media(max-width:900px){ .pr, .theme{ transform:none !important; } }
+
+  /* ================= motion + hover layer (after Brett's case study feedback) ================= */
+  /* key screens: all three pin to the top so the heading and screen sit in the same spot on each page */
+  .slide-shell.ks-shell{ align-items:flex-start; }
+
+  /* scroll: a slide's pieces arrive one after another instead of all at once */
+  .deck .slide-shell .slide > *{ opacity:0; translate:0 18px;
+    transition:opacity .7s cubic-bezier(.16,.84,.44,1) var(--d,0s), translate .7s cubic-bezier(.16,.84,.44,1) var(--d,0s),
+      transform .25s ease, box-shadow .25s ease, scale .25s ease, background-color .2s ease; }
+  .deck .slide-shell .slide.seen > *{ opacity:1; translate:0 0; }
+  .deck .slide > :nth-child(1){ --d:.05s; } .deck .slide > :nth-child(2){ --d:.14s; } .deck .slide > :nth-child(3){ --d:.23s; }
+  .deck .slide > :nth-child(4){ --d:.32s; } .deck .slide > :nth-child(5){ --d:.41s; } .deck .slide > :nth-child(n+6){ --d:.5s; }
+  /* cards inside a slide follow in order (--i is set by script) */
+  .deck .stag{ transition:opacity .6s cubic-bezier(.16,.84,.44,1) calc(.35s + var(--i,0) * 70ms), translate .6s cubic-bezier(.16,.84,.44,1) calc(.35s + var(--i,0) * 70ms),
+    transform .25s ease, box-shadow .25s ease, background-color .2s ease; }
+  .deck .slide:not(.seen) .stag{ opacity:0; translate:0 14px; }
+
+  /* key screens: note and marker light each other up, and the screen zooms to that spot */
+  .ks-zoom{ position:absolute; inset:0; transform-origin:var(--ox,50%) var(--oy,50%); transition:transform .55s cubic-bezier(.2,.8,.2,1); }
+  .ks-frame.zoomed .ks-zoom{ transform:scale(1.85); }
+  .ks-frame .mk{ cursor:pointer; transition:transform .25s ease, opacity .25s ease, box-shadow .25s ease; }
+  .ks-frame .mk.hot{ transform:scale(1.3); box-shadow:0 0 0 3px #fff, 0 0 0 7px rgba(176,64,47,.35), 0 4px 10px rgba(0,0,0,.25); }
+  .ks-frame.linked.zoomed .mk:not(.hot){ opacity:0; }
+  .ks-frame.zoomed .mk.hot{ opacity:1; transform:scale(.8); }
+  .ks-frame.linked .mk:not(.hot){ opacity:.35; }
+  .ks-notes li{ cursor:default; position:relative; transition:background-color .2s ease, box-shadow .2s ease; }
+  .ks-notes li::before{ transition:transform .2s ease, box-shadow .2s ease; }
+  .ks-notes li.hot{ background:#FFFBEA; box-shadow:-8px 0 0 #FFFBEA, 8px 0 0 #FFFBEA; }
+  .ks-notes li.hot::before{ transform:scale(1.18); box-shadow:0 0 0 4px rgba(176,64,47,.2); }
+  .ks-hint{ display:block; margin:0 0 6px; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
+  .ba p b{ cursor:pointer; transition:transform .2s ease, box-shadow .2s ease; }
+  .ba p b.hot{ transform:scale(1.2); box-shadow:0 0 0 3px rgba(176,64,47,.25); }
+
+  /* before / after: hovering one side pushes the other back */
+  .ba > div{ transition:opacity .3s ease; }
+  .ba:hover > div:not(:hover){ opacity:.5; }
+  .ba .ks-frame{ transition:transform .3s ease, box-shadow .3s ease; }
+  .ba > div:hover .ks-frame{ transform:translateY(-3px); }
+
+  /* cards: hover picks them up */
+  .shift > div{ transition:background-color .2s ease, box-shadow .2s ease; }
+  .shift > div:hover{ background-color:#FFFBEA; box-shadow:inset 0 3px 0 var(--red); }
+  .shift > div.hot{ background-color:#FFFBEA; box-shadow:inset 0 3px 0 var(--red); }
+  .impl > div{ position:relative; }
+  .impl > div::before{ content:""; position:absolute; left:-12px; top:12px; bottom:12px; width:3px; background:var(--red);
+    transform:scaleY(0); transform-origin:top; transition:transform .25s ease; }
+  .impl > div:hover::before{ transform:scaleY(1); }
+  .impl > div:hover h4{ color:var(--red); }
+  .impl h4{ transition:color .2s ease; }
+  @media (hover:hover) and (min-width:901px){ .pr:hover, .theme:hover{ transform:rotate(0deg) translateY(-5px) !important; box-shadow:0 1px 1px rgba(38,37,31,.06), 0 22px 34px -20px rgba(38,37,31,.55) !important; } }
+  .sb-panel{ transition:background-color .2s ease; }
+  .sb-panel:hover{ background:var(--paper-3); }
+  .sb-panel:hover .num{ color:var(--red); }
+  .steps > div{ transition:background-color .2s ease; }
+  .steps > div:hover{ background:#FFFBEA; }
+  .jot{ transition:scale .25s ease, box-shadow .25s ease; }
+  .jot:hover{ scale:1.05; z-index:6; }
+
+  /* tables: the row lights up and so does the column's header (who said it) */
+  .deck table td{ transition:background-color .15s ease; }
+  .deck table tr:hover > td{ background-color:rgba(253,230,138,.28); }
+  .deck table th{ transition:background-color .15s ease, color .15s ease; }
+  .deck table th.col-hot{ background-color:#FDE68A !important; color:var(--ink) !important; }
+
+
+  /* ---- no box sits yellow unless you hover it ---- */
+  .shift > div:last-child{ background:transparent; }
+  .shift > div:last-child b{ color:var(--muted); }
+  .cmp-tbl tr.us td{ background:transparent; font-weight:600; }
+  .cmp-tbl tr.us td:first-child{ box-shadow:inset 3px 0 0 var(--red); }
+  .vs .us{ background:transparent; }
+  .impact{ background:var(--paper-2); }
+  .impact > div{ transition:background-color .2s ease; }
+  .impact > div:hover{ background:#FFFBEA; }
+  .ds-rule{ background:var(--paper-2); transition:background-color .25s ease; }
+  .ds-rule:hover{ background:#FFFBEA; }
+
+  /* ---- one small thing to play with on every page ---- */
+  /* tooltips: dotted words, blacked-out salary, palette swatches */
+  .tip{ position:relative; cursor:help; }
+  .tip::after{ content:attr(data-tip); position:absolute; left:50%; bottom:calc(100% + 10px); translate:-50% 4px; width:max-content; max-width:250px;
+    padding:8px 11px; background:var(--ink); color:#fff; font:500 12.5px/1.45 'IBM Plex Sans',sans-serif; letter-spacing:0; text-transform:none;
+    white-space:normal; text-align:left; opacity:0; pointer-events:none; transition:opacity .18s ease, translate .18s ease; z-index:20;
+    box-shadow:0 10px 20px -10px rgba(0,0,0,.45); }
+  .tip.below::after{ bottom:auto; top:calc(100% + 10px); translate:-50% -4px; }
+  .tip:hover::after, .tip:focus-visible::after{ opacity:1; translate:-50% 0; }
+  .pop{ text-decoration:underline dotted var(--red); text-decoration-thickness:2px; text-underline-offset:.22em; transition:background-color .2s ease; }
+  .pop:hover, .pop:focus-visible{ background:#FFFBEA; }
+  .mock-redact.tip{ transition:background-color .2s ease; }
+  .mock-redact.tip:hover{ background:var(--red); }
+  .mock-screen{ overflow:visible; }
+  .swatch.tip .sw{ transition:transform .2s ease; }
+  .swatch.tip:hover .sw{ transform:translateY(-3px) scale(1.06); }
+  .swatch.tip:last-child::after{ left:auto; right:0; translate:0 4px; }
+  .swatch.tip:last-child:hover::after{ translate:0 0; }
+
+  /* overview: the hypothesis card's verdict stamp, always visible */
+  .pending-card .verdict{ position:absolute; right:22px; top:-16px; background:var(--paper); }
+
+  /* research: bars fill in as the page arrives, and light up on hover */
+  .stat .bar i{ transition:width 1.1s cubic-bezier(.2,.8,.2,1) .45s, background-color .2s ease; }
+  .deck .slide:not(.seen) .stat .bar i{ width:0 !important; }
+  .stat{ transition:background-color .2s ease; }
+  .stat:hover{ background:rgba(255,255,255,.45); }
+  .stat:hover .n{ color:var(--red); } .stat:hover .bar i{ background:var(--red); }
+  .stat .n{ transition:color .2s ease; }
+
+  /* evidence: cards lift, scattered chips straighten out */
+  .ev{ transition:transform .25s ease, box-shadow .25s ease; }
+  .ev:hover{ transform:translateY(-4px); box-shadow:0 18px 30px -20px rgba(38,37,31,.5); }
+  .scatter span{ transition:transform .2s ease, background-color .2s ease; }
+  .scatter span:hover{ transform:rotate(0) scale(1.06); background:#FFFBEA; }
+  .ev-nums div{ transition:background-color .2s ease; }
+  .ev-nums div:hover b{ color:var(--red); }
+
+  /* big idea: the whole row lights up, Docket's answer the most */
+  .vs > div{ transition:background-color .2s ease; }
+  .vs > div.row-hot{ background:rgba(255,255,255,.55); }
+  .vs > div.us.row-hot{ background:#FFFBEA; }
+
+  /* users + personas: photos come into color, cards lift */
+  .persona-photo{ transition:filter .4s ease; }
+  .user:hover .persona-photo, .persona-full:hover .persona-photo{ filter:none; }
+  .user{ transition:transform .25s ease, box-shadow .25s ease; }
+  .user:hover{ transform:translateY(-4px); }
+  .does li{ transition:color .2s ease; }
+  .does li:hover{ color:var(--red); }
+
+  /* task flow: steps lift, handoffs pulse */
+  .flow-step{ transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
+  .flow-step:hover{ transform:translateY(-3px); border-color:var(--ink); box-shadow:0 12px 20px -14px rgba(38,37,31,.5); }
+  .flow-step:hover .flow-num{ color:var(--red); }
+  .flow-handoff .stamp{ transition:rotate .25s ease, scale .25s ease; }
+  .flow-handoff:hover .stamp{ rotate:3deg; scale:1.08; }
+
+  /* design system: rows tint on hover */
+  .ds-row{ transition:background-color .2s ease; }
+  .ds-row:hover{ background:rgba(255,255,255,.55); }
+
+  /* cover, reflection, sources */
+  @media (hover:hover) and (min-width:901px){
+    .clip-shot{ transition:transform .35s ease, box-shadow .35s ease; }
+    .clip-shot:hover{ transform:rotate(0deg) translateY(-6px); }
+  }
+  .pad-list li{ transition:translate .2s ease; }
+  .pad-list li:hover{ translate:4px 0; }
+  .refl > div{ transition:background-color .2s ease; }
+  .refl > div:hover{ background:#FFFBEA; }
+  .srclog li{ transition:translate .2s ease; }
+  .srclog li:hover{ translate:6px 0; }
+  .srclog li:hover a{ color:var(--red); }
+  @media (hover:none){ .ba:hover > div:not(:hover){ opacity:1; } }
+  @media (prefers-reduced-motion: reduce){
+    .deck .slide-shell .slide > *, .deck .slide:not(.seen) .stag{ opacity:1 !important; translate:none !important; transition:none !important; }
+    .ks-frame.zoomed .ks-zoom{ transform:none; } .ks-frame.zoomed .mk{ opacity:1; }
+    .pr:hover, .theme:hover{ transform:none !important; }
+  }
+
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style id="unified-nav-font">
+  @font-face{font-family:'Fraunces';src:url('fonts/fraunces-soft.woff2') format('woff2');font-weight:300 600;font-style:normal;font-display:swap;}
+  @font-face{font-family:'Fraunces';src:url('fonts/fraunces-soft-italic.woff2') format('woff2');font-weight:300 600;font-style:italic;font-display:swap;}
+</style>
+<style id="unified-nav">
+/* same nav as the homepage, but see-through: no bar behind it. The name and links take their
+   colours from the slide underneath (dark on light slides, light on dark ones) and switch to
+   this project's accent on hover. Links show on the cover + last slide, tuck into the name in
+   between, and come back on hover / keyboard focus / going back a slide. Phones get a hamburger. */
+body .portfolio-nav{
+ --t-l:#26251F;--k-l:#6F6C62;--s-l:rgba(38,37,31,.3);--a-l:#B0402F;
+ --t-d:#F3EFE6;--k-d:rgba(243,239,230,.75);--s-d:rgba(243,239,230,.3);--a-d:#E8866F;
+ --pn-panel:#F3EFE6;--pn-font:'IBM Plex Sans',system-ui,sans-serif;
+ --c-text:var(--t-l);--c-link:var(--k-l);--c-sep:var(--s-l);--c-acc:var(--a-l);
+ position:fixed;top:0;left:0;right:0;z-index:40;display:block;transform:none;max-width:none;width:auto;gap:0;
+ padding:28px max(clamp(20px,4vw,56px),calc((100vw - 1280px)/2 + clamp(20px,4vw,56px)));
+ background:none;border:0;border-radius:0;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;opacity:1;pointer-events:auto;transition:none}
+body .portfolio-nav.pn-dark{--c-text:var(--t-d);--c-link:var(--k-d);--c-sep:var(--s-d);--c-acc:var(--a-d)}
+body .portfolio-nav.nav-hidden,body .portfolio-nav.nav-hidden.nav-peek{opacity:1;transform:none;pointer-events:auto}
+body .portfolio-nav .pn-line{position:relative;z-index:1;display:flex;align-items:baseline;flex-wrap:nowrap}
+body .portfolio-nav .nav-home{position:relative;z-index:2;font-family:'Fraunces',Georgia,serif;font-style:italic;font-weight:440;font-size:1.15rem;
+ letter-spacing:.01em;text-transform:none;color:var(--c-text);white-space:nowrap;flex:none;text-decoration:none;
+ font-variation-settings:'SOFT' 100,'opsz' 60;transition:color .35s}
+body .portfolio-nav:hover .nav-home,body .portfolio-nav .nav-home:focus-visible,body .portfolio-nav.pn-open .nav-home{color:var(--c-acc)}
+body .portfolio-nav ul{display:flex;align-items:baseline;gap:0;list-style:none;margin:0;padding:0;flex-shrink:0}
+body .portfolio-nav ul li{display:flex;align-items:baseline;white-space:nowrap;max-width:0;overflow:hidden;
+ opacity:0;transform:translateX(-14px);clip-path:inset(0 100% 0 0);pointer-events:none;
+ transition:opacity .25s ease,transform .35s cubic-bezier(.2,.8,.25,1),clip-path .35s cubic-bezier(.2,.8,.25,1),max-width .4s cubic-bezier(.2,.8,.25,1)}
+body .portfolio-nav ul li::before{content:"|";font-family:'Inter',system-ui,sans-serif;font-size:.8rem;font-weight:300;color:var(--c-sep);margin:0 clamp(9px,1.4vw,16px);transition:color .35s}
+body .portfolio-nav ul a{font-family:var(--pn-font);font-size:.8rem;font-weight:400;letter-spacing:.04em;text-transform:none;color:var(--c-link);opacity:1;
+ padding:0 2px 3px 0;background:linear-gradient(var(--c-acc),var(--c-acc)) 0 100%/0 1px no-repeat;text-decoration:none;box-shadow:none;border-radius:0;transition:color .3s,background-size .3s}
+body .portfolio-nav ul a:hover{color:var(--c-acc);opacity:1;background-size:100% 1px;transform:none;box-shadow:none}
+body .portfolio-nav:not(.nav-hidden) ul li,body .portfolio-nav:hover ul li,body .portfolio-nav:focus-within ul li,body .portfolio-nav.nav-peek ul li{
+ max-width:12em;opacity:1;transform:none;clip-path:inset(-4px -4px -8px 0);pointer-events:auto;
+ transition:opacity .35s ease,transform .45s cubic-bezier(.2,.8,.25,1),clip-path .45s cubic-bezier(.2,.8,.25,1),max-width .45s cubic-bezier(.2,.8,.25,1)}
+body .portfolio-nav:not(.nav-hidden) li:nth-child(1),body .portfolio-nav:hover li:nth-child(1),body .portfolio-nav:focus-within li:nth-child(1),body .portfolio-nav.nav-peek li:nth-child(1){transition-delay:.02s}
+body .portfolio-nav:not(.nav-hidden) li:nth-child(2),body .portfolio-nav:hover li:nth-child(2),body .portfolio-nav:focus-within li:nth-child(2),body .portfolio-nav.nav-peek li:nth-child(2){transition-delay:.10s}
+body .portfolio-nav:not(.nav-hidden) li:nth-child(3),body .portfolio-nav:hover li:nth-child(3),body .portfolio-nav:focus-within li:nth-child(3),body .portfolio-nav.nav-peek li:nth-child(3){transition-delay:.18s}
+body .portfolio-nav:not(.nav-hidden) li:nth-child(4),body .portfolio-nav:hover li:nth-child(4),body .portfolio-nav:focus-within li:nth-child(4),body .portfolio-nav.nav-peek li:nth-child(4){transition-delay:.26s}
+body .portfolio-nav ul li:nth-child(4){transition-delay:0s}
+body .portfolio-nav ul li:nth-child(3){transition-delay:.05s}
+body .portfolio-nav ul li:nth-child(2){transition-delay:.10s}
+body .portfolio-nav ul li:nth-child(1){transition-delay:.15s}
+body .portfolio-nav .pn-menu{display:none}
+/* slide number sits on the same line as the nav, at the right */
+body .counter{top:33px !important;bottom:auto !important;right:max(clamp(20px,4vw,56px),calc((100vw - 1280px)/2 + clamp(20px,4vw,56px))) !important;z-index:41 !important}
+@media(max-width:640px){
+ body .portfolio-nav{padding-top:22px;padding-bottom:22px}
+ body .portfolio-nav .pn-line{position:static;align-items:center}
+ body .portfolio-nav .nav-home{font-size:1.02rem}
+ body .portfolio-nav .pn-menu{display:inline-flex;align-items:center;justify-content:center;position:relative;z-index:2;width:34px;height:34px;margin-left:8px;
+  background:none;border:0;padding:0;cursor:pointer;color:var(--c-text);transition:color .35s;-webkit-tap-highlight-color:transparent}
+ body .portfolio-nav .pn-menu span,body .portfolio-nav .pn-menu span::before,body .portfolio-nav .pn-menu span::after{content:"";display:block;position:absolute;
+  width:18px;height:1.5px;border-radius:2px;background:currentColor;transition:transform .3s cubic-bezier(.2,.8,.25,1),opacity .2s,top .3s cubic-bezier(.2,.8,.25,1)}
+ body .portfolio-nav .pn-menu span{top:50%;left:8px;margin-top:-.75px}
+ body .portfolio-nav .pn-menu span::before{left:0;top:-6px}
+ body .portfolio-nav .pn-menu span::after{left:0;top:6px;width:12px}
+ /* open menu: a solid panel in this project's own colour */
+ body .portfolio-nav.pn-open{--c-text:var(--t-l);--c-link:var(--k-l);--c-sep:var(--s-l);--c-acc:var(--a-l)}
+ body .portfolio-nav::before{content:"";position:absolute;inset:0;z-index:0;background:var(--pn-panel);opacity:0;transition:opacity .25s ease;pointer-events:none}
+ body .portfolio-nav.pn-open::before{opacity:1}
+ body .portfolio-nav.pn-open .pn-menu{color:var(--c-acc)}
+ body .portfolio-nav.pn-open .pn-menu span{background:transparent}
+ body .portfolio-nav.pn-open .pn-menu span::before{top:0;transform:rotate(45deg)}
+ body .portfolio-nav.pn-open .pn-menu span::after{top:0;width:18px;transform:rotate(-45deg)}
+ body .portfolio-nav ul{position:absolute;left:0;right:0;top:100%;z-index:1;flex-direction:column;align-items:stretch;
+  padding:4px clamp(20px,4vw,56px) 18px;background:var(--pn-panel);border-bottom:1px solid var(--c-sep);
+  box-shadow:0 14px 24px -18px rgba(0,0,0,.4);opacity:0;visibility:hidden;transform:translateY(-8px);pointer-events:none;
+  transition:opacity .25s ease,transform .35s cubic-bezier(.2,.8,.25,1),visibility 0s .35s}
+ body .portfolio-nav.pn-open ul{opacity:1;visibility:visible;transform:none;pointer-events:auto;transition:opacity .25s ease,transform .35s cubic-bezier(.2,.8,.25,1),visibility 0s}
+ body .portfolio-nav ul li{max-width:none !important;overflow:visible !important;clip-path:none !important;opacity:1 !important;transform:none !important;
+  pointer-events:auto !important;transition:none !important;width:100%;display:block}
+ body .portfolio-nav ul li::before{display:none}
+ body .portfolio-nav ul li+li{border-top:1px solid var(--c-sep)}
+ body .portfolio-nav ul a{display:block;width:100%;padding:15px 0;font-size:1rem;letter-spacing:.03em;background:none;
+  opacity:0;transform:translateY(-6px);transition:opacity .25s ease,transform .35s cubic-bezier(.2,.8,.25,1),color .25s}
+ body .portfolio-nav ul a:hover{background:none}
+ body .portfolio-nav.pn-open ul a{opacity:1;transform:none}
+ body .portfolio-nav.pn-open li:nth-child(1) a{transition-delay:.04s}
+ body .portfolio-nav.pn-open li:nth-child(2) a{transition-delay:.09s}
+ body .portfolio-nav.pn-open li:nth-child(3) a{transition-delay:.14s}
+ body .portfolio-nav.pn-open li:nth-child(4) a{transition-delay:.19s}
+ body .counter{top:32px !important;right:clamp(20px,4vw,56px) !important}
+}
+@media(max-width:380px){body .portfolio-nav .nav-home{font-size:.95rem}}
+/* corners: name, page count, logo and arrows all sit the same distance from the screen edge, same as the homepage */
+:root{--edge:40px}
+@media(max-width:700px){:root{--edge:20px}}
+body .portfolio-nav{padding-left:var(--edge) !important;padding-right:var(--edge) !important}
+body .counter{right:var(--edge) !important}
+body .brandmark{left:var(--edge) !important}
+body .slide-pager{right:var(--edge) !important}
+
+/* hand-drawn logo in place of the name; drawn with currentColor so every existing color state still applies */
+.logo-mark{display:inline-block;height:var(--logo-h,34px);aspect-ratio:1264/428;background-color:currentColor;vertical-align:middle;
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 1264 428%22%3E%3Cpath fill=%22%23000%22 fill-rule=%22evenodd%22 d=%22M29.5 421.0C26.2 420.5 20.6 418.6 17.1 416.8C8.7 412.5 6.0 407.9 6.0 397.8C6.0 389.2 7.8 385.4 16.1 376.5C38.0 353.2 116.5 305.4 190.0 270.8C215.6 258.7 271.1 233.5 291.5 224.7C326.5 209.5 324.3 210.7 325.6 206.4C328.5 196.8 338.3 167.5 341.9 157.3C344.0 151.1 347.0 142.3 348.3 137.8C349.7 133.2 352.7 124.3 355.0 118.0C357.3 111.7 361.1 100.9 363.5 94.0C365.9 87.1 369.3 77.8 371.0 73.2C373.5 66.3 373.7 64.8 372.5 64.4C371.7 64.1 366.2 64.5 360.3 65.4C333.9 69.5 309.1 75.2 276.0 85.0C250.2 92.6 243.9 94.0 235.1 94.0C226.0 94.0 225.0 93.2 225.0 86.5C225.0 81.3 229.2 77.8 243.6 70.6C284.4 50.5 339.7 36.3 442.0 19.9C514.6 8.2 561.0 4.6 607.0 6.9C645.1 8.8 666.8 13.9 678.4 23.6C684.6 28.8 686.5 33.5 686.5 44.0C686.5 51.4 686.2 53.1 683.8 57.0C678.8 65.4 672.1 70.8 643.3 89.3C637.7 93.0 629.6 97.8 625.3 100.1C621.0 102.4 613.9 106.4 609.5 109.0C574.7 129.5 508.3 161.6 464.0 179.3C448.2 185.6 423.6 195.2 414.0 198.9C402.8 203.1 364.7 219.0 361.3 220.8C360.2 221.4 355.6 227.8 351.1 235.0C341.8 249.7 339.2 252.0 331.7 252.0C324.2 252.0 320.3 249.9 319.0 245.1C318.4 242.8 317.5 241.0 317.0 241.0C316.0 241.0 298.3 248.5 278.0 257.4C272.2 260.0 264.1 263.5 260.1 265.2C249.6 269.6 193.3 298.1 176.5 307.5C135.1 330.6 69.5 376.7 69.5 382.6C69.5 384.4 70.4 384.5 83.3 384.8C106.6 385.3 163.4 377.9 217.0 367.4C267.2 357.7 273.7 356.3 302.5 349.5C328.3 343.5 361.0 335.9 386.0 330.1C392.9 328.5 403.9 326.0 410.5 324.5C417.1 323.0 425.6 321.0 429.5 319.9C433.4 318.9 444.8 316.2 455.0 313.9C484.3 307.4 511.3 301.3 527.0 297.5C535.0 295.6 551.4 292.0 563.5 289.5C575.6 287.0 592.0 283.5 600.0 281.9C635.0 274.5 652.8 270.8 672.0 267.0C683.3 264.8 697.5 261.8 703.5 260.5C718.4 257.2 757.0 249.8 787.5 244.5C795.8 243.0 809.9 240.4 819.0 238.5C828.1 236.6 840.9 234.2 847.5 233.1C854.1 231.9 865.8 229.9 873.5 228.4C886.5 226.0 900.5 223.6 916.0 221.0C945.2 216.1 983.1 209.7 995.5 207.5C1003.8 206.1 1017.2 203.8 1025.5 202.5C1033.8 201.1 1045.7 199.1 1052.0 198.0C1058.3 196.9 1067.5 195.4 1072.5 194.6C1077.5 193.8 1086.9 192.2 1093.5 191.1C1159.6 179.6 1251.6 169.9 1256.5 174.0C1258.3 175.5 1258.5 181.3 1256.7 182.8C1254.2 184.9 1215.6 193.5 1186.0 198.5C1180.8 199.4 1168.8 201.7 1159.5 203.6C1139.3 207.8 1117.7 211.9 1094.5 216.0C1073.7 219.6 1048.7 224.7 1028.0 229.5C1004.8 234.8 990.5 237.9 980.5 239.5C971.1 241.1 969.2 241.5 952.0 245.4C946.2 246.7 938.1 248.6 934.0 249.5C929.9 250.4 923.8 251.7 920.5 252.5C917.2 253.2 897.9 257.0 877.5 260.9C857.1 264.8 837.4 268.6 833.5 269.4C829.6 270.2 822.5 271.6 817.5 272.5C812.5 273.4 807.1 274.6 805.3 275.1C803.6 275.6 799.7 276.5 796.8 277.0C793.9 277.5 783.9 279.5 774.5 281.5C765.1 283.5 750.1 286.6 741.0 288.5C731.9 290.4 719.5 293.1 713.5 294.4C703.6 296.6 687.5 299.9 676.5 302.0C661.6 304.8 639.6 309.7 613.0 316.0C608.3 317.1 598.0 319.4 590.0 321.1C582.0 322.7 571.9 325.0 567.5 326.1C563.1 327.2 556.8 328.8 553.5 329.5C541.5 332.2 523.3 336.1 516.5 337.5C510.4 338.8 477.4 346.4 447.5 353.6C442.0 354.9 430.3 357.5 421.5 359.4C412.7 361.3 399.2 364.4 391.5 366.4C364.7 373.2 360.4 374.2 344.5 377.6C262.4 395.3 235.9 400.2 179.5 408.5C166.3 410.4 151.9 412.7 147.5 413.5C139.5 415.0 129.2 416.4 104.5 419.6C89.5 421.5 39.0 422.4 29.5 421.0ZM385.6 183.6C388.8 182.3 399.4 177.9 409.0 174.0C418.6 170.1 430.4 165.3 435.1 163.5C439.8 161.7 445.1 159.5 446.9 158.5C448.7 157.6 454.3 155.1 459.3 153.0C512.9 130.8 568.7 101.5 609.5 74.4C618.9 68.2 629.2 60.8 632.5 58.0C644.8 47.6 643.9 45.4 626.0 41.0C604.3 35.6 564.1 36.0 513.0 42.1C504.2 43.1 454.8 50.9 431.5 54.9L421.5 56.6L420.8 64.6C420.2 71.6 417.5 81.7 411.1 101.0C410.1 104.0 408.5 108.8 407.7 111.5C406.9 114.2 404.1 121.5 401.5 127.5C398.9 133.6 394.9 143.2 392.5 149.0C390.2 154.8 385.8 165.0 382.6 171.8C379.5 178.6 377.0 184.5 377.0 185.1C377.0 186.6 379.2 186.2 385.6 183.6Z%22/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 1264 428%22%3E%3Cpath fill=%22%23000%22 fill-rule=%22evenodd%22 d=%22M29.5 421.0C26.2 420.5 20.6 418.6 17.1 416.8C8.7 412.5 6.0 407.9 6.0 397.8C6.0 389.2 7.8 385.4 16.1 376.5C38.0 353.2 116.5 305.4 190.0 270.8C215.6 258.7 271.1 233.5 291.5 224.7C326.5 209.5 324.3 210.7 325.6 206.4C328.5 196.8 338.3 167.5 341.9 157.3C344.0 151.1 347.0 142.3 348.3 137.8C349.7 133.2 352.7 124.3 355.0 118.0C357.3 111.7 361.1 100.9 363.5 94.0C365.9 87.1 369.3 77.8 371.0 73.2C373.5 66.3 373.7 64.8 372.5 64.4C371.7 64.1 366.2 64.5 360.3 65.4C333.9 69.5 309.1 75.2 276.0 85.0C250.2 92.6 243.9 94.0 235.1 94.0C226.0 94.0 225.0 93.2 225.0 86.5C225.0 81.3 229.2 77.8 243.6 70.6C284.4 50.5 339.7 36.3 442.0 19.9C514.6 8.2 561.0 4.6 607.0 6.9C645.1 8.8 666.8 13.9 678.4 23.6C684.6 28.8 686.5 33.5 686.5 44.0C686.5 51.4 686.2 53.1 683.8 57.0C678.8 65.4 672.1 70.8 643.3 89.3C637.7 93.0 629.6 97.8 625.3 100.1C621.0 102.4 613.9 106.4 609.5 109.0C574.7 129.5 508.3 161.6 464.0 179.3C448.2 185.6 423.6 195.2 414.0 198.9C402.8 203.1 364.7 219.0 361.3 220.8C360.2 221.4 355.6 227.8 351.1 235.0C341.8 249.7 339.2 252.0 331.7 252.0C324.2 252.0 320.3 249.9 319.0 245.1C318.4 242.8 317.5 241.0 317.0 241.0C316.0 241.0 298.3 248.5 278.0 257.4C272.2 260.0 264.1 263.5 260.1 265.2C249.6 269.6 193.3 298.1 176.5 307.5C135.1 330.6 69.5 376.7 69.5 382.6C69.5 384.4 70.4 384.5 83.3 384.8C106.6 385.3 163.4 377.9 217.0 367.4C267.2 357.7 273.7 356.3 302.5 349.5C328.3 343.5 361.0 335.9 386.0 330.1C392.9 328.5 403.9 326.0 410.5 324.5C417.1 323.0 425.6 321.0 429.5 319.9C433.4 318.9 444.8 316.2 455.0 313.9C484.3 307.4 511.3 301.3 527.0 297.5C535.0 295.6 551.4 292.0 563.5 289.5C575.6 287.0 592.0 283.5 600.0 281.9C635.0 274.5 652.8 270.8 672.0 267.0C683.3 264.8 697.5 261.8 703.5 260.5C718.4 257.2 757.0 249.8 787.5 244.5C795.8 243.0 809.9 240.4 819.0 238.5C828.1 236.6 840.9 234.2 847.5 233.1C854.1 231.9 865.8 229.9 873.5 228.4C886.5 226.0 900.5 223.6 916.0 221.0C945.2 216.1 983.1 209.7 995.5 207.5C1003.8 206.1 1017.2 203.8 1025.5 202.5C1033.8 201.1 1045.7 199.1 1052.0 198.0C1058.3 196.9 1067.5 195.4 1072.5 194.6C1077.5 193.8 1086.9 192.2 1093.5 191.1C1159.6 179.6 1251.6 169.9 1256.5 174.0C1258.3 175.5 1258.5 181.3 1256.7 182.8C1254.2 184.9 1215.6 193.5 1186.0 198.5C1180.8 199.4 1168.8 201.7 1159.5 203.6C1139.3 207.8 1117.7 211.9 1094.5 216.0C1073.7 219.6 1048.7 224.7 1028.0 229.5C1004.8 234.8 990.5 237.9 980.5 239.5C971.1 241.1 969.2 241.5 952.0 245.4C946.2 246.7 938.1 248.6 934.0 249.5C929.9 250.4 923.8 251.7 920.5 252.5C917.2 253.2 897.9 257.0 877.5 260.9C857.1 264.8 837.4 268.6 833.5 269.4C829.6 270.2 822.5 271.6 817.5 272.5C812.5 273.4 807.1 274.6 805.3 275.1C803.6 275.6 799.7 276.5 796.8 277.0C793.9 277.5 783.9 279.5 774.5 281.5C765.1 283.5 750.1 286.6 741.0 288.5C731.9 290.4 719.5 293.1 713.5 294.4C703.6 296.6 687.5 299.9 676.5 302.0C661.6 304.8 639.6 309.7 613.0 316.0C608.3 317.1 598.0 319.4 590.0 321.1C582.0 322.7 571.9 325.0 567.5 326.1C563.1 327.2 556.8 328.8 553.5 329.5C541.5 332.2 523.3 336.1 516.5 337.5C510.4 338.8 477.4 346.4 447.5 353.6C442.0 354.9 430.3 357.5 421.5 359.4C412.7 361.3 399.2 364.4 391.5 366.4C364.7 373.2 360.4 374.2 344.5 377.6C262.4 395.3 235.9 400.2 179.5 408.5C166.3 410.4 151.9 412.7 147.5 413.5C139.5 415.0 129.2 416.4 104.5 419.6C89.5 421.5 39.0 422.4 29.5 421.0ZM385.6 183.6C388.8 182.3 399.4 177.9 409.0 174.0C418.6 170.1 430.4 165.3 435.1 163.5C439.8 161.7 445.1 159.5 446.9 158.5C448.7 157.6 454.3 155.1 459.3 153.0C512.9 130.8 568.7 101.5 609.5 74.4C618.9 68.2 629.2 60.8 632.5 58.0C644.8 47.6 643.9 45.4 626.0 41.0C604.3 35.6 564.1 36.0 513.0 42.1C504.2 43.1 454.8 50.9 431.5 54.9L421.5 56.6L420.8 64.6C420.2 71.6 417.5 81.7 411.1 101.0C410.1 104.0 408.5 108.8 407.7 111.5C406.9 114.2 404.1 121.5 401.5 127.5C398.9 133.6 394.9 143.2 392.5 149.0C390.2 154.8 385.8 165.0 382.6 171.8C379.5 178.6 377.0 184.5 377.0 185.1C377.0 186.6 379.2 186.2 385.6 183.6Z%22/%3E%3C/svg%3E") center/contain no-repeat;}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+@media(max-width:700px){.logo-mark{--logo-h:26px;}}
+
+/* no divider between the logo and Work; logo takes the accent color whenever the full nav is showing */
+body .portfolio-nav ul li:first-child::before{content:none}
+@media(min-width:641px){body .portfolio-nav ul li:first-child{margin-left:22px}}
+body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav-home,body .portfolio-nav:focus-within .nav-home{color:var(--c-acc)}
+</style>
+</head>
+<body>
+<div class="page-veil veil-in" id="pageVeil" aria-hidden="true"></div>
+<div class="nav-hover-zone" aria-hidden="true"></div>
+
+<nav class="portfolio-nav" aria-label="Portfolio navigation">
+    <div class="pn-line">
+      <a class="nav-home" href="index.html" aria-label="Alisa Utesheva, home"><span class="logo-mark" aria-hidden="true"></span><span class="sr-only">Alisa Utesheva</span></a>
+      <button class="pn-menu" type="button" aria-label="Menu" aria-expanded="false" aria-controls="pn-links"><span></span></button>
+      <ul id="pn-links">
+        <li><a href="index.html#work">Work</a></li>
+        <li><a href="index.html#about">About</a></li>
+        <li><a href="img/AlisaUteshevaResume.pdf" target="_blank" rel="noopener">Resume</a></li>
+        <li><a href="index.html#contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+<nav class="chapters" aria-label="Case study sections">
+  <a href="#" data-slide="1">Overview</a>
+  <a href="#" data-slide="3">Research</a>
+  <a href="#" data-slide="10">Concept</a>
+  <a href="#" data-slide="13">Users</a>
+  <a href="#" data-slide="16">Task Flow</a>
+  <a href="#" data-slide="17">Design</a>
+  <a href="#" data-slide="22">Prototype</a>
+  <a href="#" data-slide="23">Iteration</a>
+  <a href="#" data-slide="28">Wrap Up</a>
+  <a class="ch-next" href="reboot.html"><span>Next</span><b>Reboot &rarr;</b></a>
+</nav>
+
+<div class="progress-line" id="progressLine"></div>
+<div class="counter" id="counter">01 / 28</div>
+<div class="brandmark">docket<em>.</em></div>
+<div class="slide-pager" aria-label="Step through case study">
+  <button type="button" class="pager-btn" id="pagerPrev" aria-label="Previous slide" disabled><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 8H3"/><path d="M7.5 3.5 3 8l4.5 4.5"/></svg></button>
+  <button type="button" class="pager-btn" id="pagerNext" aria-label="Next slide"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h10"/><path d="M8.5 3.5 13 8l-4.5 4.5"/></svg></button>
+</div>
+
+<div class="deck" id="deck">
+
+  <!-- 0. COVER -->
+  <div class="slide-shell"><section class="slide cover" data-title="Cover">
+    <div class="cover-grid">
+      <div class="pad">
+        <div class="pad-top"><i></i><i></i></div>
+        <div class="pad-body">
+          <div class="pad-head"><span class="tag">Concept &middot; In Testing</span><span class="pad-date">Hiring &middot; B2B SaaS</span></div>
+          <h1 class="pad-title">docket<em>.</em></h1>
+          <p class="pad-desc">Hiring stalls when interview feedback runs late and nobody can see who is holding it up.
+            Docket shows hiring managers what is waiting on them and for how long, so they can decide and move on.</p>
+          <ul class="pad-list">
+            <li class="done"><svg class="ck" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 13.2c2.1 1.4 3.6 3.2 4.9 5.6C11 12 15.2 7 20.8 4.2"/></svg>Research</li>
+            <li class="done"><svg class="ck" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 13.2c2.1 1.4 3.6 3.2 4.9 5.6C11 12 15.2 7 20.8 4.2"/></svg>Clickable prototype</li>
+            <li class="done"><svg class="ck" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 13.2c2.1 1.4 3.6 3.2 4.9 5.6C11 12 15.2 7 20.8 4.2"/></svg>3 rounds of usability testing</li>
+            <li><svg class="ck" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5.4 19 4.8 18.6 19.2 4.6 19.6Z" style="stroke-width:1.6;opacity:.55"/></svg>Rebuild the screens in Figma</li>
+          </ul>
+          <div class="pad-meta"><span><b>Role</b> Product Designer &middot; UX/UI</span><span><b>Platform</b> Web, desktop-first</span></div>
+        </div>
+      </div>
+      <figure class="clip-shot">
+        <svg class="clip" viewBox="0 0 40 96" aria-hidden="true"><path d="M26 30V14a8 8 0 0 0-16 0v58a12 12 0 0 0 24 0V22"/></svg>
+        <img src="img/docket_hero_list.png" alt="The Docket candidate list, showing who each candidate is waiting on and for how long">
+        <figcaption class="scrawl"><svg viewBox="0 0 58 52" aria-hidden="true"><path d="M54 44C36 46 16 38 10 8"/><path d="M3 16 10 7l8 8"/></svg>who is waiting on whom,<br>and for how long</figcaption>
+      </figure>
+    </div>
+  </section>
+    <div class="scroll-cue" id="scrollCue" aria-hidden="true">
+      <span>Scroll to continue</span>
+      <svg class="cue-chev" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.5v10"/><path d="M3.6 8.4 8 12.8l4.4-4.4"/></svg>
+    </div>
+  </div>
+
+  <!-- 1. WHY I BUILT THIS -->
+  <div class="slide-shell alt"><section class="slide" data-title="Why I Built This">
+    <div class="eyebrow">Why I Built This</div>
+    <h2 style="font-size:30px; margin-bottom:22px;">I designed for my own interviewer.</h2>
+    <p class="lead" style="max-width:680px; font-size:15px;">As a UX designer, putting myself in someone else's shoes is something I will be doing for my whole
+      career, since it is how you build products that actually work for people. Right now I am in the middle of applying to jobs,
+      so I figured I would start practicing by designing for the people on the other side of that process: the hiring managers
+      deciding whether to bring me on. I wanted to understand what makes their job difficult, what they have to keep track of,
+      and where the process could be better.</p>
+  </section></div>
+
+  <!-- 2. OVERVIEW -->
+  <div class="slide-shell"><section class="slide" data-title="Overview">
+    <div class="eyebrow">The Problem &middot; Working Hypothesis</div>
+    <h2 style="font-size:clamp(22px,4.2vw,36px); max-width:700px;">Recruiters and hiring managers often work from <em>different information</em>.</h2>
+    <p class="lead" style="margin-top:20px; font-size:15px;">
+      When a recruiter finishes a phone screen, their notes do not automatically reach the hiring manager.
+      When the hiring manager makes a decision, the recruiter usually hears about it through Slack, email or a
+      quick call. My guess going in was that details get lost along the way.
+    </p>
+    <div class="pending-card" style="margin-top:30px; max-width:640px; position:relative;">
+      <span class="stamp verdict">Half right</span>
+      <b>Hypothesis, not a finding</b>
+      <p>The research on the next pages tests this. Part of it holds up. The biggest change: the problem looks
+      less like lost information and more like slow feedback.</p>
+    </div>
+  </section></div>
+
+  <!-- 3. METHOD -->
+  <div class="slide-shell alt"><section class="slide" data-title="Research: Method">
+    <div class="eyebrow">Research &middot; How I Did It</div>
+    <h2 style="font-size:clamp(26px,3.2vw,34px); margin-bottom:12px;">How I researched this.</h2>
+    <p class="lead" style="margin-bottom:24px;">I did not have direct access to hiring managers, so I worked from published research and from what
+      recruiters, interviewers and candidates have already shared publicly. I did not interview anyone, and every
+      quote in this case study links to where I found it.</p>
+    <div class="hyp" style="margin-bottom:22px;">
+      <span class="stamp">Tested on the next pages</span>
+      <div class="lbl">Starting hypothesis</div>
+      <p>The handoff between recruiters and hiring managers causes delays, scattered information, or uneven
+      evaluation of candidates.</p>
+    </div>
+    <div class="steps">
+      <div><span class="n">01</span><b>Secondary research</b><p>Published surveys and studies on recruiters and hiring managers.</p></div>
+      <div><span class="n">02</span><b>Public firsthand accounts</b><p>15 posts, reviews and quotes from people in these roles.</p></div>
+      <div><span class="n">03</span><b>Competitive research</b><p>Greenhouse, Lever, Ashby and Phenom.</p></div>
+      <div><span class="n">04</span><b>Synthesis</b><p>Tagging every account by theme and counting.</p></div>
+      <div><span class="n">05</span><b>Design implications</b><p>What the patterns mean for Docket.</p></div>
+    </div>
+    <div class="limits"><b>Limits:</b> most of the posts come from people at big tech companies, and most software reviews
+      are written by recruiters rather than hiring managers. The findings lean that way.</div>
+  </section></div>
+
+  <!-- 4. RESEARCH -->
+  <div class="slide-shell"><section class="slide" data-title="Research">
+    <div class="rs-head">
+      <div>
+        <div class="eyebrow">01 &middot; Secondary Research</div>
+        <h2 style="font-size:clamp(28px,3.6vw,38px); max-width:720px;">The delay is <em>documented</em>. The cause is not.</h2>
+        <p class="lead" style="margin-top:14px;">I started with published data on how recruiters and hiring managers work together. One survey of
+          more than 250 recruiters found:</p>
+      </div>
+      <span class="stamp">Secondary data</span>
+    </div>
+
+    <div class="stat-sheet">
+      <div class="stat key"><svg class="mcircle" viewBox="0 0 140 80" aria-hidden="true"><path d="M14 44C8 18 96 4 126 26c18 14 2 42-50 46C30 76 6 62 12 40 16 26 44 12 78 10"/></svg><div class="n">67<small>%</small></div><div class="bar"><i style="width:67%"></i></div>
+        <p>say hiring managers take <b>2+ working days</b> to give feedback on a resume</p><span class="mnote block">and that is just the resume</span></div>
+      <div class="stat key"><div class="n">59<small>%</small></div><div class="bar"><i style="width:59%"></i></div>
+        <p>say it takes <b>2+ working days</b> to debrief after an interview</p></div>
+      <div class="stat"><div class="n">46<small>%</small></div><div class="bar"><i style="width:46%"></i></div>
+        <p>struggle to get hiring managers to separate <b>must-have</b> skills from nice-to-have ones</p></div>
+      <div class="stat"><div class="n">45<small>%</small></div><div class="bar"><i style="width:45%"></i></div>
+        <p>rely only on <b>basic email and messaging</b> to communicate with hiring managers</p></div>
+    </div>
+    <div class="src">Source: <a href="https://www.phenom.com/blog/hiring-manager-report-key-takeaways" target="_blank" rel="noopener">Phenom &amp; Talent Board, 2021 Recruiter &amp; Manager Report</a>. The survey only asked recruiters, so this is their side of the story.</div>
+
+    <div class="takeaway">
+      <span class="k">So what</span>
+      <p>I started out assuming information gets <em>lost</em> in the handoff. This data does not say that.
+      It says hiring managers are <b>slow</b> to respond. Those two problems need different solutions, so finding
+      out which one is true became the main question for the rest of my research.</p>
+    </div>
+    <aside class="jot l" style="bottom:54px; right:18px;"><b>Main question</b>Slow or lost? They need different fixes. The next pages try to answer it.</aside>
+  </section></div>
+
+  <!-- 5. RESEARCH: EVIDENCE -->
+  <div class="slide-shell alt"><section class="slide" data-title="Research: Evidence">
+    <div class="eyebrow">01 &middot; Secondary Research</div>
+    <h2 style="font-size:clamp(26px,3.2vw,34px); margin-bottom:26px; max-width:760px;">Two findings that shaped the design.</h2>
+
+    <div class="ev-grid">
+      <div class="ev">
+        <div class="who">Greenhouse research &middot; hiring software</div>
+        <h3>Reading other people's feedback first changes your own.</h3>
+        <p>Greenhouse calls this "scorecard peeking." Interviewers who read a colleague's rating before
+          submitting their own tend to agree with it, so honest disagreement is less likely to come up later.</p>
+        <div class="ev-nums">
+          <div><b>10M+</b><span>panel interviews analyzed</span></div>
+          <div><b>3.6%</b><span>more likely to give the exact same rating after peeking</span></div>
+          <div><b>85%</b><span>of their customers use a setting that prevents it</span><span class="mnote block">so it is normal now</span></div>
+        </div>
+        <div class="src">Source: <a href="https://www.greenhouse.com/guidance/how-scorecard-peeking-can-create-bias-in-hiring" target="_blank" rel="noopener">Greenhouse, How scorecard peeking can create bias in hiring</a></div>
+      </div>
+      <div class="ev">
+        <div class="who">Metaview research &middot; interview software</div>
+        <h3>Candidate information is spread across too many places.</h3>
+        <p>Metaview lists this as one of the main problems between recruiters and hiring managers. When
+          details live in different places, the two of them end up with different pictures of the same
+          candidate. The places it names:</p>
+        <div class="scatter"><span>Slack threads</span><span>hallway conversations</span><span>individual screens</span></div>
+        <div class="src">Source: <a href="https://www.metaview.ai/resources/blog/recruiter-hiring-manager-relationship" target="_blank" rel="noopener">Metaview, Recruiter and hiring manager alignment</a></div>
+      </div>
+    </div>
+
+    <div class="means">
+      <div><h4 class="keep">&#10003; Keep in Docket</h4>
+        <p>Interviewers submit their ratings before they can see anyone else's. Greenhouse already does
+        this by default, so it is a tested practice and not my own invention.</p></div>
+      <div><h4 class="test">? Still has to be tested</h4>
+        <p>Whether hiring managers are really missing information, or whether they have it and do not
+        get to it in time.</p></div>
+    </div>
+  </section></div>
+
+  <!-- 6. PERSP -->
+  <div class="slide-shell"><section class="slide" data-title="Research: Public Accounts">
+    <div class="eyebrow">02 &middot; Public Firsthand Accounts</div>
+    <h2 style="font-size:clamp(26px,3.2vw,34px); margin-bottom:12px;">What people in these roles say online.</h2>
+    <p class="lead" style="margin-bottom:22px;">One example from each group. None of these are my interviews. They come from forums,
+      articles and software reviews, and each links to the original.</p>
+    <table class="persp">
+      <tr><th>Who</th><th>What it tells us</th><th>In their words</th><th>Source</th></tr>
+      <tr><td>Recruiting leader</td><td>Good candidates can stall once they reach the hiring manager.</td>
+        <td class="q">"We've all experienced when a great candidate is sourced and sent to the hiring manager only to fall into a black hole where they never hear feedback."</td>
+        <td class="s"><a href="https://www.shrm.org/topics-tools/news/talent-acquisition/recruiting-101-5-tips-better-communication-hiring-managers" target="_blank" rel="noopener">Andre Boulais, talent acquisition executive at Entelo, quoted by SHRM, 2022</a></td></tr>
+      <tr><td>Recruiter and hiring manager</td><td>Hiring managers' schedules slow things down.</td>
+        <td class="q">"Sometimes the hiring manager gets pulled into a last-minute meeting."</td>
+        <td class="s"><a href="https://www.themuse.com/advice/4-incredibly-annoying-recruiter-habits-explained-by-a-real-recruiter" target="_blank" rel="noopener">Richard Moy, recruiter and hiring manager, The Muse</a></td></tr>
+      <tr><td>Interviewers</td><td>Feedback competes with their real work.</td>
+        <td class="q">"Google required interviewers to provide very detailed feedback on the tool and sometimes I don't have time to give it the same day."</td>
+        <td class="s"><a href="https://www.teamblind.com/post/why-is-google-interview-feedback-so-slow-z4xdxcug" target="_blank" rel="noopener">Former Google interviewer, Blind</a></td></tr>
+      <tr><td>Candidates</td><td>The wait is visible from the outside.</td>
+        <td class="q">"Sent a thank you note earlier this week and the recruiter said that feedback wasn't submitted yet, but interviewers have 3-5 days to submit feedback."</td>
+        <td class="s"><a href="https://www.teamblind.com/post/had-google-onsite-last-friday-feedback-still-isnt-submitted-nouczr8q" target="_blank" rel="noopener">Candidate, Blind</a></td></tr>
+      <tr><td>Software reviewers</td><td>Today's tools mostly work for hiring managers.</td>
+        <td class="q">"Best thing, it is easy for hiring managers to navigate."</td>
+        <td class="s"><a href="https://www.capterra.com/p/133100/Greenhouse/reviews/" target="_blank" rel="noopener">Joanna K., Recruiting Manager, Greenhouse review on Capterra</a></td></tr>
+    </table>
+  </section></div>
+
+  <!-- 7. COMPETITORS -->
+  <div class="slide-shell alt"><section class="slide" data-title="Competitors">
+    <div class="eyebrow">03 &middot; Competitive Research</div>
+    <h2 style="font-size:clamp(26px,3.2vw,34px); margin-bottom:10px;">What is already out there.</h2>
+    <p class="lead" style="margin-bottom:24px;">Checked against each tool's own help pages and product updates. Where I could not
+      confirm something, the table says so.</p>
+    <table class="cmp-tbl">
+      <tr><th>Tool</th><th>What it is</th><th>Hides others' feedback until you submit yours</th><th>Built for hiring managers</th></tr>
+      <tr><td>Greenhouse</td><td class="nw" data-label="What it is">Hiring software (ATS)</td><td data-label="Hides others' feedback until you submit yours">Yes, on by default</td><td data-label="Built for hiring managers">No separate app. Hiring managers get an "Applications to Review" panel on the main dashboard.</td></tr>
+      <tr><td>Lever</td><td class="nw" data-label="What it is">Hiring software (ATS)</td><td data-label="Hides others' feedback until you submit yours">Yes, as a team setting</td><td data-label="Built for hiring managers">No separate app found</td></tr>
+      <tr><td>Ashby</td><td class="nw" data-label="What it is">Hiring software (ATS)</td><td data-label="Hides others' feedback until you submit yours">Yes, as a setting (added 2021)</td><td data-label="Built for hiring managers">No separate app. Ready-made dashboards for recruiters and hiring managers (2023).</td></tr>
+      <tr><td>Phenom</td><td data-label="What it is">Talent platform</td><td data-label="Hides others' feedback until you submit yours"><span class="tc">not stated</span></td><td data-label="Built for hiring managers">Yes, sold as a separate Hiring Manager app</td></tr>
+      <tr class="us"><td>Docket</td><td data-label="What it is">Concept</td><td data-label="Hides others' feedback until you submit yours">Planned</td><td data-label="Built for hiring managers">Yes, it is the whole product</td></tr>
+    </table>
+    <div class="src">Sources: <a href="https://www.greenhouse.com/guidance/how-scorecard-peeking-can-create-bias-in-hiring" target="_blank" rel="noopener">Greenhouse, scorecard peeking</a>, <a href="https://support.greenhouse.io/hc/en-us/articles/360016572311-Hiring-team-role-Hiring-manager" target="_blank" rel="noopener">Greenhouse, hiring manager role</a>, <a href="https://help.lever.co/hc/en-us/articles/204502665-Why-can-t-I-see-a-candidate-s-feedback-" target="_blank" rel="noopener">Lever Help Center</a>, <a href="https://www.ashbyhq.com/product-updates/more-feedback-visibility-options" target="_blank" rel="noopener">Ashby, feedback visibility</a>, <a href="https://www.ashbyhq.com/blog/product/new-feature-default-job-dashboard" target="_blank" rel="noopener">Ashby, job dashboards</a>, <a href="https://www.phenom.com/hiring-manager" target="_blank" rel="noopener">Phenom Hiring Manager</a>.</div>
+    <div class="takeaway" style="margin-top:20px;"><span class="k">What this means</span>
+      <p>Hiding feedback until you have submitted your own is already standard, so it is table stakes for Docket, not a selling point.
+      Phenom already sells an app just for hiring managers, so I am not the first to notice this gap either. Where Docket can
+      differ is speed: making late feedback visible instead of making the screen nicer.</p></div>
+  </section></div>
+
+  <!-- 8. SYNTH -->
+  <div class="slide-shell"><section class="slide" data-title="Research: Synthesis">
+    <div class="eyebrow">04 &middot; Synthesis</div>
+    <h2 style="font-size:clamp(26px,3.2vw,34px); margin-bottom:12px;">Three patterns across 15 accounts.</h2>
+    <p class="lead" style="margin-bottom:24px;">I tagged each post, review and quote by what it was about, then counted. Three accounts
+      did not fit any theme.</p>
+    <div class="themes">
+      <div class="theme"><span class="n">01</span><h3>Feedback is extra work, so it runs late.</h3>
+        <div class="cnt"><span style="position:relative;">7 of 15<svg class="mcircle sm" viewBox="0 0 140 80" preserveAspectRatio="none" aria-hidden="true"><path d="M30 12C70 2 128 10 134 36c6 28-54 40-92 36C12 70 2 50 8 32 12 18 26 12 44 10"/></svg></span><span class="bar"><i style="width:46.7%"></i></span></div>
+        <span class="mnote block" style="margin:-4px 0 10px;">the big one. almost half</span>
+        <blockquote>"Interviewers being late to give feedback is very common especially in big companies."</blockquote>
+        <div class="who"><a href="https://www.teamblind.com/post/delays-while-waiting-for-onsite-feedbackoffer-good-or-bad-sign-cbvxcylu" target="_blank" rel="noopener">Google employee, Blind</a></div>
+        <p>Greenhouse's own guide lists the reasons people give: <a href="https://www.greenhouse.com/guidance/tips-for-improving-interview-scorecard-submission-rate" target="_blank" rel="noopener">"I am busy" and "It is not my job."</a></p></div>
+      <div class="theme"><span class="n">02</span><h3>The tools mostly work.</h3>
+        <div class="cnt"><span>4 of 15</span><span class="bar"><i style="width:26.7%"></i></span></div>
+        <blockquote>"Having a single system made collaboration between recruiters and hiring managers much smoother, w/o constant back-and-forth or status updates."</blockquote>
+        <div class="who"><a href="https://www.capterra.com/p/142452/Lever/reviews?page=2" target="_blank" rel="noopener">Samanta J., Head of Talent Acquisition, Lever review on Capterra</a></div>
+        <p>These reviews are written by recruiters. Hiring managers rarely review hiring software.</p></div>
+      <div class="theme"><span class="n">03</span><h3>Hiring managers read candidates in their inbox.</h3>
+        <div class="cnt"><span>1 of 15</span><span class="bar"><i style="width:6.7%"></i></span></div>
+        <blockquote>"My favorite aspect about Lever is being able to send candidates profiles and notes to one of our hiring managers and it goes straight to their email."</blockquote>
+        <div class="who"><a href="https://www.capterra.com/p/142452/Lever/reviews/" target="_blank" rel="noopener">Payton H., Talent Acquisition Specialist, Lever review on Capterra</a></div>
+        <p>Only one review, but it matches the survey: 45% of recruiters rely only on email and messaging.</p></div>
+    </div>
+  </section></div>
+
+  <!-- 9. IMPL -->
+  <div class="slide-shell alt"><section class="slide" data-title="Research: Implications">
+    <div class="eyebrow">05 &middot; Design Implications</div>
+    <h2 style="font-size:clamp(26px,3.2vw,34px); margin-bottom:22px;">What the research changed.</h2>
+    <div class="shift">
+      <div><b>I thought</b><p>Information gets lost between the recruiter and the hiring manager, so they need a better screen.</p></div>
+      <div><b>I found</b><p>The screens mostly work. Feedback is late because it is extra work, and hiring managers often read candidates in email.</p></div>
+      <div><b>So Docket changes</b><p>Less about a nicer screen, more about making feedback fast and making delays visible.</p></div>
+    </div>
+    <div class="impl">
+      <div><h4>Show who is late <span class="in">In prototype</span></h4><p>Each candidate shows whose feedback is missing and for how long, next to an agreed turnaround. <a href="https://www.shrm.org/topics-tools/news/talent-acquisition/recruiting-101-5-tips-better-communication-hiring-managers" target="_blank" rel="noopener">SHRM</a> suggests hiring managers review resumes within 48 hours.</p></div>
+      <div><h4>Make feedback quick <span class="in">In prototype</span></h4><p>Four ratings and two short notes, meant to take minutes instead of a long write-up.</p></div>
+      <div><h4>Meet hiring managers in their inbox <span class="in">In prototype</span></h4><p>A morning email listing who is waiting on them, with one click into the candidate's record. Shown in the prototype as a preview.</p></div>
+      <div><h4>Rate before you read <span>Planned</span></h4><p>Interviewers submit their own rating before seeing others', based on Greenhouse's research on peeking.</p></div>
+    </div>
+  </section></div>
+
+  <!-- 10. HOW MIGHT WE -->
+  <div class="slide-shell"><section class="slide" data-title="How Might We">
+    <div class="eyebrow">How Might We</div>
+    <h2 style="font-size:clamp(30px,4.4vw,46px); max-width:860px; line-height:1.25;">
+      How might we make feedback and decisions <span class="pop tip" tabindex="0" data-tip="67% of recruiters say hiring managers take 2+ working days to give feedback on a resume.">quick enough</span> that interviewers and hiring managers do not
+      <span class="pop tip" tabindex="0" data-tip="Feedback is extra work, so it gets pushed back. 7 of 15 public accounts said so.">put them off</span>?
+    </h2>
+    <p class="lead" style="margin-top:22px;">My first version was about giving hiring managers more information. After the research, it is about
+      time: feedback is extra work, so it gets pushed back.</p>
+  </section></div>
+
+  <!-- 11. THE BIG IDEA -->
+  <div class="slide-shell alt"><section class="slide" data-title="The Big Idea">
+    <div class="eyebrow">The Big Idea</div>
+    <h2 style="font-size:clamp(28px,3.8vw,40px); max-width:800px; margin-bottom:14px;">One screen for the person who makes the decision.</h2>
+    <p class="lead" style="margin-bottom:26px;">Most hiring software is built for recruiters, who work in it all day. Hiring managers open it a
+      few times a week around their normal work, and the research says they are the slow step. Docket gives them
+      one place to review a candidate and decide in the few minutes they have.</p>
+    <div class="vs">
+      <div class="k"></div><div class="hd">Most hiring tools</div><div class="hd us">Docket</div>
+      <div class="k">Built for</div><div>Recruiters</div><div class="us">Hiring managers</div>
+      <div class="k">Opened</div><div>All day</div><div class="us">A few times a week</div>
+      <div class="k">First screen</div><div>Every open role and stage</div><div class="us">Who is waiting on you <span class="mnote inline">the whole idea</span></div>
+      <div class="k">Job</div><div>Move many candidates along</div><div class="us">Make one decision quickly</div>
+    </div>
+    <div class="means" style="margin-top:20px;">
+      <div><h4 class="test">! What the reviews said</h4><p>Several recruiters say today's tools already work fine for hiring managers. So Docket cannot win on a nicer screen alone. It has to make feedback faster.</p></div>
+      <div><h4 class="keep">&#10003; Why not replace the ATS</h4><p>Companies already pay for hiring software. Docket works alongside it instead of asking anyone to switch.</p></div>
+    </div>
+  </section></div>
+
+  <!-- 12. DESIGN PRINCIPLES -->
+  <div class="slide-shell"><section class="slide" data-title="Design Principles">
+    <div class="eyebrow">Design Principles</div>
+    <h2 style="font-size:30px; margin-bottom:24px;">Four rules behind every screen.</h2>
+    <div class="pr-grid">
+      <div class="pr"><span class="n">01</span><h3>One place to start</h3>
+        <p>Everything begins on the candidate list. Comparing people is something you do from there, not another tab to check.</p>
+        <div class="where">Shows up in: Candidates list, Compare</div></div>
+      <div class="pr"><span class="n">02</span><h3>Ratings come from people</h3>
+        <p>Every score is typed in by an interviewer after the interview. Nothing gets scored automatically from a resume.</p>
+        <div class="where">Shows up in: Interviews tab, Compare chart</div></div>
+      <div class="pr"><span class="n">03</span><h3>Rate before you read</h3>
+        <p>Interviewers submit their own rating before they see anyone else's, so the first opinion does not sway the rest.</p>
+        <div class="where plan">Planned: not in the prototype yet</div></div>
+      <div class="pr"><span class="n">04</span><h3>Start after the interview</h3>
+        <p>Docket does not schedule anything. Booking stays in the tools people already use, and Docket picks up once an interview is done.</p>
+        <div class="where">Shows up in: the "Next step" line</div></div>
+    </div>
+  </section></div>
+
+  <!-- 13. USERS -->
+  <div class="slide-shell alt"><section class="slide" data-title="Users">
+    <div class="eyebrow">Who Uses It</div>
+    <h2 style="font-size:30px; margin-bottom:10px;">Two roles, one hire.</h2>
+    <p class="lead" style="margin-bottom:26px;">If you have applied for a job, you have met both. The recruiter usually contacts you first.
+      The hiring manager is the person you would end up working for.</p>
+    <div class="users">
+      <div class="user primary">
+        <img src="img/docketpersona_1.jpg" alt="Illustrative photo representing the hiring manager persona" class="persona-photo">
+        <span class="tag outline" style="margin-bottom:14px;">Illustrative photo &middot; not a real person</span>
+        <div class="role-k">Primary user</div>
+        <h3>Hiring manager</h3>
+        <p>The person the new hire will report to. Hiring is a small part of their job, fitted in around
+        their normal work. They interview candidates and make the final decision.</p>
+        <span class="eg">e.g. a design manager hiring a designer</span>
+        <div class="does"><b>In Docket they</b><ul><li>review each candidate's record</li><li>compare finalists side by side</li><li>decide the next step</li></ul></div>
+      </div>
+      <div class="user">
+        <img src="img/docketpersona_2.jpg" alt="Illustrative photo representing Sam, the recruiter persona" class="persona-photo">
+        <span class="tag outline" style="margin-bottom:14px;">Illustrative photo &middot; not a real person</span>
+        <div class="role-k">Secondary user</div>
+        <h3>Recruiter</h3>
+        <p>Works in HR or talent acquisition and runs hiring for many roles at once. They find candidates,
+        do the first phone screen, schedule interviews and send offers.</p>
+        <span class="eg">e.g. a talent partner at the same company</span>
+        <div class="does"><b>In Docket they</b><ul><li>add candidates and their documents</li><li>log interview feedback</li><li>keep each status up to date</li></ul></div>
+      </div>
+    </div>
+    <aside class="jot" style="top:40px; right:40px;"><b>Why this order</b>Hiring manager first. They make the final call, and they are the side the data says is slow.</aside>
+  </section></div>
+
+  <!-- 14. PERSONAS -->
+  <div class="slide-shell"><section class="slide" data-title="Personas">
+    <div class="eyebrow">Composite Personas</div>
+    <h2 style="font-size:30px; margin-bottom:8px;">Not real people, built from the research.</h2>
+    <p class="lead" style="margin-bottom:26px;">Every line below is either something the research pages already showed, or a reasonable
+      guess. Photos are AI-generated and illustrative, not photos of anyone real.</p>
+
+    <div class="persona-full primary">
+      <div class="pf-photo">
+        <img src="img/docketpersona_1.jpg" alt="Illustrative photo representing Daniel, the hiring manager persona" class="persona-photo">
+        <span class="tag outline">Illustrative &middot; not a real person</span>
+      </div>
+      <div class="pf-detail">
+        <div class="role-k">Primary user &middot; Composite persona</div>
+        <h3>Daniel, hiring manager</h3>
+        <p class="pf-oneline">Hiring is maybe two hours of Daniel's week, wedged between the meetings that are actually his job.</p>
+        <div class="pf-lists">
+          <div class="does"><b>Goals</b><ul>
+            <li>Make a confident decision without re-reading everything from scratch</li>
+            <li>Give feedback the same day he interviews, not days later</li>
+            <li>See a candidate's whole picture instead of a scattered chain of emails and Slack messages</li>
+          </ul></div>
+          <div class="does"><b>Frustrations</b><ul>
+            <li>Gets pulled into a last-minute meeting right when he meant to review a candidate</li>
+            <li>Feedback feels like homework on top of his real job, so it slips</li>
+            <li>By the time he responds, the recruiter has already followed up twice</li>
+          </ul></div>
+        </div>
+        <blockquote>"Sometimes the hiring manager gets pulled into a last-minute meeting."</blockquote>
+        <div class="who"><a href="https://www.themuse.com/advice/4-incredibly-annoying-recruiter-habits-explained-by-a-real-recruiter" target="_blank" rel="noopener">Richard Moy, recruiter and hiring manager, The Muse</a></div>
+      </div>
+    </div>
+
+    <div class="persona-full">
+      <div class="pf-photo">
+        <img src="img/docketpersona_2.jpg" alt="Illustrative photo representing Sam, the recruiter persona" class="persona-photo">
+        <span class="tag outline">Illustrative &middot; not a real person</span>
+      </div>
+      <div class="pf-detail">
+        <div class="role-k">Secondary user &middot; Composite persona</div>
+        <h3>Sam, recruiter</h3>
+        <p class="pf-oneline">She is running hiring for several roles at once. Docket only has to solve the hiring-manager side
+          of her job, but it cannot get in her way.</p>
+        <div class="pf-lists">
+          <div class="does"><b>Goals</b><ul>
+            <li>Keep every candidate moving without chasing hiring managers for an update</li>
+            <li>Get feedback back fast enough that good candidates do not take another offer</li>
+            <li>Use one system that already works, since most reviews say today's tools are fine for her side</li>
+          </ul></div>
+          <div class="does"><b>Frustrations</b><ul>
+            <li>Good candidates fall into a black hole waiting on the hiring manager</li>
+            <li>Falls back to email because there is no faster way to get a hiring manager's attention</li>
+            <li>Has to follow up more than once for the same candidate</li>
+          </ul></div>
+        </div>
+        <blockquote>"We've all experienced when a great candidate is sourced and sent to the hiring manager only to fall into a black hole where they never hear feedback."</blockquote>
+        <div class="who"><a href="https://www.shrm.org/topics-tools/news/talent-acquisition/recruiting-101-5-tips-better-communication-hiring-managers" target="_blank" rel="noopener">Andre Boulais, talent acquisition executive at Entelo, quoted by SHRM, 2022</a></div>
+      </div>
+    </div>
+  </section></div>
+
+  <!-- 15. STORYBOARD -->
+  <div class="slide-shell"><section class="slide" data-title="Storyboard">
+    <div class="eyebrow">A Week In The Job</div>
+    <h2 style="font-size:30px; margin-bottom:10px;">A hiring manager's week, before and after.</h2>
+    <p class="lead" style="margin-bottom:8px;">A hypothetical week built from the research findings on the pages before this one,
+      not a real person's diary.</p>
+    <div class="storyboard">
+      <div class="sb-panel"><span class="num">Mon</span><p>Three open roles, three separate email threads and a Slack channel. No single place to see who is in the pipeline.</p></div>
+      <div class="sb-panel"><span class="num">Tue</span><p>A recruiter sends over a strong candidate's resume by email. It sits in an inbox next to fifty other unread messages.</p></div>
+      <div class="sb-panel"><span class="num">Wed</span><p>Back-to-back meetings all day. The candidate does not get reviewed, and nothing flags that a day has passed.</p></div>
+      <div class="sb-panel"><span class="num">Thu</span><p>The recruiter follows up on Slack. It is been four days. The candidate is starting to look elsewhere.</p></div>
+      <div class="sb-panel"><span class="num">Fri</span><p>Feedback finally goes out, rushed and vague, because it is now overdue instead of routine.</p></div>
+      <div class="sb-panel highlight"><span class="num">With Docket</span><p>The candidate shows up flagged as waiting, with how long, next to an agreed turnaround. Feedback happens on day two, not day five.</p></div>
+    </div>
+  </section></div>
+
+  <!-- 16. TASK FLOW -->
+  <div class="slide-shell alt"><section class="slide" data-title="Task Flow">
+    <div class="eyebrow">Task Flow &middot; Hypothesized</div>
+    <h2 style="font-size:30px; margin-bottom:8px;">Where I think the handoff happens.</h2>
+    <p class="lead" style="margin-bottom:30px;">This is my best guess at the workflow, based on the research. There are two points where
+      information has to pass from one person to the other, and Docket is meant to handle both without anyone
+      writing a message. Next, this becomes a side-by-side of how it works today and how it would work with
+      Docket.</p>
+
+    <div class="flow">
+      <div class="flow-lane" data-role="recruiter">
+        <div class="flow-lane-label">Recruiter</div>
+        <div class="flow-steps">
+          <div class="flow-step"><span class="flow-num">01</span><h3>Screens the candidate</h3>
+            <p>The first phone call happens outside Docket, the same way it does now.</p></div>
+          <div class="flow-step"><span class="flow-num">02</span><h3>Logs the record</h3>
+            <p>Adds the resume, cover letter and interview ratings to the candidate's record.</p></div>
+          <div class="flow-step"><span class="flow-num">03</span><h3>Marks it Ready for Review</h3>
+            <p>Changes the status so the hiring manager knows it is their turn. No email needed.</p></div>
+        </div>
+      </div>
+
+      <div class="flow-handoff">
+        <span class="stamp">Handoff 01</span>
+        <p>The resume, notes, ratings and status all move together on one record.</p>
+      </div>
+
+      <div class="flow-lane" data-role="hm">
+        <div class="flow-lane-label">Hiring Manager</div>
+        <div class="flow-steps">
+          <div class="flow-step"><span class="flow-num">04</span><h3>Opens the record</h3>
+            <p>Sees the resume, ratings and interview notes on one page.</p></div>
+          <div class="flow-step"><span class="flow-num">05</span><h3>Compares finalists</h3>
+            <p>Puts two or three candidates side by side, rated on the same criteria.</p></div>
+          <div class="flow-step"><span class="flow-num">06</span><h3>Moves the status</h3>
+            <p>Picks the next step, for example Interviewing, Offer Extended or Not Moving Forward.</p></div>
+        </div>
+      </div>
+
+      <div class="flow-handoff">
+        <span class="stamp">Handoff 02</span>
+        <p>The recruiter sees the new status right away, without having to ask.</p>
+      </div>
+
+      <div class="flow-lane" data-role="recruiter">
+        <div class="flow-lane-label">Recruiter</div>
+        <div class="flow-steps">
+          <div class="flow-step"><span class="flow-num">07</span><h3>Follows up with the candidate</h3>
+            <p>Contacts the candidate about next steps as soon as the status changes.</p></div>
+        </div>
+      </div>
+    </div>
+    <aside class="jot l" style="top:124px; right:40px;"><b>On purpose</b>No calendar. Interviews still get booked in the tools people already use. Docket picks up after.</aside>
+  </section></div>
+
+  <!-- 17. DESIGN -->
+  <div class="slide-shell"><section class="slide" data-title="Design">
+    <div class="eyebrow">Design Direction</div>
+    <h2 style="font-size:30px; margin-bottom:8px;">Quiet &amp; Precise.</h2>
+    <p class="lead" style="margin-bottom:28px;">The product should feel like a serious work tool: dense, organized and calm. The case
+      study borrows a few details from paper case files, like a stamp, a blacked-out field and handwritten
+      notes. I only use them where they mean something. The stamp shows a status, and the blacked-out field
+      stands for salary details that only some people should see.</p>
+
+    <div class="mock-deck">
+      <span class="mock-tab">HANDOFF &middot; REQ-2291</span>
+      <span class="stamp mock-stamp">REVIEW NEEDED</span>
+      <div class="mock-screen">
+        <div class="mock-head"><div class="t">Senior Product Designer, Candidates</div><div class="s">req-2291 &middot; updated 2m ago</div></div>
+        <table>
+          <tr><th>Candidate</th><th>Stage</th><th>Comp band</th><th>Recruiter note</th></tr>
+          <tr>
+            <td><div class="name">Maya Chen</div><div class="role">8 yrs &middot; ex-Figma</div></td>
+            <td><span class="mock-badge yellow">Ready for review</span></td>
+            <td><span class="mock-redact tip below" tabindex="0" data-tip="Salary band. Blacked out because only the hiring manager and recruiter should see it."></span></td>
+            <td><span class="mock-note"><span class="mock-dot"></span>1 new</span></td>
+          </tr>
+          <tr>
+            <td><div class="name">Devon Ruiz</div><div class="role">5 yrs &middot; ex-Notion</div></td>
+            <td><span class="mock-badge gray">Scheduling</span></td>
+            <td><span class="mock-redact tip below" tabindex="0" data-tip="Salary band. Blacked out because only the hiring manager and recruiter should see it."></span></td>
+            <td><span class="mock-note" style="color:var(--muted);">&middot;</span></td>
+          </tr>
+          <tr>
+            <td><div class="name">Priya Nair</div><div class="role">10 yrs &middot; ex-Linear</div></td>
+            <td><span class="mock-badge outline">Passed panel</span></td>
+            <td><span class="mock-redact tip" tabindex="0" data-tip="Salary band. Blacked out because only the hiring manager and recruiter should see it."></span></td>
+            <td><span class="mock-note"><span class="mock-dot"></span>2 new</span></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:48px; margin-top:30px; flex-wrap:wrap; align-items:flex-start;">
+      <div>
+        <div class="eyebrow" style="margin-bottom:10px;">Palette</div>
+        <div class="swatch-row">
+          <div class="swatch tip" tabindex="0" data-tip="The background. Warm like a paper case file, not blue like most work software."><div class="sw" style="background:#F3EFE6;"></div><div class="lbl">Paper</div></div>
+          <div class="swatch tip" tabindex="0" data-tip="Text, headings and main buttons."><div class="sw" style="background:#26251F;"></div><div class="lbl">Ink</div></div>
+          <div class="swatch tip" tabindex="0" data-tip="Only one job: it is your turn to act."><div class="sw" style="background:#FDE68A;"></div><div class="lbl">Yellow</div></div>
+          <div class="swatch tip" tabindex="0" data-tip="Late tags, warnings and the notes in this case study."><div class="sw" style="background:#B0402F;"></div><div class="lbl">Stamp red</div></div>
+        </div>
+      </div>
+      <div>
+        <div class="eyebrow" style="margin-bottom:10px;">Type</div>
+        <div style="font-size:22px; font-weight:700; font-family:'IBM Plex Mono',monospace;">IBM Plex Sans, body copy</div>
+        <div class="mono" style="font-size:14px; color:var(--muted); margin-top:6px;">IBM Plex Mono, headings, IDs, timestamps, labels</div>
+      </div>
+    </div>
+    <aside class="jot" style="top:112px; right:40px;"><b>Why not blue?</b>Most work software is blue. Paper colors fit the case-file idea better.</aside>
+  </section></div>
+
+  <!-- 18. DESIGN SYSTEM -->
+  <div class="slide-shell alt"><section class="slide" data-title="Design System">
+    <div class="eyebrow">Design System</div>
+    <h2 style="font-size:30px; margin-bottom:24px;">The pieces the product is built from.</h2>
+    <div class="ds">
+      <div class="ds-box">
+        <div class="sub-h">Status</div>
+        <div class="ds-row"><span class="k">Needs you</span><div><span class="ds-pill aw">Ready for review</span></div></div>
+        <div class="ds-row"><span class="k">In progress</span><div><span class="ds-pill pr1">Scheduling</span><span class="ds-pill pr2">Interviewing</span></div></div>
+        <div class="ds-row"><span class="k">Good news</span><div><span class="ds-pill ok">Passed panel</span><span class="ds-pill of">Offer extended</span></div></div>
+        <div class="ds-row"><span class="k">Hidden</span><div><span class="ds-pill cl">Not moving forward</span><span class="ds-pill cl">Withdrew</span></div></div>
+        <div class="ds-rule">Yellow only ever means "it's your turn." Nothing else in the product uses it.</div>
+      </div>
+      <div class="ds-box">
+        <div class="sub-h">Type</div>
+        <div class="ds-row"><span class="k">Plex Sans</span><div style="font-family:'IBM Plex Sans',sans-serif; font-size:17px; font-weight:600;">Candidates<small>Buttons, labels, tables</small></div></div>
+        <div class="ds-row"><span class="k">Plex Serif</span><div style="font-family:'IBM Plex Serif',Georgia,serif; font-size:16px;">Clear on why she's leaving.<small>Resumes, cover letters, interview notes</small></div></div>
+        <div class="ds-row"><span class="k">Plex Mono</span><div style="font-family:'IBM Plex Mono',monospace; font-size:14px;">CAND-0412 &middot; Sep 22 &middot; 3/4<small>IDs, dates, counts</small></div></div>
+        <div class="sub-h" style="margin-top:16px;">Components</div>
+        <div class="ds-row"><span class="k">Rating</span><div><span class="ds-seg"><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i></i></span> <span class="mono" style="font-size:12px;">4/5</span></div></div>
+        <div class="ds-row"><span class="k">Interviews</span><div><span class="ds-pips"><i class="d"></i><i class="d"></i><i class="s"></i><i></i></span> <span style="font-size:12px; color:var(--muted);">done, done, booked, not booked</span></div></div>
+        <div class="ds-row"><span class="k">Verdict</span><div><span class="ds-rec sy">Strong yes</span><span class="ds-rec y">Yes</span><span class="ds-rec n">No</span></div></div>
+      </div>
+    </div>
+    <div class="a11y">
+      <b>Accessibility</b>
+      <ul>
+        <li>Color never works alone. Every status and the Late tag are words, and interview progress uses shape: filled, dashed, empty.</li>
+        <li>All text in the prototype meets WCAG AA contrast (4.5:1). I checked every screen and darkened the gray to pass.</li>
+        <li>The compare chart has a table view with the same numbers.</li>
+        <li>Each compare checkbox names the person it selects, and motion turns off for people who set their device to reduce it.</li>
+      </ul>
+    </div>
+  </section></div>
+
+  <!-- 19. KEY SCREEN: CANDIDATES -->
+  <div class="slide-shell ks-shell"><section class="slide" data-title="Key Screen: Candidates">
+    <div class="eyebrow">Key Screens &middot; 01 of 03</div>
+    <h2 style="font-size:clamp(26px,3.2vw,34px); margin-bottom:22px;">See who is waiting on you.</h2>
+    <div class="ks">
+      <div class="ks-frame" aria-hidden="true"><iframe src="docket-prototype.html?clean#/" tabindex="-1" loading="lazy" title=""></iframe><span class="mk" style="left:15.2%; top:12.8%;">1</span><span class="mk" style="left:48.8%; top:50.9%;">2</span><span class="mk" style="left:65.4%; top:51.1%;">3</span><span class="mk" style="left:69.5%; top:17.9%;">4</span><span class="mk" style="left:25.1%; top:29.6%;">5</span><span class="mk" style="left:61.7%; top:35.5%;">6</span></div>
+      <div><ol class="ks-notes"><li><span>One real tab. Requisitions and Reports are grayed out to show where it could grow.</span></li><li><span>Yellow means it is ready for your review. No other status uses yellow.</span></li><li><span>Interview progress without opening anything: filled is done, dashed is booked, empty is not booked. The overall score sits next to it.</span></li><li><span>Filters with a count on each, plus a sort. After testing, the list opens with whatever is late or due first.</span></li><li><span>Each row has one checkbox. Check any rows and a bar appears at the bottom to Compare or Archive the selection.</span></li><li><span>Added after the research: whose turn it is and for how long. Past the team's 2-day goal it gets a red Late tag, the same one used in the bar at the top.</span></li></ol><a class="ks-open" href="docket-prototype.html#/" target="_blank" rel="noopener">Open this screen &rarr;</a></div>
+    </div>
+  </section></div>
+
+  <!-- 20. KEY SCREEN: RECORD -->
+  <div class="slide-shell alt ks-shell"><section class="slide" data-title="Key Screen: Record">
+    <div class="eyebrow">Key Screens &middot; 02 of 03</div>
+    <h2 style="font-size:clamp(26px,3.2vw,34px); margin-bottom:22px;">Everything about one person, on one page.</h2>
+    <div class="ks">
+      <div class="ks-frame" aria-hidden="true"><iframe src="docket-prototype.html?clean#/c/CAND-0412" tabindex="-1" loading="lazy" title=""></iframe><span class="mk" style="left:68.4%; top:39.2%;">1</span><span class="mk" style="left:41.3%; top:46.9%;">2</span><span class="mk" style="left:35.5%; top:58.8%;">3</span><span class="mk" style="left:37%; top:61.4%;">4</span><span class="mk" style="left:59.2%; top:66.6%;">5</span><span class="mk" style="left:16.9%; top:29.9%;">6</span></div>
+      <div><ol class="ks-notes"><li><span>A "Your decision" box names the next step on a button. Afterward it says what moved, with Undo, and the recruiter sees it right away.</span></li><li><span>Next step is plain text the recruiter types after booking. Docket does not schedule.</span></li><li><span>Interviews and notes, documents, and activity are tabs inside the candidate.</span></li><li><span>What interviewers said comes first: every pro and concern, with the recommendations. The overall score and full notes sit below.</span></li><li><span>Concerns are in bold, since a tester only found them at the bottom of each interview.</span></li><li><span>Added after the research: who the candidate is waiting on, for how long, and the team goal, in plain words.</span></li></ol><a class="ks-open" href="docket-prototype.html#/c/CAND-0412" target="_blank" rel="noopener">Open this screen &rarr;</a></div>
+    </div>
+  </section></div>
+
+  <!-- 21. KEY SCREEN: COMPARE -->
+  <div class="slide-shell ks-shell"><section class="slide" data-title="Key Screen: Compare">
+    <div class="eyebrow">Key Screens &middot; 03 of 03</div>
+    <h2 style="font-size:clamp(26px,3.2vw,34px); margin-bottom:22px;">Finalists side by side.</h2>
+    <div class="ks">
+      <div class="ks-frame" aria-hidden="true"><iframe src="docket-prototype.html?clean#/compare/CAND-0412,CAND-0398,CAND-0405" tabindex="-1" loading="lazy" title=""></iframe><span class="mk" style="left:58.1%; top:58.3%;">1</span><span class="mk" style="left:18.5%; top:47.7%;">2</span><span class="mk" style="left:27.0%; top:81.2%;">3</span><span class="mk" style="left:58.1%; top:88.5%;">4</span><span class="mk" style="left:17.2%; top:31.4%;">5</span></div>
+      <div><ol class="ks-notes"><li><span>Grouped bars instead of a radar chart. Bar heights are easier to compare.</span></li><li><span>Each person keeps the same color, even if someone is removed from the comparison.</span></li><li><span>The same numbers as a table, for anyone who cannot read the chart.</span></li><li><span>Each person's own words, recommendations and notes side by side, with a button to move them forward right here.</span></li><li><span>Added after testing: one overall score per person, since a tester wanted a single number to compare by.</span></li></ol><a class="ks-open" href="docket-prototype.html#/compare/CAND-0412,CAND-0398,CAND-0405" target="_blank" rel="noopener">Open this screen &rarr;</a></div>
+    </div>
+  </section></div>
+
+  <!-- 22. PROTOTYPE -->
+  <div class="slide-shell alt"><section class="slide" data-title="Prototype">
+    <div class="eyebrow">Prototype</div>
+    <h2 style="font-size:30px; margin-bottom:8px;">Clickable prototype.</h2>
+    <p class="lead" style="margin-bottom:24px;">A working version of the three main screens: the candidate list, a candidate's record
+      and the compare view. The candidates are made up. The reasons behind each decision are on the Key Screens pages.</p>
+    <a class="proto-live" href="docket-prototype.html" target="_blank" rel="noopener" aria-label="Open the clickable Docket prototype">
+      <iframe src="docket-prototype.html?clean" title="Docket prototype preview" tabindex="-1" loading="lazy"></iframe>
+      <span class="open">Open prototype &rarr;</span>
+    </a>
+    <div style="margin-top:14px;"><a class="ks-open" href="docket-prototype.html" target="_blank" rel="noopener">Open the clickable prototype &rarr;</a></div>
+    <div class="proto-meta"><span><b>3</b> screens</span><span><b>9</b> sample candidates</span><span>Interactive HTML version</span><span>Tested with 6 people, 7 sessions</span></div>
+  </section></div>
+
+  <!-- 23. WHAT THE RESEARCH CHANGED -->
+  <div class="slide-shell"><section class="slide" data-title="What the Research Changed">
+    <div class="eyebrow">Iteration &middot; What the Research Changed</div>
+    <h2 style="font-size:clamp(26px,3.2vw,34px); margin-bottom:10px;">Making late feedback visible.</h2>
+    <p class="lead" style="margin-bottom:16px;">I built the first prototype before the research. The research said the problem is slow feedback, and
+      the first version had nothing that showed it. So I added it.</p>
+    <div class="ba">
+      <div><div class="ba-k">Before</div>
+        <div class="ks-frame" aria-hidden="true"><iframe src="docket-prototype.html?clean&amp;before#/" tabindex="-1" loading="lazy" title=""></iframe></div>
+        <p>The status says whose turn it is, but not for how long. A candidate who is been stuck for days looks the same as one who arrived an hour ago.</p></div>
+      <div><div class="ba-k after">After <span class="mnote inline">new: who is late, and for how long</span></div>
+        <div class="ks-frame" aria-hidden="true"><iframe src="docket-prototype.html?clean#/" tabindex="-1" loading="lazy" title=""></iframe><span class="mk" style="left:18%; top:23.2%;">1</span><span class="mk" style="left:61.7%; top:35.5%;">2</span></div>
+        <p><b>1</b> A bar at the top lists anyone past the team's goal. <b>2</b> A new Waiting on column shows whose turn it is and for how long, and turns red when it is late. <a href="docket-prototype.html#/c/CAND-0417" target="_blank" rel="noopener" style="color:var(--ink);">Try it on Hannah Okafor's record &rarr;</a></p></div>
+    </div>
+    <div class="shift" style="margin-top:16px; margin-bottom:0;">
+      <div><b>What the research said</b><p>Feedback runs late because it is extra work (7 of 15 accounts), and SHRM suggests hiring managers review resumes within 48 hours.</p></div>
+      <div data-mk="all"><b>What I changed</b><p>A 2-day team goal, a Waiting on column, a late bar, and a Send reminder button inside the candidate's record.</p></div>
+      <div><b>What testing said</b><p>Mazzy could not tell whose side the hold-up was on. After I reworded it, Leo, Conner and Johnny all got it right away, 5/5 sure. Ash, Mazzy and Leo all said seeing "Late" helps.</p></div>
+    </div>
+  </section></div>
+
+  <!-- 24. USABILITY TESTING -->
+  <div class="slide-shell alt"><section class="slide" data-title="Usability Testing">
+    <div class="ph-head">
+      <div><div class="eyebrow">Usability Testing &middot; 3 rounds so far</div>
+        <h2 style="font-size:30px; margin-bottom:10px;">Three testers, four sessions.</h2>
+        <p class="lead" style="margin-bottom:22px;">I ran each session and wrote down what the tester did and said. Ash tried the second
+          version. I fixed what Ash got stuck on, then Ash and Mazzy tried the third. I fixed that round too, then Leo tried the fourth.
+          Same tasks every time, so the rounds line up. New testers are on the next page.</p></div>
+      <span class="stamp">1 of 2 done</span>
+    </div>
+    <table class="persp test-tbl t3">
+      <colgroup><col style="width:13%"><col style="width:31%"><col style="width:28%"><col style="width:28%"></colgroup>
+      <tr><th>Task</th><th>Round 1 &middot; Ash</th><th>Round 2 &middot; Mazzy</th><th>Round 3 &middot; Leo</th></tr>
+      <tr><td>Find who's waiting on you</td>
+        <td><span class="res mid">R1 &middot; Found it, but confused</span>Read the "Awaiting you" status and the "Waiting on: You" column as the same thing twice, and counted three.
+          <span class="res ok r2">R2 &middot; Found it &middot; 4/5</span>Went by the Waiting on column. Would start with the one that is due today.</td>
+        <td><span class="res ok">Found it</span>Went by the Ready for review status and opened the top one.</td>
+        <td><span class="res ok">Found it</span>Went by the Ready for review status.</td></tr>
+      <tr><td>Remind whoever is holding up Hannah</td>
+        <td><span class="res ok">R1 &middot; Done</span>Used Send reminder.
+          <span class="res ok r2">R2 &middot; Done &middot; 5/5</span>Used Send reminder.</td>
+        <td><span class="res bad">Stuck</span>Could not tell if the hold-up was on the team's side or Hannah's. The page read like a resume with nothing to click, and Send reminder did not say what it would do.</td>
+        <td><span class="res ok">Done &middot; 5/5</span>Clicked Remind Rae. The big yellow button meant click it, and the hold-up was Rae's, not his.</td></tr>
+      <tr><td>Move Maya to the next step</td>
+        <td><span class="res bad">R1 &middot; Stuck &middot; 1/5</span>Did not know what "next step" meant or how to move her.
+          <span class="res ok r2">R2 &middot; Done &middot; 5/5</span>Read the overall score as how she did across every step.</td>
+        <td><span class="res bad">Stuck</span>Saw Not moving forward, but not how to move her ahead. Could not find the interview notes, and was not sure what had changed after acting.</td>
+        <td><span class="res ok">Done &middot; 5/5</span>Read the overall score as how well she did.</td></tr>
+      <tr><td>Compare the finalists and pick one</td>
+        <td><span class="res bad">R1 &middot; Stuck &middot; 1/5</span>Did not know who the finalists were or how to compare them.
+          <span class="res ok r2">R2 &middot; Done</span>Picked Aisha for the best overall score and almost no concerns. Could not find the recommendations.</td>
+        <td><span class="res mid">Done, with a hint</span>Thought the checkboxes would move or delete people, and would have clicked the name. Once shown, liked the graphs a lot. Decided on experience, interviews and status.</td>
+        <td><span class="res bad">Needed a hint</span>Clicked names, not the checkboxes, and only compared once told. Said they were all still interviewing, so picked at random.</td></tr>
+      <tr><td>Act on the morning email</td>
+        <td><span class="res na">R1 &middot; Not in this round</span>
+          <span class="res ok r2">R2 &middot; Done &middot; 4/5</span></td>
+        <td><span class="res ok">Done &middot; 3.5/5</span></td>
+        <td><span class="res ok">Done &middot; 5/5</span>Said it could use some quality of life changes.</td></tr>
+    </table>
+    <div class="heard h3">
+      <div><b>Ash also said</b><ul>
+        <li>Did not know what a "cross-functional panel" is.</li>
+        <li>Liked comparing candidates a lot, and wanted to compare more than three.</li>
+        <li>Wanted one total score, on a 1 to 5 scale, and a way to sort candidates.</li>
+        <li>The comparison should feel like it is about people, not just numbers.</li>
+        <li>"Late" next to a colleague's name would help, not feel awkward. It looked different in the bar at the top and in the table.</li>
+        <li>You can sort by overall score, but the score is not shown anywhere in the list.</li></ul></div>
+      <div><b>Mazzy also said</b><ul>
+        <li>"Late" helped.</li>
+        <li>Did not understand "Overall so far" until I explained it, then liked it. Did not use it to decide.</li>
+        <li>Read each record top to bottom and only found the concerns at the end. Wanted pros and cons near the top, bolder, with details below.</li>
+        <li>Does not want to spend long on each person.</li>
+        <li>The Compare screen has nothing to act on. Wanted a button there to move the chosen person forward.</li>
+        <li>The colors helped.</li>
+        <li>Wanted a way to filter by what is best, like rating or number of interviews.</li></ul></div>
+      <div><b>Leo also said</b><ul>
+        <li>For the process question he picked the candidate who shares his name, and read Leo Brandt's status as passed panel.</li>
+        <li>Big numbers mean better.</li>
+        <li>The long list should be more organized, with filters or candidates grouped together.</li>
+        <li>He was not confused at any point.</li>
+        <li>Seeing "Late" would help him know who is late.</li>
+        <li>He wanted to sort by status, overall score, interviews and waiting on. He found the Sort by menu at the end, but said it is in a confusing spot. Clicking a column title, like Status, should sort by it.</li></ul></div>
+    </div>
+  </section></div>
+
+  <!-- 24b. RETEST -->
+  <div class="slide-shell"><section class="slide" data-title="New Testers">
+    <div class="ph-head">
+      <div><div class="eyebrow">Usability Testing &middot; New testers</div>
+        <h2 style="font-size:30px; margin-bottom:10px;">Same tasks, new people.</h2>
+        <p class="lead" style="margin-bottom:22px;">After fixing what came up, I gave the same tasks to three people who had never seen Docket, to see
+          if the fixes hold up for fresh eyes. All three are done, and what they found is fixed below.</p></div>
+      <span class="stamp">2 of 2 done</span>
+    </div>
+    <table class="persp test-tbl t3">
+      <colgroup><col style="width:19%"><col style="width:27%"><col style="width:27%"><col style="width:27%"></colgroup>
+      <tr><th>Task</th><th>New &middot; Conner</th><th>New &middot; Johnny</th><th>New &middot; Brett</th></tr>
+      <tr><td>Find who's waiting on you</td>
+        <td><span class="res ok">Found it &middot; 5/5</span>Used Waiting on you at the top, and "You" next to each name.</td>
+        <td><span class="res ok">Found it</span>Went by the yellow Ready for review tag. Asked where a candidate was in the process, he opened what the interviewers said and started listing it.</td>
+        <td><span class="res ok">Found it &middot; 5/5</span>"It told me." Read his candidate as ready for an interview.</td></tr>
+      <tr><td>Remind whoever is holding up Hannah</td>
+        <td><span class="res ok">Done &middot; 5/5</span>Clicked Remind Rae.</td>
+        <td><span class="res ok">Done &middot; 5/5</span>Sent the reminder.</td>
+        <td><span class="res ok">Done &middot; 5/5</span>Sent the reminder.</td></tr>
+      <tr><td>Move Maya to the next step</td>
+        <td><span class="res ok">Done &middot; 5/5</span>Read the overall score as how well she did in every step combined.</td>
+        <td><span class="res ok">Done &middot; 5/5</span>Said she meets almost every criterion, weakest on role experience, then collaboration. Guessed the four 1 to 5 ratings add up to 20, which is right.</td>
+        <td><span class="res ok">Done &middot; 5/5</span>Read the overall score as how good a fit the person is.</td></tr>
+      <tr><td>Compare the finalists and pick one</td>
+        <td><span class="res mid">Done &middot; 4/5</span>Picked by best score and no concerns. Did not know he could tick the boxes to compare.</td>
+        <td><span class="res bad">Stuck</span>Could not find how to compare and needed to be told. Picked the top scores with the most years of experience.</td>
+        <td><span class="res mid">Done &middot; 5/5</span>Picked by overall score. Still confused by two Compare buttons, and read the checkboxes as delete.</td></tr>
+      <tr><td>Act on the morning email</td>
+        <td><span class="res ok">Done &middot; 4/5</span></td>
+        <td><span class="res na">Not asked</span></td>
+        <td><span class="res na">Not asked</span></td></tr>
+    </table>
+    <div class="heard h3">
+      <div><b>Conner said</b><ul>
+        <li>He was not confused at any point and did not ask for anything new.</li>
+        <li>He did not know he could tick the boxes to compare. He picked from the list instead.</li></ul></div>
+      <div><b>Johnny said</b><ul>
+        <li>Rated it 4.5 out of 5 overall. Comparing was the confusing part.</li>
+        <li>On the Compare screen, the overall scores were not in any order, not by name and not by score.</li></ul></div>
+      <div><b>Brett said</b><ul>
+        <li>Pretty easy, 5 out of 5. Comparing was the one confusing part.</li>
+        <li>Saw the squares for comparing and thought they were for deleting. Wanted a way to delete candidates.</li>
+        <li>There were two Compare buttons. Combine them into one.</li>
+        <li>Maybe a short tutorial the first time.</li></ul></div>
+    </div>
+    <div class="impl" style="margin-top:18px;">
+      <div><h4>One Compare button <span class="in">Built</span></h4><p>Brett found two Compare buttons confusing. Now there is one. With nobody picked it compares the finalists, and once you pick people it compares them.</p></div>
+      <div><h4>One selection, then Compare or Archive <span class="in">Built</span></h4><p>Compare and Archive used to sit apart, a toggle on each row plus its own button. Now one checkbox selects a row, and a bar at the bottom lets you Compare or Archive whatever is checked. Archive moves people to Hidden instead of deleting them, since hiring records have to be kept, and it comes with Undo.</p></div>
+      <div><h4>Highest score first <span class="in">Built</span></h4><p>Johnny noticed the Compare screen listed people in no order. Everything on it now reads from highest overall score down.</p></div>
+      <div><h4>A first-time tutorial <span class="w">Watching</span></h4><p>Brett suggested one. I would rather fix the screen than explain it, so I am holding off unless the new Compare still gets missed.</p></div>
+      <div><h4>Sort from the column titles <span class="in">Built</span></h4><p>Leo's idea from round 3. Every column title sorts the list now, with an arrow showing which way.</p></div>
+    </div>
+  </section></div>
+
+  <!-- 25. WHAT TESTING CHANGED -->
+  <div class="slide-shell alt"><section class="slide" data-title="What Testing Changed">
+    <div class="eyebrow">Iteration &middot; What Testing Changed</div>
+    <h2 style="font-size:clamp(26px,3.2vw,34px); margin-bottom:10px;">Fixing where Ash got stuck.</h2>
+    <p class="lead" style="margin-bottom:16px;">Every change here came from something Ash did or said. Then Ash came back and Mazzy tried it for the first
+      time, running the same tasks on the new version. It worked for Ash, not for Mazzy.</p>
+    <div class="ba">
+      <div><div class="ba-k">Before &middot; round 1</div>
+        <div class="ks-frame" aria-hidden="true"><img src="img/docket_test_before_record.png" alt=""></div>
+        <p>To move Maya forward you had to open a status dropdown and pick the right option. Ash did not know what to do.</p></div>
+      <div><div class="ba-k after">After &middot; round 2</div>
+        <div class="ks-frame" aria-hidden="true"><iframe src="docket-prototype.html?clean#/c/CAND-0412" tabindex="-1" loading="lazy" title=""></iframe><span class="mk" style="left:70.5%; top:17.9%;">1</span><span class="mk" style="left:44.2%; top:54.4%;">2</span></div>
+        <p><b>1</b> The next step is a button that says what it does. <b>2</b> An overall score out of 20 next to the breakdown. This time Ash moved Maya forward, 5/5 sure. Mazzy missed the button, so this is not solved yet. <a href="docket-prototype.html#/c/CAND-0412" target="_blank" rel="noopener" style="color:var(--ink);">Try it &rarr;</a></p></div>
+    </div>
+    <table class="persp test-tbl chg" style="margin-top:20px;">
+      <colgroup><col style="width:32%"><col style="width:44%"><col style="width:24%"></colgroup>
+      <tr><th>What happened in round 1</th><th>What I changed</th><th>Round 2 (Ash, Mazzy)</th></tr>
+      <tr><td>"Awaiting you" and "Waiting on: You" read as the same thing</td><td>Renamed the status Ready for review, and added one Waiting on you filter.</td><td><span class="res ok">Both found them</span></td></tr>
+      <tr><td>Did not know how to move Maya forward</td><td>A button that names the next step, plus Not moving forward. The dropdown is still there as Other status.</td><td><span class="res mid">Ash did it. Mazzy missed the button</span></td></tr>
+      <tr><td>Did not know who the finalists were or how to compare</td><td>A Finalists filter, a column labeled Compare, and a Compare button at the top.</td><td><span class="res mid">Both compared. Mazzy needed a hint</span></td></tr>
+      <tr><td>"Cross-functional panel" was unclear</td><td>Renamed it Team panel.</td><td><span class="res ok">No confusion</span></td></tr>
+      <tr><td>Wanted one number and a 1 to 5 scale</td><td>Ratings are now 1 to 5, with an overall score out of 20. The breakdown stays next to it.</td><td><span class="res mid">Ash decided by it. Mazzy needed it explained</span></td></tr>
+      <tr><td>Wanted to sort</td><td>Sort by last interview, interviews completed, overall score, waiting longest or name.</td><td><span class="res mid">Ash used it. The score is not shown</span></td></tr>
+      <tr><td>Felt like numbers, not people</td><td>Initials for each person, and their own words from the cover letter before any scores.</td><td><span class="res na">Not asked yet</span></td></tr>
+    </table>
+  </section></div>
+
+  <!-- 26. ROUND 2 CHANGES -->
+  <div class="slide-shell"><section class="slide" data-title="What Round 2 Changed">
+    <div class="ph-head">
+      <div><div class="eyebrow">Iteration &middot; What Round 2 Changed</div>
+        <h2 style="font-size:30px; margin-bottom:10px;">Fixing where Mazzy got stuck.</h2>
+        <p class="lead" style="margin-bottom:18px;">Round 2 split. Ash finished everything, Mazzy got stuck on two tasks, including the one
+          the research led to. I built these changes, then Leo and Conner tested them in round 3.</p></div>
+      <span class="stamp">Round 3 &middot; Leo, Conner</span>
+    </div>
+    <div class="ba">
+      <div><div class="ba-k">Before &middot; round 2</div>
+        <div class="ks-frame" aria-hidden="true"><img src="img/docket_r2_before_record.png" alt=""></div>
+        <p>"Waiting on Rae Lindqvist" and a Send reminder button. Mazzy could not tell if the problem was the team's or Hannah's, or what the button would do.</p></div>
+      <div><div class="ba-k after">After</div>
+        <div class="ks-frame" aria-hidden="true"><iframe src="docket-prototype.html?clean#/c/CAND-0417" tabindex="-1" loading="lazy" title=""></iframe><span class="mk" style="left:18.1%; top:29.9%;">1</span><span class="mk" style="left:86.6%; top:30.6%;">2</span><span class="mk" style="left:54.2%; top:42.1%;">3</span></div>
+        <p><b>1</b> It says in plain words that the hold-up is on the team, not Hannah. <b>2</b> The button says who the reminder goes to and how. <b>3</b> A "Your decision" box says whether you need to do anything. Leo and Conner both got it right away, 5/5 sure. <a href="docket-prototype.html#/c/CAND-0417" target="_blank" rel="noopener" style="color:var(--ink);">Try it &rarr;</a></p></div>
+    </div>
+    <div class="impl" style="margin-top:18px;">
+      <div><h4>Whose turn it is, in plain words <span class="in">Worked in round 3</span></h4><p>Mazzy could not tell whose side Hannah's hold-up was on. It now says, and the button reads "Remind Rae." Leo and Conner: 5/5.</p></div>
+      <div><h4>A "Your decision" box <span class="in">Worked in round 3</span></h4><p>Mazzy missed the button to move Maya ahead and could not tell what changed. The decision is its own box now, and afterward it says what moved, with Undo. Leo and Conner: 5/5.</p></div>
+      <div><h4>Pros and cons at the top <span class="in">Built</span></h4><p>Mazzy only found the concerns at the bottom. Every interviewer's pros and concerns now sit first, concerns in bold, with the recommendations.</p></div>
+      <div><h4>"Select to compare" <span>Still an issue</span></h4><p>Mazzy read the checkboxes as move or delete, so the column now says what they are for. Leo still clicked names and only compared once told, Conner did not know he could tick them, Johnny needed to be told how, and Brett read them as delete. In five of seven sessions someone needed help comparing.</p><span class="mnote block">Rebuilt after the new testers.</span></div>
+      <div><h4>Decide from Compare <span class="in">Built</span></h4><p>Mazzy wanted to act where the decision happens. Each person on the Compare screen has a move forward button.</p></div>
+      <div><h4>Score in the list <span class="in">Built</span></h4><p>Ash could sort by overall score but never see it. The list now has an Overall column.</p></div>
+      <div><h4>One look for "Late" <span class="in">Built</span></h4><p>Ash said "Late" looked different in the bar and the table. Both use the same red tag now.</p></div>
+      <div><h4>Most urgent first <span class="in">Built</span></h4><p>Ash wanted to start with the candidate due today. The list now opens sorted by what is late or due.</p></div>
+      <div><h4>Sort from the column titles <span class="in">Built</span></h4><p>Mazzy asked to sort by rating or interviews. Leo found the Sort by menu only at the end and said it is in a confusing spot. He suggested clicking a column title, like Status, to sort by it. Every column title sorts now.</p></div>
+      <div><h4>The overall score <span class="w">Watching</span></h4><p>Ash and Leo read it as how good the person is. Ash picked Aisha for her score, though she already had an offer. Mazzy needed it explained and decided on experience and status. Johnny guessed on his own that the four ratings add up to 20.</p></div>
+      <div><h4>Compare more than three <span class="w">Watching</span></h4><p>Ash wanted to. I am holding off until another tester asks, because four sets of bars get hard to read.</p></div>
+    </div>
+  </section></div>
+
+  <!-- 27b. METRICS -->
+  <div class="slide-shell alt"><section class="slide" data-title="How I Would Measure It">
+    <div class="ph-head">
+      <div><div class="eyebrow">Wrap Up &middot; Proposed Metrics</div>
+        <h2 style="font-size:30px; margin-bottom:10px;">How I would know it is working.</h2>
+        <p class="lead" style="margin-bottom:22px;">Docket has not shipped, so there are no results here. These are the numbers
+          I would track if it did, and why each one matters.</p></div>
+      <span class="stamp">Proposed &middot; not measured</span>
+    </div>
+    <table class="met-tbl">
+      <tr><th>What I would track</th><th>Why it matters</th><th>Comes from</th></tr>
+      <tr><td>Days from interview to feedback</td><td>The research said feedback runs late because it is extra work. This is the main number Docket should shrink.</td><td>Research, 7 of 15 accounts</td></tr>
+      <tr><td>Feedback turned in within the 2-day goal</td><td>The Late tag is built around this goal. If this share does not go up, the tag is not changing anything.</td><td>SHRM's 48-hour guideline</td></tr>
+      <tr><td>Reminders that end in feedback</td><td>Shows whether Remind Rae gets people to act or just gets ignored.</td><td>Round 3 testing</td></tr>
+      <tr><td>Days from finalists to a decision</td><td>Compare and the Your decision box exist to make this part faster.</td><td>Key screens 02 and 03</td></tr>
+      <tr><td>Recruiter follow-ups per hire</td><td>Recruiters chase hiring managers over Slack and email. Fewer follow-ups means Docket is doing that job for them.</td><td>Persona: Sam</td></tr>
+    </table>
+    <div class="impact">
+      <div><b>Hiring manager</b><p>Less time figuring out what needs them.</p></div>
+      <div><b>Recruiter</b><p>Less chasing people for feedback.</p></div>
+      <div><b>Candidate</b><p>Less time waiting to hear back.</p></div>
+      <div><b>Company</b><p>Faster decisions, and fewer good candidates lost while they wait.</p></div>
+    </div>
+    <p class="lead" style="margin-top:16px; font-size:14px; max-width:720px;">How I would test it first: one hiring team uses Docket for a month,
+      and I compare their interview-to-feedback time with the month before.</p>
+  </section></div>
+
+  <!-- 25. REFLECTION -->
+  <div class="slide-shell"><section class="slide" data-title="Reflection">
+    <div class="eyebrow">Reflection</div>
+    <h2 style="font-size:30px; margin-bottom:24px;">What I learned.</h2>
+    <div class="refl">
+      <div><b>What surprised me</b><p>I went in sure the problem was lost information. The research pointed to slow feedback instead, and
+        recruiters' reviews said today's tools already work fine. The idea had to move from a nicer screen to making delays visible.</p></div>
+      <div><b>What I would do differently</b><p>Research first, screens second. I built the prototype before the research, so the biggest change was
+        added on top instead of shaping it from the start. I would also look harder for hiring managers' own words, since most public reviews
+        come from recruiters.</p></div>
+      <div><b>What is next</b><p>Test the rebuilt Compare with someone new, since comparing is the task most testers missed. Then
+        rebuild the screens in Figma, and build rate before you read, the last change the research pointed to.</p></div>
+    </div>
+  </section></div>
+
+  <!-- 26. SOURCES -->
+  <div class="slide-shell alt"><section class="slide" data-title="Sources">
+    <div class="eyebrow">Sources</div>
+    <h2 style="font-size:30px; margin-bottom:22px;">Everything I used.</h2>
+    <div class="srclog">
+      <h4>Published research (6)</h4>
+      <ol>
+        <li><a href="https://www.phenom.com/blog/hiring-manager-report-key-takeaways" target="_blank" rel="noopener">Phenom &amp; Talent Board, 2021 Recruiter &amp; Manager Report</a></li>
+        <li><a href="https://www.greenhouse.com/guidance/how-scorecard-peeking-can-create-bias-in-hiring" target="_blank" rel="noopener">Greenhouse, How scorecard peeking can create bias in hiring</a></li>
+        <li><a href="https://www.greenhouse.com/guidance/tips-for-improving-interview-scorecard-submission-rate" target="_blank" rel="noopener">Greenhouse, Tips for improving scorecard submission rate</a></li>
+        <li><a href="https://www.metaview.ai/resources/blog/recruiter-hiring-manager-relationship" target="_blank" rel="noopener">Metaview, Recruiter and hiring manager alignment</a></li>
+        <li><a href="https://www.shrm.org/topics-tools/news/talent-acquisition/recruiting-101-5-tips-better-communication-hiring-managers" target="_blank" rel="noopener">SHRM, 5 tips for better communication with hiring managers (2022)</a></li>
+        <li><a href="https://www.shrm.org/topics-tools/news/talent-acquisition/sharpen-recruiting-workflow-service-level-agreements" target="_blank" rel="noopener">SHRM, Sharpen your recruiting workflow with service-level agreements (2020)</a></li>
+      </ol>
+      <h4>Competitor documentation (5)</h4>
+      <ol>
+        <li><a href="https://support.greenhouse.io/hc/en-us/articles/360016572311-Hiring-team-role-Hiring-manager" target="_blank" rel="noopener">Greenhouse Support, Hiring team role: Hiring manager</a></li>
+        <li><a href="https://help.lever.co/hc/en-us/articles/204502665-Why-can-t-I-see-a-candidate-s-feedback-" target="_blank" rel="noopener">Lever Help Center, Why can't I see a candidate's feedback?</a></li>
+        <li><a href="https://www.ashbyhq.com/product-updates/more-feedback-visibility-options" target="_blank" rel="noopener">Ashby, More feedback visibility options (2021)</a></li>
+        <li><a href="https://www.ashbyhq.com/blog/product/new-feature-default-job-dashboard" target="_blank" rel="noopener">Ashby, Default job dashboard (2023)</a></li>
+        <li><a href="https://www.phenom.com/hiring-manager" target="_blank" rel="noopener">Phenom, Hiring Manager app</a></li>
+      </ol>
+      <h4>Firsthand accounts (15)</h4>
+      <ol>
+        <li><a href="https://www.teamblind.com/post/had-google-onsite-last-friday-feedback-still-isnt-submitted-nouczr8q" target="_blank" rel="noopener">Blind: feedback still isn't submitted</a> <small>theme 01</small></li>
+        <li><a href="https://www.teamblind.com/post/waiting-for-onsite-feedback-is-this-a-normal-timeline-jyfg5t4x" target="_blank" rel="noopener">Blind: is this a normal timeline?</a> <small>theme 01</small></li>
+        <li><a href="https://www.teamblind.com/post/delays-while-waiting-for-onsite-feedbackoffer-good-or-bad-sign-cbvxcylu" target="_blank" rel="noopener">Blind: delays waiting for feedback or offer</a> <small>theme 01</small></li>
+        <li><a href="https://www.teamblind.com/post/when-do-interviewers-write-feedback-f2vm1lvv" target="_blank" rel="noopener">Blind: when do interviewers write feedback?</a> <small>theme 01</small></li>
+        <li><a href="https://www.teamblind.com/post/why-is-google-interview-feedback-so-slow-z4xdxcug" target="_blank" rel="noopener">Blind: why is interview feedback so slow?</a> <small>theme 01</small></li>
+        <li><a href="https://www.themuse.com/advice/4-incredibly-annoying-recruiter-habits-explained-by-a-real-recruiter" target="_blank" rel="noopener">The Muse: a recruiter and hiring manager explains delays</a> <small>theme 01</small></li>
+        <li><a href="https://www.shrm.org/topics-tools/news/talent-acquisition/recruiting-101-5-tips-better-communication-hiring-managers" target="_blank" rel="noopener">SHRM: Andre Boulais on the feedback "black hole"</a> <small>theme 01</small></li>
+        <li><a href="https://www.capterra.com/p/133100/Greenhouse/reviews/" target="_blank" rel="noopener">Capterra: Greenhouse review, Joanna K., Recruiting Manager</a> <small>theme 02</small></li>
+        <li><a href="https://www.capterra.com/p/142452/Lever/reviews?page=2" target="_blank" rel="noopener">Capterra: Lever review, Samanta J., Head of Talent Acquisition</a> <small>theme 02</small></li>
+        <li><a href="https://www.capterra.com/p/142452/Lever/reviews?page=2" target="_blank" rel="noopener">Capterra: Lever review, Cara D., Recruiter</a> <small>theme 02</small></li>
+        <li><a href="https://www.capterra.com/p/142452/Lever/reviews/" target="_blank" rel="noopener">Capterra: Lever review, Payton H., Talent Acquisition Specialist</a> <small>theme 03</small></li>
+        <li><a href="https://www.capterra.com/p/133100/Greenhouse/reviews/?page=16" target="_blank" rel="noopener">Capterra: Greenhouse review, Daniel K., Customer Support Manager</a> <small>theme 02</small></li>
+        <li><a href="https://www.teamblind.com/post/apple-taking-forever-after-hiring-manager-interview-n3hwm1pf" target="_blank" rel="noopener">Blind: taking forever after hiring manager interview</a> <small>other</small></li>
+        <li><a href="https://www.capterra.com/p/142452/Lever/reviews/" target="_blank" rel="noopener">Capterra: Lever review, Garima M., Senior Manager Talent Acquisition</a> <small>other</small></li>
+        <li><a href="https://www.capterra.com/p/133100/Greenhouse/reviews/?page=16" target="_blank" rel="noopener">Capterra: Greenhouse review, Sherry S., HR Manager</a> <small>other</small></li>
+      </ol>
+    </div>
+  </section></div>
+
+  <!-- 27. STATUS -->
+  <div class="slide-shell"><section class="slide" data-title="Status" style="min-height:calc(100vh - 1px); display:flex; flex-direction:column; justify-content:center;">
+    <div class="eyebrow">Project Status</div>
+    <h2 style="font-size:36px; max-width:720px; margin-bottom:24px;">Where it stands, and what is next.</h2>
+    <table class="who-tbl" style="max-width:680px;">
+      <tr><td>Research</td><td><span class="done">Done.</span> 15 firsthand accounts, 6 published sources, and 4 competing tools checked against their own help pages.</td></tr>
+      <tr><td>Prototype</td><td><span class="done">Sixth version.</span> Three clickable screens and a morning email, with the fixes from every round of testing.</td></tr>
+      <tr><td>Testing</td><td><span class="done">6 testers, 7 sessions.</span> Every fix worked except comparing, which I rebuilt after the last round.</td></tr>
+      <tr><td>Next</td><td>Test the rebuilt Compare with someone new. Then build rate before you read and rebuild the final screens in Figma.</td></tr>
+    </table>
+    <p class="lead" style="margin-top:22px;">This is a concept, so the real test would be a hiring team using it for their actual hires.</p>
+    <div class="cs-end">
+      <a href="index.html#work">&larr; All case studies</a>
+      <a class="next" href="reboot.html">Next &middot; Reboot &rarr;</a>
+    </div>
+  </section></div>
+
+</div>
+
+<script>
+  const slides = [...document.querySelectorAll('.slide')];
+  const total = slides.length;
+  const counter = document.getElementById('counter');
+  const progressLine = document.getElementById('progressLine');
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function pad(n){ return n < 10 ? '0' + n : n; }
+
+  function updateProgress(){
+    const scrollContainer = document.body.scrollHeight > document.documentElement.scrollHeight ? document.body : document.documentElement;
+    const scrollTop = scrollContainer.scrollTop;
+    const scrollable = scrollContainer.scrollHeight - window.innerHeight;
+    const percentage = scrollable > 0 ? (scrollTop / scrollable) * 100 : 0;
+    const current = slides.reduce((closestIndex, slide, index) => {
+      const distance = Math.abs(slide.getBoundingClientRect().top - window.innerHeight * .35);
+      const closestDistance = Math.abs(slides[closestIndex].getBoundingClientRect().top - window.innerHeight * .35);
+      return distance < closestDistance ? index : closestIndex;
+    }, 0);
+    counter.textContent = pad(current + 1) + ' / ' + pad(total);
+    if (window.railUpdate) window.railUpdate(current, total);
+    if (window.navUpdate) window.navUpdate(current, total);
+    if (window.pagerUpdate) window.pagerUpdate(current, total);
+    progressLine.style.width = percentage + '%';
+  }
+
+  function scrollToSlide(slide){
+    (slide.closest('.slide-shell') || slide).scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+  }
+
+  window.addEventListener('scroll', updateProgress, { passive:true });
+  document.body.addEventListener('scroll', updateProgress, { passive:true });
+  window.addEventListener('resize', updateProgress);
+  updateProgress();
+</script>
+
+<script>
+(function(){
+  var sl=[].slice.call(document.querySelectorAll('.slide-shell .slide'));
+  if(!sl.length) return;
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduce||!('IntersectionObserver' in window)){ sl.forEach(function(e){e.classList.add('seen');}); return; }
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(en){ if(en.isIntersecting){ en.target.classList.add('seen'); io.unobserve(en.target); } });
+  },{rootMargin:'0px 0px -10% 0px',threshold:0.06});
+  sl.forEach(function(e,i){ if(i<2){ e.classList.add('seen'); } else { io.observe(e); } });
+})();
+
+var scrollCue = document.getElementById('scrollCue');
+if (scrollCue){
+  var hideCue = function(){
+    var y = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+    scrollCue.classList.toggle('gone', y > 40);
+  };
+  window.addEventListener('scroll', hideCue, {passive:true});
+  hideCue();
+}
+
+(function(){
+  var rail = document.querySelector('.chapters');
+  if (!rail) return;
+  var items = [].slice.call(rail.querySelectorAll('a[data-slide]'));
+  function placeRail(){
+    var slide = document.querySelector('.slide');
+    if (!slide) return;
+    var textLeft = slide.getBoundingClientRect().left + parseFloat(getComputedStyle(slide).paddingLeft);
+    var railW = rail.getBoundingClientRect().width || 70;
+    var x = Math.round((textLeft - railW) * 0.34);
+    x = Math.max(40, Math.min(x, 150));
+    if (textLeft - (x + railW) < 26) x = Math.max(24, textLeft - railW - 26);
+    document.documentElement.style.setProperty('--rail-x', x + 'px');
+  }
+  placeRail();
+  window.addEventListener('resize', placeRail);
+  window.railUpdate = function(current, total){
+    rail.classList.toggle('on', current > 0 && current < total - 1);
+    var activeIdx = -1;
+    for (var i = 0; i < items.length; i++){ if (+items[i].dataset.slide <= current) activeIdx = i; }
+    items.forEach(function(a, i){ a.classList.toggle('active', i === activeIdx); });
+  };
+  rail.addEventListener('click', function(e){
+    var a = e.target.closest('a[data-slide]');
+    if (!a) return;
+    e.preventDefault();
+    var target = document.querySelectorAll('.slide')[+a.dataset.slide];
+    if (target) (target.closest('.slide-shell') || target).scrollIntoView({ behavior: 'instant', block: 'start' });
+  });
+})();
+
+(function(){
+    /* homepage nav behaviour: links show on the cover + last slide, tuck into the name in
+       between, and come back on hover, keyboard focus, or when you go back a slide */
+    var nav = document.querySelector('.portfolio-nav');
+    if (!nav) return;
+    var zone = document.querySelector('.nav-hover-zone');
+    var ZONE_H = 90;
+    var slides = document.querySelectorAll('.slide');
+    var prev = null;
+    function isDark(el){
+      while (el && el !== document.documentElement){
+        var m = (getComputedStyle(el).backgroundColor || '').match(/[\d.]+/g);
+        if (m && (m.length < 4 || +m[3] > .5)){
+          return (.299*m[0] + .587*m[1] + .114*m[2]) / 255 < .45;
+        }
+        el = el.parentElement;
+      }
+      return false;
+    }
+    window.navUpdate = function(current, total){
+      var atEdge = current === 0 || current === total - 1;
+      nav.classList.toggle('nav-hidden', !atEdge);
+      if (atEdge) nav.classList.remove('nav-peek');
+      else if (prev !== null && current < prev) nav.classList.add('nav-peek');
+      else if (prev !== null && current > prev) nav.classList.remove('nav-peek');
+      prev = current;
+      nav.classList.toggle('pn-dark', !!slides[current] && isDark(slides[current]));
+    };
+    var lingerT;
+    function peek(){ clearTimeout(lingerT); nav.classList.add('nav-peek'); }
+    function unpeek(){ clearTimeout(lingerT); nav.classList.remove('nav-peek'); }
+    /* after the mouse leaves, keep it open a moment before it tucks away */
+    function unpeekLater(){ clearTimeout(lingerT); lingerT = setTimeout(unpeek, 700); }
+    if (zone){ zone.addEventListener('mouseenter', peek); zone.addEventListener('mouseleave', unpeekLater); }
+    nav.addEventListener('mouseenter', peek);
+    nav.addEventListener('mouseleave', unpeekLater);
+    window.addEventListener('touchstart', function(e){
+      var t = e.touches && e.touches[0];
+      if (t && t.clientY < ZONE_H) peek();
+    }, { passive:true });
+
+    /* phone menu */
+    var btn = nav.querySelector('.pn-menu');
+    if (btn){
+      var setOpen = function(open){
+        nav.classList.toggle('pn-open', open);
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        btn.setAttribute('aria-label', open ? 'Close menu' : 'Menu');
+      };
+      btn.addEventListener('click', function(e){ e.stopPropagation(); setOpen(!nav.classList.contains('pn-open')); });
+      nav.querySelectorAll('ul a').forEach(function(a){ a.addEventListener('click', function(){ setOpen(false); }); });
+      document.addEventListener('click', function(e){ if (!nav.contains(e.target)) setOpen(false); });
+      document.addEventListener('keydown', function(e){ if (e.key === 'Escape') setOpen(false); });
+      window.addEventListener('resize', function(){ if (innerWidth > 640) setOpen(false); });
+    }
+  })();
+
+(function(){
+  var prevBtn = document.getElementById('pagerPrev');
+  var nextBtn = document.getElementById('pagerNext');
+  if (!prevBtn || !nextBtn) return;
+  var idx = 0;
+  window.pagerUpdate = function(current, total){
+    idx = current;
+    prevBtn.disabled = current <= 0;
+    nextBtn.disabled = current >= total - 1;
+  };
+  prevBtn.addEventListener('click', function(){ if (idx > 0) scrollToSlide(slides[idx - 1]); });
+  nextBtn.addEventListener('click', function(){ if (idx < slides.length - 1) scrollToSlide(slides[idx + 1]); });
+})();
+</script>
+
+<script>
+(function(){
+  var veil = document.getElementById('pageVeil');
+  if(!veil) return;
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function reveal(){ requestAnimationFrame(function(){ requestAnimationFrame(function(){ veil.classList.remove('veil-in'); }); }); }
+  if(reduce){ veil.classList.remove('veil-in'); }
+  else if(document.readyState==='complete'){ reveal(); }
+  else{ window.addEventListener('load', reveal); }
+  document.addEventListener('click', function(e){
+    if(e.defaultPrevented || e.button!==0 || e.metaKey||e.ctrlKey||e.shiftKey||e.altKey) return;
+    var a = e.target.closest('a[href]');
+    if(!a) return;
+    var href = a.getAttribute('href');
+    if(!href || href.charAt(0)==='#' || a.target==='_blank' || a.hasAttribute('download')) return;
+    if(/^https?:\/\//i.test(href) || href.indexOf('mailto:')===0 || href.indexOf('tel:')===0) return;
+    e.preventDefault();
+    veil.classList.add('veil-in');
+    var go = function(){ window.location.href = href; };
+    if(reduce) go(); else setTimeout(go, 520);
+  }, true);
+})();
+</script>
+
+<script>
+(function(){
+  var rail = document.querySelector('.chapters');
+  if (!rail) return;
+  var links = [].slice.call(rail.querySelectorAll('a[data-slide]'));
+  if (!links.length) return;
+  var all = document.querySelectorAll('.slide');
+  var total = all.length;
+  var head = document.createElement('div');
+  head.className = 'ch-head';
+  head.innerHTML = 'Sections<small>each bar is one page</small>';
+  rail.insertBefore(head, rail.firstChild);
+  var ticks = [];
+  links.forEach(function(a, i){
+    var start = +a.dataset.slide;
+    var end = (i < links.length - 1 ? +links[i+1].dataset.slide : total - 1) - 1;
+    var n = Math.max(1, end - start + 1);
+    var name = a.textContent.trim();
+    a.innerHTML = '<span class="ch-name"></span><span class="ch-count"></span><span class="ch-ticks" aria-hidden="true"></span>';
+    a.querySelector('.ch-name').textContent = name;
+    var count = a.querySelector('.ch-count');
+    count.textContent = n + (n === 1 ? ' page' : ' pages');
+    a.setAttribute('aria-label', name + ', ' + n + (n === 1 ? ' page' : ' pages'));
+    a._n = n; a._start = start; a._count = count;
+    var row = a.querySelector('.ch-ticks');
+    for (var k = 0; k < n; k++){
+      var t = document.createElement('i');
+      t.dataset.s = start + k;
+      t.title = name + ' · page ' + (k + 1) + ' of ' + n;
+      row.appendChild(t);
+      ticks.push(t);
+    }
+  });
+  rail.addEventListener('click', function(e){
+    var t = e.target.closest('.ch-ticks i');
+    if (!t) return;
+    e.preventDefault(); e.stopPropagation();
+    var s = all[+t.dataset.s];
+    if (s) (s.closest('.slide-shell') || s).scrollIntoView({ behavior:'instant', block:'start' });
+  }, true);
+  var orig = window.railUpdate;
+  window.railUpdate = function(current, tot){
+    if (orig) orig(current, tot);
+    ticks.forEach(function(t){
+      var s = +t.dataset.s;
+      t.classList.toggle('now', s === current);
+      t.classList.toggle('past', s < current);
+    });
+    links.forEach(function(a){
+      var inside = current >= a._start && current < a._start + a._n;
+      a._count.textContent = inside ? (current - a._start + 1) + ' of ' + a._n
+                                    : a._n + (a._n === 1 ? ' page' : ' pages');
+    });
+  };
+  window.dispatchEvent(new Event('scroll'));
+})();
+</script>
+
+<script>
+(function(){
+  // scale the live prototype preview to fit its frame
+  var frames = [].slice.call(document.querySelectorAll('.proto-live, .ks-frame'));
+  function fit(){ frames.forEach(function(f){ var ifr = f.querySelector('iframe'); if (ifr) ifr.style.transform = 'scale(' + (f.clientWidth / 1440) + ')'; }); }
+  fit(); window.addEventListener('resize', fit);
+
+  // no widows: glue the last two words of each text block together
+  var els = document.querySelectorAll('.deck p, .deck h2, .deck h3, .deck li span, .deck .jot, .deck .user li, .deck .ks-notes li span, .deck .pr p, .deck .persp td, .deck .theme blockquote, .deck .impl p, .deck .refl p, .deck .ba p, .deck .sb-panel p, .deck .pf-oneline, .deck .does li, .deck .heard li');
+  [].forEach.call(els, function(el){
+    var w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null), n, last = null;
+    while ((n = w.nextNode())){ if (/\S\s+\S/.test(n.nodeValue)) last = n; }
+    if (last) last.nodeValue = last.nodeValue.replace(/\s+(\S+\s*)$/, '\u00A0$1');
+  });
+})();
+</script>
+
+
+<script>
+/* hover layer: numbered notes <-> markers on the screens, staggered card reveals, table column highlight */
+(function(){
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var canHover = window.matchMedia && matchMedia('(hover:hover)').matches;
+
+  ['.ks-notes > li','.impl > div','.shift > div','.themes > .theme','.pr-grid > .pr','.sb-panel','.steps > div','.refl > div'].forEach(function(sel){
+    document.querySelectorAll('.deck ' + sel).forEach(function(el){
+      el.style.setProperty('--i', Array.prototype.indexOf.call(el.parentNode.children, el));
+      el.classList.add('stag');
+    });
+  });
+
+  document.querySelectorAll('.deck .ks-frame').forEach(function(f){
+    var mks = [].slice.call(f.querySelectorAll('.mk'));
+    if (!mks.length) return;
+    var z = document.createElement('div'); z.className = 'ks-zoom';
+    while (f.firstChild) z.appendChild(f.firstChild);
+    f.appendChild(z);
+    var ks = f.closest('.ks');
+    var partners = ks ? [].slice.call(ks.querySelectorAll('.ks-notes > li')) : [].slice.call(f.parentNode.querySelectorAll('p b'));
+    var slide = f.closest('.slide');
+    var group = slide ? [].slice.call(slide.querySelectorAll('[data-mk="all"]')) : [];
+    var pinned = -1;
+    function on(i, zoom){
+      mks.forEach(function(m, j){ m.classList.toggle('hot', i === 'all' || j === i); });
+      partners.forEach(function(p, j){ p.classList.toggle('hot', i === 'all' || j === i); });
+      f.classList.add('linked');
+      if (zoom && !reduce && i !== 'all'){
+        z.style.setProperty('--ox', mks[i].style.left);
+        z.style.setProperty('--oy', mks[i].style.top);
+        f.classList.add('zoomed');
+      }
+    }
+    function off(){
+      pinned = -1;
+      mks.concat(partners).forEach(function(el){ el.classList.remove('hot'); });
+      f.classList.remove('linked', 'zoomed');
+    }
+    partners.forEach(function(p, i){
+      if (i >= mks.length) return;
+      p.addEventListener('mouseenter', function(){ if (canHover) on(i, true); });
+      p.addEventListener('mouseleave', function(){ if (canHover) off(); });
+      p.addEventListener('click', function(e){
+        if (canHover || e.target.closest('a')) return;
+        if (pinned === i){ off(); } else { off(); pinned = i; on(i, true); }
+      });
+    });
+    mks.forEach(function(m, i){
+      m.addEventListener('mouseenter', function(){ on(i, false); });
+      m.addEventListener('mouseleave', off);
+    });
+    group.forEach(function(g){
+      g.addEventListener('mouseenter', function(){ g.classList.add('hot'); on('all', false); });
+      g.addEventListener('mouseleave', function(){ g.classList.remove('hot'); off(); });
+    });
+    if (ks && canHover){
+      var hint = document.createElement('span'); hint.className = 'ks-hint'; hint.textContent = 'Hover a note to zoom in';
+      var ol = ks.querySelector('.ks-notes'); ol.parentNode.insertBefore(hint, ol);
+    }
+  });
+
+
+  document.querySelectorAll('.deck .vs').forEach(function(v){
+    var cells = [].slice.call(v.children);
+    cells.forEach(function(c, i){
+      var row = Math.floor(i / 3);
+      if (row === 0) return;
+      c.addEventListener('mouseenter', function(){ cells.forEach(function(d, j){ d.classList.toggle('row-hot', Math.floor(j / 3) === row); }); });
+    });
+    v.addEventListener('mouseleave', function(){ cells.forEach(function(d){ d.classList.remove('row-hot'); }); });
+  });
+  document.querySelectorAll('.deck table').forEach(function(t){
+    var head = t.querySelector('tr');
+    if (!head || !head.querySelector('th')) return;
+    var ths = [].slice.call(head.children);
+    function clear(){ ths.forEach(function(h){ h.classList.remove('col-hot'); }); }
+    t.addEventListener('mouseover', function(e){
+      clear();
+      var td = e.target.closest('td');
+      if (!td || td.parentNode === head) return;
+      var i = Array.prototype.indexOf.call(td.parentNode.children, td);
+      if (i > 0 && ths[i]) ths[i].classList.add('col-hot');
+    });
+    t.addEventListener('mouseleave', clear);
+  });
+})();
+</script>
+</body>
+</html>
