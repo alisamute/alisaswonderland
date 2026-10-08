@@ -8,11 +8,11 @@
 <link rel="apple-touch-icon" href="img/favicon-180.png">
 <meta name="description" content="Nuance: a beauty app case study on personalized shade matching and unsponsored reviews, by Alisa Utesheva.">
 <meta property="og:url" content="https://alisaux.com/nuance.html">
-<meta property="og:image" content="https://alisaux.com/img/share-card.png">
+<meta property="og:image" content="https://alisaux.com/img/social-preview.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://alisaux.com/img/share-card.png">
+<meta name="twitter:image" content="https://alisaux.com/img/social-preview.jpg">
 <meta property="og:title" content="Nuance · UX Case Study · Alisa Utesheva">
 <meta property="og:description" content="Nuance: a beauty app case study on personalized shade matching and unsponsored reviews, by Alisa Utesheva.">
 <meta property="og:type" content="website">
@@ -1042,8 +1042,9 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
       <a href="#" data-slide="1">Overview</a>
       <a href="#" data-slide="2">Research</a>
       <a href="#" data-slide="7">Persona</a>
-      <a href="#" data-slide="9">Testing</a>
-      <a href="#" data-slide="11">Design</a>
+      <a href="#" data-slide="9">Moodboard</a>
+      <a href="#" data-slide="10">Testing</a>
+      <a href="#" data-slide="12">Design</a>
       <a href="#" data-slide="14">Prototype</a>
       <a href="#" data-slide="18">Outcome</a>
       <a class="ch-next" href="docket.html"><span>Next</span><b>Docket &rarr;</b></a>
@@ -1108,7 +1109,7 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
         </p>
       </div>
       <div class="col problem-image" style="display:flex; justify-content:flex-end; position:relative; z-index:1; margin-right:calc(-1 * clamp(24px, 8vw, 96px));">
-        <img src="img/girl1.png" alt="A user, discouraged, reading comments about a product that broke her out" style="width:100%; max-width:640px; display:block;">
+        <img loading="lazy" decoding="async" src="img/girl1.webp" alt="A user, discouraged, reading comments about a product that broke her out" style="width:100%; max-width:640px; display:block;">
       </div>
     </div>
   </section></div>
@@ -1246,7 +1247,7 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
       </div>
       <div class="col" style="display:flex; justify-content:center;">
         <div style="position:relative; background:rgba(38,38,36,.06); border-radius:8px; padding:16px;">
-          <img src="img/nuancepersona_1.png" alt="Stacy, frustrated, applying a shade that isn't quite right" style="width:100%; max-width:400px; border-radius:3px; display:block;">
+          <img loading="lazy" decoding="async" src="img/nuancepersona_1.webp" alt="Stacy, frustrated, applying a shade that isn't quite right" style="width:100%; max-width:400px; border-radius:3px; display:block;">
           <div class="pill" style="position:absolute; left:32px; bottom:32px; background:rgba(26,25,23,.85); color:var(--linen); border-color:transparent;">User Pain Point</div>
         </div>
       </div>
@@ -1313,7 +1314,7 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
       <!-- Right: portrait + habits + quote -->
       <div class="persona-right">
         <div class="persona-portrait-wrap">
-          <img src="img/nuancepersona_3.png" alt="Stacy, uncertain, applying a shade that isn't quite right">
+          <img loading="lazy" decoding="async" src="img/nuancepersona_3.webp" alt="Stacy, uncertain, applying a shade that isn't quite right">
         </div>
         <div class="persona-habits">
           <div class="persona-mini-label" style="margin-top:0;">Known Habits</div>
@@ -1338,6 +1339,29 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
     <h2 style="font-size:52px; max-width:900px; line-height:1.3; color:var(--ink);">
       How might we help <em style="color:var(--caramel);">Stacy</em> discover affordable makeup in a way that feels reliable instead of risky?
     </h2>
+  </section></div>
+
+  <!-- MOODBOARD -->
+  <div class="slide-shell"><section class="slide" data-title="Moodboard">
+    <div class="eyebrow">Moodboard</div>
+    <h2 style="font-size:28px; margin-bottom:20px;">Warm, editorial, skin-first</h2>
+    <div style="border-radius:8px; overflow:hidden;">
+      <img loading="lazy" decoding="async" src="img/nuance_moodboard.webp" alt="Nuance moodboard: warm editorial beauty references, typography, and colour palette" style="width:100%; height:auto; display:block;">
+    </div>
+    <div class="two-col" style="margin-top:26px;">
+      <div class="col"><div class="meta-label">Typography</div><div class="meta-value">Playfair Display &middot; Lato</div></div>
+      <div class="col">
+        <div class="meta-label">Palette</div>
+        <div style="display:flex; gap:8px; margin-top:6px;">
+          <div style="width:30px;height:30px;border-radius:6px;background:#262624;"></div>
+          <div style="width:30px;height:30px;border-radius:6px;background:#C9956A;"></div>
+          <div style="width:30px;height:30px;border-radius:6px;background:#D7B08E;"></div>
+          <div style="width:30px;height:30px;border-radius:6px;background:#EDDBC8;"></div>
+          <div style="width:30px;height:30px;border-radius:6px;background:#9A5E2F;"></div>
+          <div style="width:30px;height:30px;border-radius:6px;background:#84251F;"></div>
+        </div>
+      </div>
+    </div>
   </section></div>
 
   <!-- 7b. USABILITY TESTING ROUND 1 -->
@@ -1431,28 +1455,6 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
   </section></div>
 
   <!-- 9. DESIGN SYSTEM: TYPE & COLOR -->
-  <!-- MOODBOARD -->
-  <div class="slide-shell"><section class="slide" data-title="Moodboard">
-    <div class="eyebrow">Moodboard</div>
-    <h2 style="font-size:28px; margin-bottom:20px;">Warm, editorial, skin-first</h2>
-    <div style="border-radius:8px; overflow:hidden;">
-      <img src="img/nuance_moodboard.png" alt="Nuance moodboard: warm editorial beauty references, typography, and colour palette" style="width:100%; height:auto; display:block;">
-    </div>
-    <div class="two-col" style="margin-top:26px;">
-      <div class="col"><div class="meta-label">Typography</div><div class="meta-value">Playfair Display &middot; Lato</div></div>
-      <div class="col">
-        <div class="meta-label">Palette</div>
-        <div style="display:flex; gap:8px; margin-top:6px;">
-          <div style="width:30px;height:30px;border-radius:6px;background:#262624;"></div>
-          <div style="width:30px;height:30px;border-radius:6px;background:#C9956A;"></div>
-          <div style="width:30px;height:30px;border-radius:6px;background:#D7B08E;"></div>
-          <div style="width:30px;height:30px;border-radius:6px;background:#EDDBC8;"></div>
-          <div style="width:30px;height:30px;border-radius:6px;background:#9A5E2F;"></div>
-          <div style="width:30px;height:30px;border-radius:6px;background:#84251F;"></div>
-        </div>
-      </div>
-    </div>
-  </section></div>
 
   
   <div class="slide-shell light" style="background:#e7d6bd;"><section class="slide light" data-title="Design System - Type & Color" style="background:#e7d6bd; color:var(--ink);">
@@ -1485,7 +1487,7 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
     <div class="eyebrow" style="color:var(--caramel);">Design System</div>
     <h2 style="font-size:52px; color:var(--ink);">Buttons &amp; <em style="color:var(--caramel);">UI</em></h2>
     <div style="margin-top:34px;">
-      <img src="img/nuance_buttonsui.png" alt="Nuance UI kit: buttons, pills and tags, cards, and navigation and input components" style="width:100%; height:auto; display:block;">
+      <img loading="lazy" decoding="async" src="img/nuance_buttonsui.webp" alt="Nuance UI kit: buttons, pills and tags, cards, and navigation and input components" style="width:100%; height:auto; display:block;">
     </div>
   </section></div>
 
@@ -1507,7 +1509,7 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
       </div>
       <div class="col" style="display:flex; justify-content:center;">
         <div style="width:100%; max-width:520px; aspect-ratio:800/450; border-radius:6px; overflow:hidden; box-shadow:0 30px 60px rgba(0,0,0,.35);">
-          <iframe title="Nuance interactive prototype: Discover flow" style="width:100%; height:100%; border:none;" src="https://embed.figma.com/proto/cYMT4dbsNI1j46kN3urhUU/HCI-UX-CLASS--Makeup-?node-id=952-888&scaling=scale-down&content-scaling=fixed&page-id=952%3A289&starting-point-node-id=952%3A888&show-proto-sidebar=1&embed-host=share" allowfullscreen></iframe>
+          <iframe loading="lazy" title="Nuance interactive prototype: Discover flow" style="width:100%; height:100%; border:none;" src="https://embed.figma.com/proto/cYMT4dbsNI1j46kN3urhUU/HCI-UX-CLASS--Makeup-?node-id=952-888&scaling=scale-down&content-scaling=fixed&page-id=952%3A289&starting-point-node-id=952%3A888&show-proto-sidebar=1&embed-host=share" allowfullscreen></iframe>
         </div>
       </div>
     </div>
@@ -1531,7 +1533,7 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
       </div>
       <div class="col" style="display:flex; justify-content:center;">
         <div style="width:100%; max-width:520px; aspect-ratio:800/450; border-radius:6px; overflow:hidden; box-shadow:0 30px 60px rgba(0,0,0,.35);">
-          <iframe title="Nuance interactive prototype: Match flow" style="width:100%; height:100%; border:none;" src="https://embed.figma.com/proto/cYMT4dbsNI1j46kN3urhUU/HCI-UX-CLASS--Makeup-?node-id=952-1118&scaling=scale-down&content-scaling=fixed&page-id=952%3A289&starting-point-node-id=952%3A1118&show-proto-sidebar=1&embed-host=share" allowfullscreen></iframe>
+          <iframe loading="lazy" title="Nuance interactive prototype: Match flow" style="width:100%; height:100%; border:none;" src="https://embed.figma.com/proto/cYMT4dbsNI1j46kN3urhUU/HCI-UX-CLASS--Makeup-?node-id=952-1118&scaling=scale-down&content-scaling=fixed&page-id=952%3A289&starting-point-node-id=952%3A1118&show-proto-sidebar=1&embed-host=share" allowfullscreen></iframe>
         </div>
       </div>
     </div>
@@ -1555,7 +1557,7 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
       </div>
       <div class="col" style="display:flex; justify-content:center;">
         <div style="width:100%; max-width:520px; aspect-ratio:800/450; border-radius:6px; overflow:hidden; box-shadow:0 30px 60px rgba(0,0,0,.35);">
-          <iframe title="Nuance interactive prototype: Routine flow" style="width:100%; height:100%; border:none;" src="https://embed.figma.com/proto/cYMT4dbsNI1j46kN3urhUU/HCI-UX-CLASS--Makeup-?node-id=952-1348&scaling=scale-down&content-scaling=fixed&page-id=952%3A289&starting-point-node-id=952%3A1348&show-proto-sidebar=1&embed-host=share" allowfullscreen></iframe>
+          <iframe loading="lazy" title="Nuance interactive prototype: Routine flow" style="width:100%; height:100%; border:none;" src="https://embed.figma.com/proto/cYMT4dbsNI1j46kN3urhUU/HCI-UX-CLASS--Makeup-?node-id=952-1348&scaling=scale-down&content-scaling=fixed&page-id=952%3A289&starting-point-node-id=952%3A1348&show-proto-sidebar=1&embed-host=share" allowfullscreen></iframe>
         </div>
       </div>
     </div>
@@ -1579,7 +1581,7 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
       </div>
       <div class="col" style="display:flex; justify-content:center;">
         <div style="width:100%; max-width:520px; aspect-ratio:800/450; border-radius:6px; overflow:hidden; box-shadow:0 30px 60px rgba(0,0,0,.35);">
-          <iframe title="Nuance web prototype" style="width:100%; height:100%; border:none;" src="https://embed.figma.com/proto/cYMT4dbsNI1j46kN3urhUU/HCI-UX-CLASS--Makeup-?node-id=1191-1533&t=yQUcLi4CPvOXKkPE-1&scaling=scale-down&content-scaling=fixed&page-id=1191%3A262&starting-point-node-id=1191%3A1533&show-proto-sidebar=1&embed-host=share" allowfullscreen></iframe>
+          <iframe loading="lazy" title="Nuance web prototype" style="width:100%; height:100%; border:none;" src="https://embed.figma.com/proto/cYMT4dbsNI1j46kN3urhUU/HCI-UX-CLASS--Makeup-?node-id=1191-1533&t=yQUcLi4CPvOXKkPE-1&scaling=scale-down&content-scaling=fixed&page-id=1191%3A262&starting-point-node-id=1191%3A1533&show-proto-sidebar=1&embed-host=share" allowfullscreen></iframe>
         </div>
       </div>
     </div>
@@ -1603,7 +1605,7 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
       </div>
       <div class="col" style="display:flex; justify-content:center;">
         <div style="position:relative; width:100%; max-width:420px;">
-          <img src="img/nuancepersona_2.png" alt="Stacy, delighted, having found her match" style="width:100%; height:520px; object-fit:cover; object-position:top; border-radius:4px; display:block; box-shadow:0 30px 60px rgba(0,0,0,.25);">
+          <img loading="lazy" decoding="async" src="img/nuancepersona_2.webp" alt="Stacy, delighted, having found her match" style="width:100%; height:520px; object-fit:cover; object-position:top; border-radius:4px; display:block; box-shadow:0 30px 60px rgba(0,0,0,.25);">
           <div class="pill" style="position:absolute; left:20px; bottom:20px; background:rgba(26,25,23,.8); color:var(--linen); backdrop-filter:blur(6px); border-color:transparent;">User Scenario</div>
         </div>
       </div>
