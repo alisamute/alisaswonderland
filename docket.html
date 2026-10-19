@@ -844,6 +844,9 @@
     /* hover motion removed */
   }
 
+  .src-more{margin-top:22px; max-width:760px;}
+  .src-more summary{cursor:pointer; font-weight:600; min-height:44px; display:flex; align-items:center;}
+  .src-more .srclog{margin-top:8px;}
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <style id="unified-nav-font">
@@ -970,15 +973,13 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
 
 <nav class="chapters" aria-label="Case study sections">
   <a href="#" data-slide="1">Overview</a>
-  <a href="#" data-slide="3">Research</a>
-  <a href="#" data-slide="10">Concept</a>
-  <a href="#" data-slide="13">Users</a>
-  <a href="#" data-slide="16">Task Flow</a>
-  <a href="#" data-slide="17">Design</a>
-  <a href="#" data-slide="22">Prototype</a>
-  <a href="#" data-slide="23">Iteration</a>
-  <a href="#" data-slide="28">Wrap Up</a>
-  <a class="ch-next" href="reboot.html"><span>Next</span><b>Reboot &rarr;</b></a>
+  <a href="#" data-slide="2">Research</a>
+  <a href="#" data-slide="5">Concept</a>
+  <a href="#" data-slide="7">Users</a>
+  <a href="#" data-slide="9">Design</a>
+  <a href="#" data-slide="13">Prototype</a>
+  <a href="#" data-slide="14">Iteration</a>
+  <a href="#" data-slide="17">Wrap Up</a>
 </nav>
 
 <div class="progress-line" id="progressLine"></div>
@@ -1022,61 +1023,31 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
     </div>
   </div>
 
-  <!-- 1. WHY I BUILT THIS -->
-  <div class="slide-shell alt"><section class="slide" data-title="Why I Built This">
-    <div class="eyebrow">Why I Built This</div>
-    <h2 style="font-size:30px; margin-bottom:22px;">I designed for my own interviewer.</h2>
-    <p class="lead" style="max-width:680px; font-size:15px;">I am applying to jobs right now, so I wanted to design for the people on the other side. <b>The hiring managers.</b> They are the ones deciding whether to hire me. I wanted to know what makes their job hard and where the process could be better.</p>
-  </section></div>
-
-  <!-- 2. OVERVIEW -->
-  <div class="slide-shell"><section class="slide" data-title="Overview">
-    <div class="eyebrow">The Problem &middot; Working Hypothesis</div>
+  <!-- OVERVIEW -->
+  <div class="slide-shell alt"><section class="slide" data-title="Overview">
+    <div class="eyebrow">Why I Built This &middot; The Problem</div>
     <h2 style="font-size:clamp(22px,4.2vw,36px); max-width:700px;">Recruiters and hiring managers often work with <em>different information</em>.</h2>
     <p class="lead" style="margin-top:20px; font-size:15px;">
-      When a recruiter finishes a phone screen, their notes do not automatically reach the hiring manager.
-      When the hiring manager makes a decision, the recruiter usually hears about it through Slack, email or a
-      quick call. My guess going in was that details get lost along the way.
+      I am applying to jobs right now, so I designed for the people on the other side: <b>the hiring managers</b> who decide whether to hire me.
+      When a recruiter finishes a phone screen, their notes do not automatically reach the hiring manager, and decisions travel back
+      through Slack, email or a quick call. My guess going in was that details get lost along the way.
     </p>
     <div class="pending-card" style="margin-top:30px; max-width:640px; position:relative;">
       <span class="stamp verdict">Half right</span>
       <b>Hypothesis, not a finding</b>
-      <p>The research on the next pages tests this. Part of it holds up. The research pointed to slow feedback more than lost information.</p>
+      <p>The research on the next pages tests this. Part of it holds up: the research pointed to slow feedback more than lost information.</p>
     </div>
   </section></div>
 
-  <!-- 3. METHOD -->
-  <div class="slide-shell alt"><section class="slide" data-title="Research: Method">
-    <div class="eyebrow">Research &middot; How I Did It</div>
-    <h2 style="font-size:clamp(26px,3.2vw,34px); margin-bottom:12px;">How I researched this.</h2>
-    <p class="lead" style="margin-bottom:24px;">I did not have direct access to hiring managers, so I worked from published research and from what
-      recruiters, interviewers and candidates have already shared publicly. I did not interview anyone, and every
-      quote in this case study links to where I found it.</p>
-    <div class="hyp" style="margin-bottom:22px;">
-      <span class="stamp">Tested on the next pages</span>
-      <div class="lbl">Starting hypothesis</div>
-      <p>The handoff between recruiters and hiring managers causes delays, scattered information, or uneven
-      evaluation of candidates.</p>
-    </div>
-    <div class="steps">
-      <div><span class="n">01</span><b>Secondary research</b><p>Published surveys and studies on recruiters and hiring managers.</p></div>
-      <div><span class="n">02</span><b>Public firsthand accounts</b><p>15 posts, reviews and quotes from people in these roles.</p></div>
-      <div><span class="n">03</span><b>Competitive research</b><p>Greenhouse, Lever, Ashby and Phenom.</p></div>
-      <div><span class="n">04</span><b>Synthesis</b><p>Tagging every account by theme and counting.</p></div>
-      <div><span class="n">05</span><b>Design implications</b><p>What the patterns mean for Docket.</p></div>
-    </div>
-    <div class="limits"><b>Limits:</b> most of the posts come from people at big tech companies, and most software reviews
-      are written by recruiters rather than hiring managers. The findings lean that way.</div>
-  </section></div>
-
-  <!-- 4. RESEARCH -->
+  <!-- RESEARCH -->
   <div class="slide-shell"><section class="slide" data-title="Research">
     <div class="rs-head">
       <div>
-        <div class="eyebrow">01 &middot; Secondary Research</div>
+        <div class="eyebrow">Research &middot; What the Data Says</div>
         <h2 style="font-size:clamp(28px,3.6vw,38px); max-width:720px;">The delay is <em>real</em>. The cause was not clear.</h2>
-        <p class="lead" style="margin-top:14px;">I started with published data on how recruiters and hiring managers work together. One survey of
-          more than 250 recruiters found:</p>
+        <p class="lead" style="margin-top:14px;">I did not have access to hiring managers, so I worked from published research, 15 public
+          accounts from recruiters, interviewers and candidates, and four competing tools. I did not interview anyone, and every quote
+          links to where I found it. One survey of more than 250 recruiters found:</p>
       </div>
       <span class="stamp">Secondary data</span>
     </div>
@@ -1099,77 +1070,14 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
       It says hiring managers are <b>slow</b> to respond. Those two problems need different solutions, so finding
       out which one is true became the main question for the rest of my research.</p>
     </div>
+    <div class="limits"><b>Limits:</b> most of the posts come from people at big tech companies, and most software reviews
+      are written by recruiters rather than hiring managers. The findings lean that way.</div>
     <aside class="jot l" style="bottom:54px; right:18px;"><b>Main question</b>Slow or lost? They need different fixes. The next pages try to answer it.</aside>
   </section></div>
 
-  <!-- 5. RESEARCH: EVIDENCE -->
-  <div class="slide-shell alt"><section class="slide" data-title="Research: Evidence">
-    <div class="eyebrow">01 &middot; Secondary Research</div>
-    <h2 style="font-size:clamp(26px,3.2vw,34px); margin-bottom:26px; max-width:760px;">Two findings that shaped the design.</h2>
-
-    <div class="ev-grid">
-      <div class="ev">
-        <div class="who">Greenhouse research &middot; hiring software</div>
-        <h3>Reading other people's feedback first changes your own.</h3>
-        <p>Greenhouse calls this "scorecard peeking." Interviewers who read a colleague's rating before
-          submitting their own tend to agree with it, so honest disagreement is less likely to come up later.</p>
-        <div class="ev-nums">
-          <div><b>10M+</b><span>panel interviews analyzed</span></div>
-          <div><b>3.6%</b><span>more likely to give the exact same rating after peeking</span></div>
-          <div><b>85%</b><span>of their customers use a setting that prevents it</span><span class="mnote block">so it is normal now</span></div>
-        </div>
-        <div class="src">Source: <a href="https://www.greenhouse.com/guidance/how-scorecard-peeking-can-create-bias-in-hiring" target="_blank" rel="noopener">Greenhouse, How scorecard peeking can create bias in hiring</a></div>
-      </div>
-      <div class="ev">
-        <div class="who">Metaview research &middot; interview software</div>
-        <h3>Candidate information is spread across too many places.</h3>
-        <p>Metaview lists this as one of the main problems between recruiters and hiring managers. When
-          details live in different places, the two of them end up with different pictures of the same
-          candidate. The places it names:</p>
-        <div class="scatter"><span>Slack threads</span><span>hallway conversations</span><span>individual screens</span></div>
-        <div class="src">Source: <a href="https://www.metaview.ai/resources/blog/recruiter-hiring-manager-relationship" target="_blank" rel="noopener">Metaview, Recruiter and hiring manager alignment</a></div>
-      </div>
-    </div>
-
-    <div class="means">
-      <div><h4 class="keep">&#10003; Keep in Docket</h4>
-        <p>Interviewers submit their ratings before they can see anyone else's. Greenhouse already does
-        this by default, so it is a tested practice and not my own invention.</p></div>
-      <div><h4 class="test">? Still has to be tested</h4>
-        <p>Whether hiring managers are really missing information, or whether they have it and do not
-        get to it in time.</p></div>
-    </div>
-  </section></div>
-
-  <!-- 6. PERSP -->
-  <div class="slide-shell"><section class="slide" data-title="Research: Public Accounts">
-    <div class="eyebrow">02 &middot; Public Firsthand Accounts</div>
-    <h2 style="font-size:clamp(26px,3.2vw,34px); margin-bottom:12px;">What people in these roles say online.</h2>
-    <p class="lead" style="margin-bottom:22px;">One example from each group. None of these are my interviews. They come from forums,
-      articles and software reviews, and each links to the original.</p>
-    <table class="persp">
-      <tr><th>Who</th><th>What it tells us</th><th>In their words</th><th>Source</th></tr>
-      <tr><td>Recruiting leader</td><td>Good candidates can stall once they reach the hiring manager.</td>
-        <td class="q">"We've all experienced when a great candidate is sourced and sent to the hiring manager only to fall into a black hole where they never hear feedback."</td>
-        <td class="s"><a href="https://www.shrm.org/topics-tools/news/talent-acquisition/recruiting-101-5-tips-better-communication-hiring-managers" target="_blank" rel="noopener">Andre Boulais, talent acquisition executive at Entelo, quoted by SHRM, 2022</a></td></tr>
-      <tr><td>Recruiter and hiring manager</td><td>Hiring managers' schedules slow things down.</td>
-        <td class="q">"Sometimes the hiring manager gets pulled into a last-minute meeting."</td>
-        <td class="s"><a href="https://www.themuse.com/advice/4-incredibly-annoying-recruiter-habits-explained-by-a-real-recruiter" target="_blank" rel="noopener">Richard Moy, recruiter and hiring manager, The Muse</a></td></tr>
-      <tr><td>Interviewers</td><td>Feedback competes with their real work.</td>
-        <td class="q">"Google required interviewers to provide very detailed feedback on the tool and sometimes I don't have time to give it the same day."</td>
-        <td class="s"><a href="https://www.teamblind.com/post/why-is-google-interview-feedback-so-slow-z4xdxcug" target="_blank" rel="noopener">Former Google interviewer, Blind</a></td></tr>
-      <tr><td>Candidates</td><td>The wait is visible from the outside.</td>
-        <td class="q">"Sent a thank you note earlier this week and the recruiter said that feedback wasn't submitted yet, but interviewers have 3-5 days to submit feedback."</td>
-        <td class="s"><a href="https://www.teamblind.com/post/had-google-onsite-last-friday-feedback-still-isnt-submitted-nouczr8q" target="_blank" rel="noopener">Candidate, Blind</a></td></tr>
-      <tr><td>Software reviewers</td><td>Today's tools mostly work for hiring managers.</td>
-        <td class="q">"Best thing, it is easy for hiring managers to navigate."</td>
-        <td class="s"><a href="https://www.capterra.com/p/133100/Greenhouse/reviews/" target="_blank" rel="noopener">Joanna K., Recruiting Manager, Greenhouse review on Capterra</a></td></tr>
-    </table>
-  </section></div>
-
-  <!-- 7. COMPETITORS -->
+  <!-- COMPETITORS -->
   <div class="slide-shell alt"><section class="slide" data-title="Competitors">
-    <div class="eyebrow">03 &middot; Competitive Research</div>
+    <div class="eyebrow">Research &middot; Competitors</div>
     <h2 style="font-size:clamp(26px,3.2vw,34px); margin-bottom:10px;">What is already out there.</h2>
     <p class="lead" style="margin-bottom:24px;">Checked against each tool's own help pages and product updates. Where I could not
       confirm something, the table says so.</p>
@@ -1186,9 +1094,9 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
       <p>Hiding feedback until you submit your own is already standard, so every tool needs it. Phenom already sells an app for hiring managers, so I am not the first to see this gap. Docket can stand out on speed by showing late feedback.</p></div>
   </section></div>
 
-  <!-- 8. SYNTH -->
+  <!-- WHAT I FOUND -->
   <div class="slide-shell"><section class="slide" data-title="Research: Synthesis">
-    <div class="eyebrow">04 &middot; Synthesis</div>
+    <div class="eyebrow">Research &middot; What I Found</div>
     <h2 style="font-size:clamp(26px,3.2vw,34px); margin-bottom:12px;">Three patterns across 15 accounts.</h2>
     <p class="lead" style="margin-bottom:24px;">I tagged each post, review and quote by what it was about, then counted. Three accounts
       did not fit any theme.</p>
@@ -1212,10 +1120,15 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
     </div>
   </section></div>
 
-  <!-- 9. IMPL -->
-  <div class="slide-shell alt"><section class="slide" data-title="Research: Implications">
-    <div class="eyebrow">05 &middot; Design Implications</div>
-    <h2 style="font-size:clamp(26px,3.2vw,34px); margin-bottom:22px;">What the research changed.</h2>
+  <!-- HOW MIGHT WE -->
+  <div class="slide-shell alt"><section class="slide" data-title="How Might We">
+    <div class="eyebrow">How Might We</div>
+    <h2 style="font-size:clamp(30px,4.4vw,46px); max-width:860px; line-height:1.25;">
+      How might we make feedback and decisions <span class="pop tip" tabindex="0" data-tip="67% of recruiters say hiring managers take 2+ working days to give feedback on a resume.">quick enough</span> that interviewers and hiring managers do not
+      <span class="pop tip" tabindex="0" data-tip="Feedback is extra work, so it gets pushed back. 7 of 15 public accounts said so.">put them off</span>?
+    </h2>
+    <p class="lead" style="margin-top:22px; margin-bottom:22px;">My first version was about giving hiring managers more information. After the research, it is about
+      time: feedback is extra work, so it gets pushed back.</p>
     <div class="shift">
       <div><b>I thought</b><p>Information gets lost between the recruiter and the hiring manager, so they need a better screen.</p></div>
       <div><b>I found</b><p>The screens mostly work. Feedback is late because it is extra work, and hiring managers often read candidates in email.</p></div>
@@ -1229,19 +1142,8 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
     </div>
   </section></div>
 
-  <!-- 10. HOW MIGHT WE -->
-  <div class="slide-shell"><section class="slide" data-title="How Might We">
-    <div class="eyebrow">How Might We</div>
-    <h2 style="font-size:clamp(30px,4.4vw,46px); max-width:860px; line-height:1.25;">
-      How might we make feedback and decisions <span class="pop tip" tabindex="0" data-tip="67% of recruiters say hiring managers take 2+ working days to give feedback on a resume.">quick enough</span> that interviewers and hiring managers do not
-      <span class="pop tip" tabindex="0" data-tip="Feedback is extra work, so it gets pushed back. 7 of 15 public accounts said so.">put them off</span>?
-    </h2>
-    <p class="lead" style="margin-top:22px;">My first version was about giving hiring managers more information. After the research, it is about
-      time: feedback is extra work, so it gets pushed back.</p>
-  </section></div>
-
-  <!-- 11. THE BIG IDEA -->
-  <div class="slide-shell alt"><section class="slide" data-title="The Big Idea">
+  <!-- THE BIG IDEA -->
+  <div class="slide-shell"><section class="slide" data-title="The Big Idea">
     <div class="eyebrow">The Big Idea</div>
     <h2 style="font-size:clamp(28px,3.8vw,40px); max-width:800px; margin-bottom:14px;">One screen for the person who makes the decision.</h2>
     <p class="lead" style="margin-bottom:26px;">Most hiring software is built for recruiters, who work in it all day. Hiring managers open it a
@@ -1260,63 +1162,13 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
     </div>
   </section></div>
 
-  <!-- 12. DESIGN PRINCIPLES -->
-  <div class="slide-shell"><section class="slide" data-title="Design Principles">
-    <div class="eyebrow">Design Principles</div>
-    <h2 style="font-size:30px; margin-bottom:24px;">Four rules behind every screen.</h2>
-    <div class="pr-grid">
-      <div class="pr"><h3>One place to start</h3>
-        <p>Everything begins on the candidate list. Comparing people is something you do from there, not another tab to check.</p>
-        <div class="where">Shows up in: Candidates list, Compare</div></div>
-      <div class="pr"><h3>Ratings come from people</h3>
-        <p>Every score is typed in by an interviewer after the interview. Nothing gets scored automatically from a resume.</p>
-        <div class="where">Shows up in: Interviews tab, Compare chart</div></div>
-      <div class="pr"><h3>Rate before you read</h3>
-        <p>Interviewers submit their own rating before they see anyone else's, so the first opinion does not sway the rest.</p>
-        <div class="where plan">Planned: not in the prototype yet</div></div>
-      <div class="pr"><h3>Start after the interview</h3>
-        <p>Docket does not schedule anything. Booking stays in the tools people already use, and Docket picks up once an interview is done.</p>
-        <div class="where">Shows up in: the "Next step" line</div></div>
-    </div>
-  </section></div>
-
-  <!-- 13. USERS -->
-  <div class="slide-shell alt"><section class="slide" data-title="Users">
-    <div class="eyebrow">Who Uses It</div>
-    <h2 style="font-size:30px; margin-bottom:10px;">Two roles, one hire.</h2>
+  <!-- PERSONAS -->
+  <div class="slide-shell alt"><section class="slide" data-title="Personas">
+    <div class="eyebrow">Who Uses It &middot; Composite Personas</div>
+    <h2 style="font-size:30px; margin-bottom:8px;">Two roles, one hire.</h2>
     <p class="lead" style="margin-bottom:26px;">If you have applied for a job, you have met both. The recruiter usually contacts you first.
-      The hiring manager is the person you would end up working for.</p>
-    <div class="users">
-      <div class="user primary">
-        <img loading="lazy" decoding="async" src="img/docketpersona_1.jpg" alt="Illustrative photo representing the hiring manager persona" class="persona-photo">
-        <span class="tag outline" style="margin-bottom:14px;">Illustrative photo &middot; not a real person</span>
-        <div class="role-k">Primary user</div>
-        <h3>Hiring manager</h3>
-        <p>The person the new hire will report to. Hiring is a small part of their job, fitted in around
-        their normal work. They interview candidates and make the final decision.</p>
-        <span class="eg">e.g. a design manager hiring a designer</span>
-        <div class="does"><b>In Docket they</b><ul><li>review each candidate's record</li><li>compare finalists side by side</li><li>decide the next step</li></ul></div>
-      </div>
-      <div class="user">
-        <img loading="lazy" decoding="async" src="img/docketpersona_2.jpg" alt="Illustrative photo representing Sam, the recruiter persona" class="persona-photo">
-        <span class="tag outline" style="margin-bottom:14px;">Illustrative photo &middot; not a real person</span>
-        <div class="role-k">Secondary user</div>
-        <h3>Recruiter</h3>
-        <p>Works in HR or talent acquisition and runs hiring for many roles at once. They find candidates,
-        do the first phone screen, schedule interviews and send offers.</p>
-        <span class="eg">e.g. a talent partner at the same company</span>
-        <div class="does"><b>In Docket they</b><ul><li>add candidates and their documents</li><li>log interview feedback</li><li>keep each status up to date</li></ul></div>
-      </div>
-    </div>
-    <aside class="jot" style="top:40px; right:40px;"><b>Why this order</b>Hiring manager first. They make the final call, and they are the side the data says is slow.</aside>
-  </section></div>
-
-  <!-- 14. PERSONAS -->
-  <div class="slide-shell"><section class="slide" data-title="Personas">
-    <div class="eyebrow">Composite Personas</div>
-    <h2 style="font-size:30px; margin-bottom:8px;">Not real people, built from the research.</h2>
-    <p class="lead" style="margin-bottom:26px;">Every line below is either something the research pages already showed, or a reasonable
-      guess. Photos are AI-generated and illustrative, not photos of anyone real.</p>
+      The hiring manager is the person you would end up working for. These are composites, not real people: every line comes from the
+      research or is a reasonable guess, and the photos are AI-generated.</p>
 
     <div class="persona-full primary">
       <div class="pf-photo">
@@ -1372,30 +1224,13 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
     </div>
   </section></div>
 
-  <!-- 15. STORYBOARD -->
-  <div class="slide-shell"><section class="slide" data-title="Storyboard">
-    <div class="eyebrow">A Week In The Job</div>
-    <h2 style="font-size:30px; margin-bottom:10px;">A hiring manager's week, before and after.</h2>
-    <p class="lead" style="margin-bottom:8px;">A hypothetical week built from the research findings on the pages before this one,
-      not a real person's diary.</p>
-    <div class="storyboard">
-      <div class="sb-panel"><span class="num">Mon</span><p>Three open roles, three separate email threads and a Slack channel. No single place to see who is in the pipeline.</p></div>
-      <div class="sb-panel"><span class="num">Tue</span><p>A recruiter sends over a strong candidate's resume by email. It sits in an inbox next to fifty other unread messages.</p></div>
-      <div class="sb-panel"><span class="num">Wed</span><p>Back-to-back meetings all day. The candidate does not get reviewed, and nothing flags that a day has passed.</p></div>
-      <div class="sb-panel"><span class="num">Thu</span><p>The recruiter follows up on Slack. It has been four days. The candidate is starting to look elsewhere.</p></div>
-      <div class="sb-panel"><span class="num">Fri</span><p>Feedback finally goes out, rushed and vague, because it is now overdue instead of routine.</p></div>
-      <div class="sb-panel highlight"><span class="num">With Docket</span><p>The candidate shows up flagged as waiting, with how long, next to an agreed turnaround. Feedback happens on day two, not day five.</p></div>
-    </div>
-  </section></div>
-
-  <!-- 16. TASK FLOW -->
-  <div class="slide-shell alt"><section class="slide" data-title="Task Flow">
+  <!-- TASK FLOW -->
+  <div class="slide-shell"><section class="slide" data-title="Task Flow">
     <div class="eyebrow">Task Flow &middot; Hypothesized</div>
     <h2 style="font-size:30px; margin-bottom:8px;">Where I think the handoff happens.</h2>
     <p class="lead" style="margin-bottom:30px;">This is my best guess at the workflow, based on the research. There are two points where
       information has to pass from one person to the other, and Docket is meant to handle both without anyone
-      writing a message. Next, this becomes a side-by-side of how it works today and how it would work with
-      Docket.</p>
+      writing a message.</p>
 
     <div class="flow">
       <div class="flow-lane" data-role="recruiter">
@@ -1443,65 +1278,20 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
     <aside class="jot l" style="top:124px; right:40px;"><b>On purpose</b>No calendar. Interviews still get booked in the tools people already use. Docket picks up after.</aside>
   </section></div>
 
-  <!-- 17. DESIGN -->
-  <div class="slide-shell"><section class="slide" data-title="Design">
-    <div class="eyebrow">Design Direction</div>
+  <!-- DESIGN -->
+  <div class="slide-shell alt"><section class="slide" data-title="Design">
+    <div class="eyebrow">Design</div>
     <h2 style="font-size:30px; margin-bottom:8px;">Like a work tool.</h2>
-    <p class="lead" style="margin-bottom:28px;">I wanted Docket to feel like a serious work tool. I borrowed a few details from paper case files, like a stamp, a blacked-out field, and handwritten notes. The stamp shows a status, and the blacked-out field
-      stands for salary details that only some people should see.</p>
-
-    <div class="mock-deck">
-      <span class="mock-tab">HANDOFF &middot; REQ-2291</span>
-      <span class="stamp mock-stamp">REVIEW NEEDED</span>
-      <div class="mock-screen">
-        <div class="mock-head"><div class="t">Senior Product Designer, Candidates</div><div class="s">req-2291 &middot; updated 2m ago</div></div>
-        <table>
-          <tr><th>Candidate</th><th>Stage</th><th>Comp band</th><th>Recruiter note</th></tr>
-          <tr>
-            <td><div class="name">Maya Chen</div><div class="role">8 yrs &middot; ex-Figma</div></td>
-            <td><span class="mock-badge yellow">Ready for review</span></td>
-            <td><span class="mock-redact tip below" tabindex="0" data-tip="Salary band. Blacked out because only the hiring manager and recruiter should see it."></span></td>
-            <td><span class="mock-note"><span class="mock-dot"></span>1 new</span></td>
-          </tr>
-          <tr>
-            <td><div class="name">Devon Ruiz</div><div class="role">5 yrs &middot; ex-Notion</div></td>
-            <td><span class="mock-badge gray">Scheduling</span></td>
-            <td><span class="mock-redact tip below" tabindex="0" data-tip="Salary band. Blacked out because only the hiring manager and recruiter should see it."></span></td>
-            <td><span class="mock-note" style="color:var(--muted);">&middot;</span></td>
-          </tr>
-          <tr>
-            <td><div class="name">Priya Nair</div><div class="role">10 yrs &middot; ex-Linear</div></td>
-            <td><span class="mock-badge outline">Passed panel</span></td>
-            <td><span class="mock-redact tip" tabindex="0" data-tip="Salary band. Blacked out because only the hiring manager and recruiter should see it."></span></td>
-            <td><span class="mock-note"><span class="mock-dot"></span>2 new</span></td>
-          </tr>
-        </table>
-      </div>
-    </div>
-
-    <div style="display:flex; gap:48px; margin-top:30px; flex-wrap:wrap; align-items:flex-start;">
-      <div>
-        <div class="eyebrow" style="margin-bottom:10px;">Palette</div>
+    <p class="lead" style="margin-bottom:20px;">I wanted Docket to feel like a serious work tool, so I borrowed a few details from paper case files:
+      a stamp for status, and handwritten notes. Most work software is blue. Paper colors fit the case-file idea better.</p>
+    <div style="margin-bottom:22px;">
         <div class="swatch-row">
           <div class="swatch tip" tabindex="0" data-tip="The background. Warm like a paper case file, not blue like most work software."><div class="sw" style="background:#F3EFE6;"></div><div class="lbl">Paper</div></div>
           <div class="swatch tip" tabindex="0" data-tip="Text, headings and main buttons."><div class="sw" style="background:#26251F;"></div><div class="lbl">Ink</div></div>
           <div class="swatch tip" tabindex="0" data-tip="Only one job: it is your turn to act."><div class="sw" style="background:#FDE68A;"></div><div class="lbl">Yellow</div></div>
           <div class="swatch tip" tabindex="0" data-tip="Late tags, warnings and the notes in this case study."><div class="sw" style="background:#B0402F;"></div><div class="lbl">Stamp red</div></div>
         </div>
-      </div>
-      <div>
-        <div class="eyebrow" style="margin-bottom:10px;">Type</div>
-        <div style="font-size:22px; font-weight:700; font-family:'IBM Plex Mono',monospace;">IBM Plex Sans, body copy</div>
-        <div class="mono" style="font-size:14px; color:var(--muted); margin-top:6px;">IBM Plex Mono, headings, IDs, timestamps, labels</div>
-      </div>
     </div>
-    <aside class="jot" style="top:112px; right:40px;"><b>Why not blue?</b>Most work software is blue. Paper colors fit the case-file idea better.</aside>
-  </section></div>
-
-  <!-- 18. DESIGN SYSTEM -->
-  <div class="slide-shell alt"><section class="slide" data-title="Design System">
-    <div class="eyebrow">Design System</div>
-    <h2 style="font-size:30px; margin-bottom:24px;">The pieces the product is built from.</h2>
     <div class="ds">
       <div class="ds-box">
         <div class="sub-h">Status</div>
@@ -1533,7 +1323,7 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
     </div>
   </section></div>
 
-  <!-- 19. KEY SCREEN: CANDIDATES -->
+  <!-- KEY SCREEN: CANDIDATES -->
   <div class="slide-shell ks-shell"><section class="slide" data-title="Key Screen: Candidates">
     <div class="eyebrow">Key Screens &middot; 01 of 03</div>
     <h2 style="font-size:clamp(26px,3.2vw,34px); margin-bottom:22px;">See who is waiting on you.</h2>
@@ -1543,7 +1333,7 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
     </div>
   </section></div>
 
-  <!-- 20. KEY SCREEN: RECORD -->
+  <!-- KEY SCREEN: RECORD -->
   <div class="slide-shell alt ks-shell"><section class="slide" data-title="Key Screen: Record">
     <div class="eyebrow">Key Screens &middot; 02 of 03</div>
     <h2 style="font-size:clamp(26px,3.2vw,34px); margin-bottom:22px;">Everything about one person, on one page.</h2>
@@ -1553,7 +1343,7 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
     </div>
   </section></div>
 
-  <!-- 21. KEY SCREEN: COMPARE -->
+  <!-- KEY SCREEN: COMPARE -->
   <div class="slide-shell ks-shell"><section class="slide" data-title="Key Screen: Compare">
     <div class="eyebrow">Key Screens &middot; 03 of 03</div>
     <h2 style="font-size:clamp(26px,3.2vw,34px); margin-bottom:22px;">Finalists side by side.</h2>
@@ -1563,7 +1353,7 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
     </div>
   </section></div>
 
-  <!-- 22. PROTOTYPE -->
+  <!-- PROTOTYPE -->
   <div class="slide-shell alt"><section class="slide" data-title="Prototype">
     <div class="eyebrow">Prototype</div>
     <h2 style="font-size:30px; margin-bottom:8px;">Clickable prototype.</h2>
@@ -1577,7 +1367,7 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
     <div class="proto-meta"><span><b>3</b> screens</span><span><b>9</b> sample candidates</span><span>Interactive HTML version</span><span>Figma prototype, 4 flows</span><span>Tested with 6 people, 7 sessions</span></div>
   </section></div>
 
-  <!-- 23. WHAT THE RESEARCH CHANGED -->
+  <!-- WHAT THE RESEARCH CHANGED -->
   <div class="slide-shell"><section class="slide" data-title="What the Research Changed">
     <div class="eyebrow">Iteration &middot; What the Research Changed</div>
     <h2 style="font-size:clamp(26px,3.2vw,34px); margin-bottom:10px;">Making late feedback visible.</h2>
@@ -1598,216 +1388,72 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
     </div>
   </section></div>
 
-  <!-- 24. USABILITY TESTING -->
+  <!-- USABILITY TESTING -->
   <div class="slide-shell alt"><section class="slide" data-title="Usability Testing">
     <div class="ph-head">
-      <div><div class="eyebrow">Usability Testing &middot; 3 rounds so far</div>
-        <h2 style="font-size:30px; margin-bottom:10px;">Three testers, four sessions.</h2>
-        <p class="lead" style="margin-bottom:22px;">I ran each session and wrote down what the tester did and said. Ash tried the second
-          version. I fixed what Ash got stuck on, then Ash and Mazzy tried the third. I fixed that round too, then Leo tried the fourth.
-          Same tasks every time, so the rounds line up. New testers are on the next page.</p></div>
-      <span class="stamp">1 of 2 done</span>
+      <div><div class="eyebrow">Usability Testing &middot; 6 testers, 7 sessions</div>
+        <h2 style="font-size:30px; margin-bottom:10px;">Same five tasks, every round.</h2>
+        <p class="lead" style="margin-bottom:22px;">I ran each session and wrote down what the tester did and said. Ash tried two versions,
+          Mazzy and Leo each tried a fixed one, and then Conner, Johnny and Brett saw Docket for the first time, to check the fixes hold up
+          for fresh eyes. I fixed what came up after every round.</p></div>
+      <span class="stamp">Done</span>
     </div>
-    <table class="persp test-tbl t3">
-      <colgroup><col style="width:13%"><col style="width:31%"><col style="width:28%"><col style="width:28%"></colgroup>
-      <tr><th>Task</th><th>Round 1 &middot; Ash</th><th>Round 2 &middot; Mazzy</th><th>Round 3 &middot; Leo</th></tr>
-      <tr><td>Find who is waiting on you</td>
-        <td><span class="res mid">R1 &middot; Found it, but confused</span>Read the "Awaiting you" status and the "Waiting on: You" column as the same thing twice, and counted three.
-          <span class="res ok r2">R2 &middot; Found it &middot; 4/5</span>Went by the Waiting on column. Would start with the one that is due today.</td>
-        <td><span class="res ok">Found it</span>Went by the Ready for review status and opened the top one.</td>
-        <td><span class="res ok">Found it</span>Went by the Ready for review status.</td></tr>
-      <tr><td>Remind whoever is holding up Hannah</td>
-        <td><span class="res ok">R1 &middot; Done</span>Used Send reminder.
-          <span class="res ok r2">R2 &middot; Done &middot; 5/5</span>Used Send reminder.</td>
-        <td><span class="res bad">Stuck</span>Could not tell if the hold-up was on the team's side or Hannah's. The page read like a resume with nothing to click, and Send reminder did not say what it would do.</td>
-        <td><span class="res ok">Done &middot; 5/5</span>Clicked Remind Rae. The big yellow button meant click it, and the hold-up was Rae's, not his.</td></tr>
-      <tr><td>Move Maya to the next step</td>
-        <td><span class="res bad">R1 &middot; Stuck &middot; 1/5</span>Did not know what "next step" meant or how to move her.
-          <span class="res ok r2">R2 &middot; Done &middot; 5/5</span>Read the overall score as how she did across every step.</td>
-        <td><span class="res bad">Stuck</span>Saw Not moving forward, but not how to move her ahead. Could not find the interview notes, and was not sure what had changed after acting.</td>
-        <td><span class="res ok">Done &middot; 5/5</span>Read the overall score as how well she did.</td></tr>
-      <tr><td>Compare the finalists and pick one</td>
-        <td><span class="res bad">R1 &middot; Stuck &middot; 1/5</span>Did not know who the finalists were or how to compare them.
-          <span class="res ok r2">R2 &middot; Done</span>Picked Aisha for the best overall score and almost no concerns. Could not find the recommendations.</td>
-        <td><span class="res mid">Done, with a hint</span>Thought the checkboxes would move or delete people, and would have clicked the name. Once shown, liked the graphs a lot. Decided on experience, interviews and status.</td>
-        <td><span class="res bad">Needed a hint</span>Clicked names, not the checkboxes, and only compared once told. Said they were all still interviewing, so picked at random.</td></tr>
-      <tr><td>Act on the morning email</td>
-        <td><span class="res na">R1 &middot; Not in this round</span>
-          <span class="res ok r2">R2 &middot; Done &middot; 4/5</span></td>
-        <td><span class="res ok">Done &middot; 3.5/5</span></td>
-        <td><span class="res ok">Done &middot; 5/5</span>Said it could use some quality of life changes.</td></tr>
+    <table class="persp test-tbl">
+      <tr><th>Task</th><th>Ash &middot; R1, R2</th><th>Mazzy &middot; R2</th><th>Leo &middot; R3</th><th>Conner &middot; new</th><th>Johnny &middot; new</th><th>Brett &middot; new</th></tr>
+      <tr><td>Find who is waiting on you</td><td><span class="res mid">R1 &middot; Confused</span><span class="res ok r2">R2 &middot; Found it</span></td><td><span class="res ok">Found it</span></td><td><span class="res ok">Found it</span></td><td><span class="res ok">Found it</span></td><td><span class="res ok">Found it</span></td><td><span class="res ok">Found it</span></td></tr>
+      <tr><td>Remind whoever is holding up Hannah</td><td><span class="res ok">Done</span></td><td><span class="res bad">Stuck</span></td><td><span class="res ok">Done</span></td><td><span class="res ok">Done</span></td><td><span class="res ok">Done</span></td><td><span class="res ok">Done</span></td></tr>
+      <tr><td>Move Maya to the next step</td><td><span class="res bad">R1 &middot; Stuck</span><span class="res ok r2">R2 &middot; Done</span></td><td><span class="res bad">Stuck</span></td><td><span class="res ok">Done</span></td><td><span class="res ok">Done</span></td><td><span class="res ok">Done</span></td><td><span class="res ok">Done</span></td></tr>
+      <tr><td>Compare the finalists and pick one</td><td><span class="res bad">R1 &middot; Stuck</span><span class="res ok r2">R2 &middot; Done</span></td><td><span class="res mid">Needed a hint</span></td><td><span class="res mid">Needed a hint</span></td><td><span class="res mid">Missed the checkboxes</span></td><td><span class="res bad">Stuck</span></td><td><span class="res mid">Read checkboxes as delete</span></td></tr>
+      <tr><td>Act on the morning email</td><td><span class="res na">R1 &middot; Not tested</span><span class="res ok r2">R2 &middot; Done</span></td><td><span class="res ok">Done</span></td><td><span class="res ok">Done</span></td><td><span class="res ok">Done</span></td><td><span class="res na">Not asked</span></td><td><span class="res na">Not asked</span></td></tr>
     </table>
-    <div class="heard h3">
-      <div><b>Ash also said</b><ul>
-        <li>Did not know what a "cross-functional panel" is.</li>
-        <li>Liked comparing candidates a lot, and wanted to compare more than three.</li>
-        <li>Wanted one total score, on a 1 to 5 scale, and a way to sort candidates.</li>
-        <li>The comparison should feel like it is about people, not just numbers.</li>
-        <li>"Late" next to a colleague's name would help, not feel awkward. It looked different in the bar at the top and in the table.</li>
-        <li>You can sort by overall score, but the score is not shown anywhere in the list.</li></ul></div>
-      <div><b>Mazzy also said</b><ul>
-        <li>"Late" helped.</li>
-        <li>Did not understand "Overall so far" until I explained it, then liked it. Did not use it to decide.</li>
-        <li>Read each record top to bottom and only found the concerns at the end. Wanted pros and cons near the top, bolder, with details below.</li>
-        <li>Does not want to spend long on each person.</li>
-        <li>The Compare screen has nothing to act on. Wanted a button there to move the chosen person forward.</li>
-        <li>The colors helped.</li>
-        <li>Wanted a way to filter by what is best, like rating or number of interviews.</li></ul></div>
-      <div><b>Leo also said</b><ul>
-        <li>For the process question he picked the candidate who shares his name, and read Leo Brandt's status as passed panel.</li>
-        <li>Big numbers mean better.</li>
-        <li>The long list should be more organized, with filters or candidates grouped together.</li>
-        <li>He was not confused at any point.</li>
-        <li>Seeing "Late" would help him know who is late.</li>
-        <li>He wanted to sort by status, overall score, interviews and waiting on. He found the Sort by menu at the end, but said it is in a confusing spot. Clicking a column title, like Status, should sort by it.</li></ul></div>
-    </div>
+    <div class="takeaway" style="margin-top:20px;"><span class="k">What stood out</span>
+      <p>Once fixed, finding, reminding and moving a candidate worked for every new tester, 5/5 sure. <b>Comparing</b> was the hard one:
+      in five of seven sessions someone needed help, mostly because the checkboxes read as move or delete. Brett summed up the rest:
+      "Pretty easy, 5 out of 5."</p></div>
   </section></div>
 
-  <!-- 24b. RETEST -->
-  <div class="slide-shell"><section class="slide" data-title="New Testers">
-    <div class="ph-head">
-      <div><div class="eyebrow">Usability Testing &middot; New testers</div>
-        <h2 style="font-size:30px; margin-bottom:10px;">Same tasks, new people.</h2>
-        <p class="lead" style="margin-bottom:22px;">After fixing what came up, I gave the same tasks to three people who had never seen Docket, to see
-          if the fixes hold up for fresh eyes. All three are done, and what they found is fixed below.</p></div>
-      <span class="stamp">2 of 2 done</span>
-    </div>
-    <table class="persp test-tbl t3">
-      <colgroup><col style="width:19%"><col style="width:27%"><col style="width:27%"><col style="width:27%"></colgroup>
-      <tr><th>Task</th><th>New &middot; Conner</th><th>New &middot; Johnny</th><th>New &middot; Brett</th></tr>
-      <tr><td>Find who is waiting on you</td>
-        <td><span class="res ok">Found it &middot; 5/5</span>Used Waiting on you at the top, and "You" next to each name.</td>
-        <td><span class="res ok">Found it</span>Went by the yellow Ready for review tag. Asked where a candidate was in the process, he opened what the interviewers said and started listing it.</td>
-        <td><span class="res ok">Found it &middot; 5/5</span>"It told me." Read his candidate as ready for an interview.</td></tr>
-      <tr><td>Remind whoever is holding up Hannah</td>
-        <td><span class="res ok">Done &middot; 5/5</span>Clicked Remind Rae.</td>
-        <td><span class="res ok">Done &middot; 5/5</span>Sent the reminder.</td>
-        <td><span class="res ok">Done &middot; 5/5</span>Sent the reminder.</td></tr>
-      <tr><td>Move Maya to the next step</td>
-        <td><span class="res ok">Done &middot; 5/5</span>Read the overall score as how well she did in every step combined.</td>
-        <td><span class="res ok">Done &middot; 5/5</span>Said she meets almost every criterion, weakest on role experience, then collaboration. Guessed the four 1 to 5 ratings add up to 20, which is right.</td>
-        <td><span class="res ok">Done &middot; 5/5</span>Read the overall score as how good a fit the person is.</td></tr>
-      <tr><td>Compare the finalists and pick one</td>
-        <td><span class="res mid">Done &middot; 4/5</span>Picked by best score and no concerns. Did not know he could tick the boxes to compare.</td>
-        <td><span class="res bad">Stuck</span>Could not find how to compare and needed to be told. Picked the top scores with the most years of experience.</td>
-        <td><span class="res mid">Done &middot; 5/5</span>Picked by overall score. Still confused by two Compare buttons, and read the checkboxes as delete.</td></tr>
-      <tr><td>Act on the morning email</td>
-        <td><span class="res ok">Done &middot; 4/5</span></td>
-        <td><span class="res na">Not asked</span></td>
-        <td><span class="res na">Not asked</span></td></tr>
-    </table>
-    <div class="heard h3">
-      <div><b>Conner said</b><ul>
-        <li>He was not confused at any point and did not ask for anything new.</li>
-        <li>He did not know he could tick the boxes to compare. He picked from the list instead.</li></ul></div>
-      <div><b>Johnny said</b><ul>
-        <li>Rated it 4.5 out of 5 overall. Comparing was the confusing part.</li>
-        <li>On the Compare screen, the overall scores were not in any order, not by name and not by score.</li></ul></div>
-      <div><b>Brett said</b><ul>
-        <li>Pretty easy, 5 out of 5. Comparing was the one confusing part.</li>
-        <li>Saw the squares for comparing and thought they were for deleting. Wanted a way to delete candidates.</li>
-        <li>There were two Compare buttons. Combine them into one.</li>
-        <li>Maybe a short tutorial the first time.</li></ul></div>
-    </div>
-    <div class="impl" style="margin-top:18px;">
-      <div><h4>One Compare button <span class="in">Built</span></h4><p>Brett found two Compare buttons confusing. Now there is one. With nobody picked it compares the finalists, and once you pick people it compares them.</p></div>
-      <div><h4>One selection, then Compare or Archive <span class="in">Built</span></h4><p>Compare and Archive used to sit apart, a toggle on each row plus its own button. Now one checkbox selects a row, and a bar at the bottom lets you Compare or Archive whatever is checked. Archive moves people to Hidden instead of deleting them, since hiring records have to be kept, and it comes with Undo.</p></div>
-      <div><h4>Highest score first <span class="in">Built</span></h4><p>Johnny noticed the Compare screen listed people in no order. Everything on it now reads from highest overall score down.</p></div>
-      <div><h4>A first-time tutorial <span class="w">Watching</span></h4><p>Brett suggested one. I would rather fix the screen than explain it, so I am holding off unless the new Compare still gets missed.</p></div>
-      <div><h4>Sort from the column titles <span class="in">Built</span></h4><p>Leo's idea from round 3. Every column title sorts the list now, with an arrow showing which way.</p></div>
-    </div>
-  </section></div>
-
-  <!-- 25. WHAT TESTING CHANGED -->
-  <div class="slide-shell alt"><section class="slide" data-title="What Testing Changed">
+  <!-- WHAT TESTING CHANGED -->
+  <div class="slide-shell"><section class="slide" data-title="What Testing Changed">
     <div class="eyebrow">Iteration &middot; What Testing Changed</div>
-    <h2 style="font-size:clamp(26px,3.2vw,34px); margin-bottom:10px;">Fixing where Ash got stuck.</h2>
-    <p class="lead" style="margin-bottom:16px;">Every change here came from something Ash did or said. Then Ash came back and Mazzy tried it for the first
-      time, running the same tasks on the new version. It worked for Ash, not for Mazzy.</p>
-    <div class="ba">
-      <div><div class="ba-k">Before &middot; round 1</div>
-        <div class="ks-frame" aria-hidden="true"><img loading="lazy" decoding="async" src="img/docket_test_before_record.png" alt=""></div>
-        <p>To move Maya forward you had to open a status dropdown and pick the right option. Ash did not know what to do.</p></div>
-      <div><div class="ba-k after">After &middot; round 2</div>
-        <div class="ks-frame" aria-hidden="true"><iframe src="docket-prototype.html?clean#/c/CAND-0412" tabindex="-1" loading="lazy" title=""></iframe><span class="mk" style="left:70.5%; top:17.9%;">1</span><span class="mk" style="left:44.2%; top:54.4%;">2</span></div>
-        <p><b>1</b> The next step is a button that says what it does. <b>2</b> An overall score out of 20 next to the breakdown. This time Ash moved Maya forward, 5/5 sure. Mazzy missed the button, so this is not solved yet. <a href="docket-prototype.html#/c/CAND-0412" target="_blank" rel="noopener" style="color:var(--ink);">Try it &rarr;</a></p></div>
-    </div>
-    <table class="persp test-tbl chg" style="margin-top:20px;">
-      <colgroup><col style="width:32%"><col style="width:44%"><col style="width:24%"></colgroup>
-      <tr><th>What happened in round 1</th><th>What I changed</th><th>Round 2 (Ash, Mazzy)</th></tr>
-      <tr><td>"Awaiting you" and "Waiting on: You" read as the same thing</td><td>Renamed the status Ready for review, and added one Waiting on you filter.</td><td><span class="res ok">Both found them</span></td></tr>
-      <tr><td>Did not know how to move Maya forward</td><td>A button that names the next step, plus Not moving forward. The dropdown is still there as Other status.</td><td><span class="res mid">Ash did it. Mazzy missed the button</span></td></tr>
-      <tr><td>Did not know who the finalists were or how to compare</td><td>A Finalists filter, a column labeled Compare, and a Compare button at the top.</td><td><span class="res mid">Both compared. Mazzy needed a hint</span></td></tr>
-      <tr><td>"Cross-functional panel" was unclear</td><td>Renamed it Team panel.</td><td><span class="res ok">No confusion</span></td></tr>
-      <tr><td>Wanted one number and a 1 to 5 scale</td><td>Ratings are now 1 to 5, with an overall score out of 20. The breakdown stays next to it.</td><td><span class="res mid">Ash decided by it. Mazzy needed it explained</span></td></tr>
-      <tr><td>Wanted to sort</td><td>Sort by last interview, interviews completed, overall score, waiting longest or name.</td><td><span class="res mid">Ash used it. The score is not shown</span></td></tr>
-      <tr><td>Felt like numbers, not people</td><td>Initials for each person, and their own words from the cover letter before any scores.</td><td><span class="res na">Not asked yet</span></td></tr>
-    </table>
-  </section></div>
-
-  <!-- 26. ROUND 2 CHANGES -->
-  <div class="slide-shell"><section class="slide" data-title="What Round 2 Changed">
-    <div class="ph-head">
-      <div><div class="eyebrow">Iteration &middot; What Round 2 Changed</div>
-        <h2 style="font-size:30px; margin-bottom:10px;">Fixing where Mazzy got stuck.</h2>
-        <p class="lead" style="margin-bottom:18px;">Round 2 split. Ash finished everything, Mazzy got stuck on two tasks, including the one
-          the research led to. I built these changes, then Leo tested them in round 3, and Conner tried them as a new tester.</p></div>
-      <span class="stamp">Round 3 &middot; Leo, then Conner (new)</span>
-    </div>
+    <h2 style="font-size:clamp(26px,3.2vw,34px); margin-bottom:10px;">Fixing where people got stuck.</h2>
+    <p class="lead" style="margin-bottom:16px;">Every change here came from something a tester did or said. The biggest one: Mazzy could not tell
+      whose side the hold-up was on, which is the exact problem the research pointed to.</p>
     <div class="ba">
       <div><div class="ba-k">Before &middot; round 2</div>
         <div class="ks-frame" aria-hidden="true"><img loading="lazy" decoding="async" src="img/docket_r2_before_record.png" alt=""></div>
         <p>"Waiting on Rae Lindqvist" and a Send reminder button. Mazzy could not tell if the problem was the team's or Hannah's, or what the button would do.</p></div>
       <div><div class="ba-k after">After</div>
         <div class="ks-frame" aria-hidden="true"><iframe src="docket-prototype.html?clean#/c/CAND-0417" tabindex="-1" loading="lazy" title=""></iframe><span class="mk" style="left:18.1%; top:29.9%;">1</span><span class="mk" style="left:86.6%; top:30.6%;">2</span><span class="mk" style="left:54.2%; top:42.1%;">3</span></div>
-        <p><b>1</b> It says in plain words that the hold-up is on the team, not Hannah. <b>2</b> The button says who the reminder goes to and how. <b>3</b> A "Your decision" box says whether you need to do anything. Leo and Conner, a new tester, both got it right away, 5/5 sure. <a href="docket-prototype.html#/c/CAND-0417" target="_blank" rel="noopener" style="color:var(--ink);">Try it &rarr;</a></p></div>
+        <p><b>1</b> It says in plain words that the hold-up is on the team, not Hannah. <b>2</b> The button says who the reminder goes to and how. <b>3</b> A "Your decision" box says whether you need to do anything. Leo and every new tester after him got it right away, 5/5 sure. <a href="docket-prototype.html#/c/CAND-0417" target="_blank" rel="noopener" style="color:var(--ink);">Try it &rarr;</a></p></div>
     </div>
-    <div class="impl" style="margin-top:18px;">
-      <div><h4>Whose turn it is, in plain words <span class="in">Worked in round 3</span></h4><p>Mazzy could not tell whose side Hannah's hold-up was on. It now says, and the button reads "Remind Rae." Leo and Conner: 5/5.</p></div>
-      <div><h4>A "Your decision" box <span class="in">Worked in round 3</span></h4><p>Mazzy missed the button to move Maya ahead and could not tell what changed. The decision is its own box now, and afterward it says what moved, with Undo. Leo and Conner: 5/5.</p></div>
-      <div><h4>Pros and cons at the top <span class="in">Built</span></h4><p>Mazzy only found the concerns at the bottom. Every interviewer's pros and concerns now sit first, concerns in bold, with the recommendations.</p></div>
-      <div><h4>"Select to compare" <span>Still an issue</span></h4><p>Mazzy read the checkboxes as move or delete, so the column now says what they are for. Leo still clicked names and only compared once told, Conner did not know he could tick them, Johnny needed to be told how, and Brett read them as delete. In five of seven sessions someone needed help comparing.</p><span class="mnote block">Rebuilt after the new testers.</span></div>
-      <div><h4>Decide from Compare <span class="in">Built</span></h4><p>Mazzy wanted to act where the decision happens. Each person on the Compare screen has a move forward button.</p></div>
-      <div><h4>Score in the list <span class="in">Built</span></h4><p>Ash could sort by overall score but never see it. The list now has an Overall column.</p></div>
-      <div><h4>One look for "Late" <span class="in">Built</span></h4><p>Ash said "Late" looked different in the bar and the table. Both use the same red tag now.</p></div>
-      <div><h4>Most urgent first <span class="in">Built</span></h4><p>Ash wanted to start with the candidate due today. The list now opens sorted by what is late or due.</p></div>
-      <div><h4>Sort from the column titles <span class="in">Built</span></h4><p>Mazzy asked to sort by rating or interviews. Leo found the Sort by menu only at the end and said it is in a confusing spot. He suggested clicking a column title, like Status, to sort by it. Every column title sorts now.</p></div>
-      <div><h4>The overall score <span class="w">Watching</span></h4><p>Ash and Leo read it as how good the person is. Ash picked Aisha for her score, though she already had an offer. Mazzy needed it explained and decided on experience and status. Johnny guessed on his own that the four ratings add up to 20.</p></div>
-      <div><h4>Compare more than three <span class="w">Watching</span></h4><p>Ash wanted to. I am holding off until another tester asks, because four sets of bars get hard to read.</p></div>
-    </div>
+    <table class="persp test-tbl chg" style="margin-top:20px;">
+      <colgroup><col style="width:32%"><col style="width:44%"><col style="width:24%"></colgroup>
+      <tr><th>What testers hit</th><th>What I changed</th><th>Result</th></tr>
+      <tr><td>"Awaiting you" and "Waiting on: You" read as the same thing (Ash)</td><td>Renamed the status Ready for review, and added one Waiting on you filter.</td><td><span class="res ok">Everyone after found it</span></td></tr>
+      <tr><td>Did not know how to move Maya forward (Ash, Mazzy)</td><td>A "Your decision" box with a button that names the next step. Afterward it says what moved, with Undo.</td><td><span class="res ok">5/5 from round 3 on</span></td></tr>
+      <tr><td>Could not tell whose side Hannah's hold-up was on (Mazzy)</td><td>It says in plain words that the hold-up is on the team, and the button reads "Remind Rae."</td><td><span class="res ok">5/5 from round 3 on</span></td></tr>
+      <tr><td>Found the concerns only at the bottom (Mazzy)</td><td>Every interviewer's pros and concerns come first, concerns in bold.</td><td><span class="res ok">Built</span></td></tr>
+      <tr><td>Wanted one number and a way to sort (Ash, Mazzy, Leo)</td><td>An overall score out of 20 in the list. Every column title sorts, and the list opens with what is late or due.</td><td><span class="res ok">Built</span></td></tr>
+      <tr><td>Checkboxes read as move or delete, and there were two Compare buttons (5 of 7 sessions)</td><td>One checkbox selects a row, and a bar at the bottom lets you Compare or Archive. One Compare button, highest score first.</td><td><span class="res mid">Rebuilt. Testing next</span></td></tr>
+    </table>
   </section></div>
 
-  <!-- 27b. METRICS -->
-  <div class="slide-shell alt"><section class="slide" data-title="How I Would Measure It">
+  <!-- WRAP UP -->
+  <div class="slide-shell alt"><section class="slide" data-title="Wrap Up">
     <div class="ph-head">
-      <div><div class="eyebrow">Wrap Up &middot; Proposed Metrics</div>
-        <h2 style="font-size:30px; margin-bottom:10px;">How I would know it is working.</h2>
-        <p class="lead" style="margin-bottom:22px;">Docket has not shipped, so there are no results here. These are the numbers
-          I would track if it did, and why each one matters.</p></div>
+      <div><div class="eyebrow">Wrap Up</div>
+        <h2 style="font-size:30px; margin-bottom:10px;">How I would know it works, and what I learned.</h2>
+        <p class="lead" style="margin-bottom:22px;">Docket has not shipped, so there are no results here. These are the numbers I would track,
+          starting with one hiring team using it for a month.</p></div>
       <span class="stamp">Proposed &middot; not measured</span>
     </div>
     <table class="met-tbl">
       <tr><th>What I would track</th><th>Why it matters</th><th>Comes from</th></tr>
       <tr><td>Days from interview to feedback</td><td>The research said feedback runs late because it is extra work. This is the main number Docket should shrink.</td><td>Research, 7 of 15 accounts</td></tr>
       <tr><td>Feedback turned in within the 2-day goal</td><td>The Late tag is built around this goal. If this share does not go up, the tag is not changing anything.</td><td>SHRM's 48-hour guideline</td></tr>
-      <tr><td>Reminders that end in feedback</td><td>Shows whether Remind Rae gets people to act or just gets ignored.</td><td>Round 3 testing</td></tr>
       <tr><td>Days from finalists to a decision</td><td>Compare and the Your decision box exist to make this part faster.</td><td>Key screens 02 and 03</td></tr>
-      <tr><td>Recruiter follow-ups per hire</td><td>Recruiters chase hiring managers over Slack and email. Fewer follow-ups means Docket is doing that job for them.</td><td>Persona: Sam</td></tr>
     </table>
-    <div class="impact">
-      <div><b>Hiring manager</b><p>Less time figuring out what needs them.</p></div>
-      <div><b>Recruiter</b><p>Less chasing people for feedback.</p></div>
-      <div><b>Candidate</b><p>Less time waiting to hear back.</p></div>
-      <div><b>Company</b><p>Faster decisions, and fewer good candidates lost while they wait.</p></div>
-    </div>
-    <p class="lead" style="margin-top:16px; font-size:14px; max-width:720px;">How I would test it first: one hiring team uses Docket for a month,
-      and I compare their interview-to-feedback time with the month before.</p>
-  </section></div>
-
-  <!-- 25. REFLECTION -->
-  <div class="slide-shell"><section class="slide" data-title="Reflection">
-    <div class="eyebrow">Reflection</div>
-    <h2 style="font-size:30px; margin-bottom:24px;">What I learned.</h2>
+    <div style="margin-top:26px;">
     <div class="refl">
       <div><b>What surprised me</b><p>I went in sure the problem was lost information. The research pointed to slow feedback instead, and
         recruiters' reviews said today's tools already work fine. So I changed Docket to focus on showing delays.</p></div>
@@ -1816,12 +1462,22 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
         come from recruiters.</p></div>
       <div><b>What is next</b><p>Test the rebuilt Compare with someone new, since comparing is the task most testers missed. Then build rate before you read, the last change the research pointed to.</p></div>
     </div>
+    </div>
   </section></div>
 
-  <!-- 26. SOURCES -->
-  <div class="slide-shell alt"><section class="slide" data-title="Sources">
-    <div class="eyebrow">Sources</div>
-    <h2 style="font-size:30px; margin-bottom:22px;">Sources.</h2>
+  <!-- STATUS -->
+  <div class="slide-shell"><section class="slide" data-title="Status" style="min-height:calc(100vh - 1px); display:flex; flex-direction:column; justify-content:center;">
+    <div class="eyebrow">Project Status</div>
+    <h2 style="font-size:36px; max-width:720px; margin-bottom:24px;">Where it stands, and what is next.</h2>
+    <table class="who-tbl" style="max-width:680px;">
+      <tr><td>Research</td><td><span class="done">Done.</span> 15 firsthand accounts, 6 published sources, and 4 competing tools checked against their own help pages.</td></tr>
+      <tr><td>Prototype</td><td><span class="done">Sixth version.</span> Three clickable screens and a morning email, with the fixes from every round of testing.</td></tr>
+      <tr><td>Testing</td><td><span class="done">6 testers, 7 sessions.</span> Every fix worked except comparing, which I rebuilt after the last round.</td></tr>
+      <tr><td>Next</td><td>Test the rebuilt Compare with someone new. Then build rate before you read.</td></tr>
+    </table>
+    <p class="lead" style="margin-top:22px;">This is a concept, so the real test would be a hiring team using it for their actual hires.</p>
+    <details class="src-more">
+      <summary>Sources (26)</summary>
     <div class="srclog">
       <h4>Published research (6)</h4>
       <ol>
@@ -1859,19 +1515,7 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
         <li><a href="https://www.capterra.com/p/133100/Greenhouse/reviews/?page=16" target="_blank" rel="noopener">Capterra: Greenhouse review, Sherry S., HR Manager</a> <small>other</small></li>
       </ol>
     </div>
-  </section></div>
-
-  <!-- 27. STATUS -->
-  <div class="slide-shell"><section class="slide" data-title="Status" style="min-height:calc(100vh - 1px); display:flex; flex-direction:column; justify-content:center;">
-    <div class="eyebrow">Project Status</div>
-    <h2 style="font-size:36px; max-width:720px; margin-bottom:24px;">Where it stands, and what is next.</h2>
-    <table class="who-tbl" style="max-width:680px;">
-      <tr><td>Research</td><td><span class="done">Done.</span> 15 firsthand accounts, 6 published sources, and 4 competing tools checked against their own help pages.</td></tr>
-      <tr><td>Prototype</td><td><span class="done">Sixth version.</span> Three clickable screens and a morning email, with the fixes from every round of testing.</td></tr>
-      <tr><td>Testing</td><td><span class="done">6 testers, 7 sessions.</span> Every fix worked except comparing, which I rebuilt after the last round.</td></tr>
-      <tr><td>Next</td><td>Test the rebuilt Compare with someone new. Then build rate before you read.</td></tr>
-    </table>
-    <p class="lead" style="margin-top:22px;">This is a concept, so the real test would be a hiring team using it for their actual hires.</p>
+    </details>
     <div class="cs-end">
       <a href="index.html#work">&larr; All case studies</a>
       <a class="next" href="reboot.html">Next &middot; Reboot &rarr;</a>
