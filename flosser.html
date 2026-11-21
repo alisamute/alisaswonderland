@@ -80,6 +80,12 @@
   /* the chip illustrations are a fixed 70px, which overflows the narrow
      columns on a phone; let them shrink with their card */
   #gp-closet svg{ max-width:100%; height:auto; }
+  /* a grid of Chip cards, like If Snaggle Wins and Levelling, so it centres like they do */
+  #gp-closet{ text-align:center; }
+  #gp-closet .cl-grid{ justify-content:center; }
+  #gp-closet h2, #gp-closet p.lead{ margin-left:auto; margin-right:auto; }
+  /* six across leaves ~50px a card on a phone; four keeps the labels readable */
+  @media (max-width:700px){ #gp-closet .cl-grid{ grid-template-columns:repeat(4, minmax(0, calc((100% - 36px) / 4))) !important; } }
   /* a few of these panels came from slides that were dark green; the slide
      takes that tone back while such a panel is the one showing */
   .slide-shell[data-tone="dark"]{ color:#F4ECE0; }
@@ -90,16 +96,16 @@
   /* the brick red is for light slides; on the dark green ones it drops to 3:1,
      so those use the same salmon the green slides already use */
   .slide-shell[style*="#212B18"] .eyebrow,
-  .slide-shell[data-tone="dark"] .eyebrow{ color:#E8A27F; }
+  .slide-shell[data-tone="dark"] .eyebrow{ color:#E8683B; }
   .slide-shell[style*="#212B18"] [style*="color:var(--pink)"],
-  .slide-shell[data-tone="dark"] [style*="color:var(--pink)"]{ color:#E8A27F !important; }
+  .slide-shell[data-tone="dark"] [style*="color:var(--pink)"]{ color:#E8683B !important; }
   .sv-panel[data-skin="green"]{ color:#F4ECE0; }
-  .sv-panel[data-skin="green"] .eyebrow { color:#E8A27F; }
+  .sv-panel[data-skin="green"] .eyebrow { color:#E8683B; }
   .sv-panel[data-skin="green"] h2 { color:#F4ECE0 !important; }
   .sv-panel[data-skin="green"] p { color:rgba(244,236,224,.75) !important; }
   .sv-panel[data-skin="green"] [style*="border-bottom:1.5px solid var(--ink)"] { border-bottom-color:rgba(244,236,224,.55) !important; color:rgba(244,236,224,.6) !important; }
   .sv-panel[data-skin="green"] [style*="border-bottom:1px solid var(--line)"] { border-bottom-color:rgba(244,236,224,.14) !important; }
-  .sv-panel[data-skin="green"] [style*="color:var(--pink)"] { color:#E8A27F !important; }
+  .sv-panel[data-skin="green"] [style*="color:var(--pink)"] { color:#E8683B !important; }
   .sv-panel[data-skin="green"] .principle { color:#B9CDA6; }
   .deck-bg.tinting{ transition: background-color .45s ease; }
   .slide-shell.portal{ background: radial-gradient(ellipse at 50% 30%, #111B22 0%, #070908 78%); border-top:none; }
@@ -549,7 +555,7 @@
   /* four of Flosser's slides are darkened by an inline style, where the dark
      ink rail would disappear completely */
   body.on-dark .chapters a{ color:#F4ECE0; border-left-color:rgba(244,236,224,.20); }
-  body.on-dark .chapters a.active{ color:#EBB59C; border-left-color:#EBB59C; box-shadow:inset 2px 0 0 #EBB59C; }
+  body.on-dark .chapters a.active{ color:#E8683B; border-left-color:#E8683B; box-shadow:inset 2px 0 0 #E8683B; }
   body.on-dark .counter, body.on-dark .brandmark{ color:#F4ECE0; }
 
   /* Short laptop screens (1280x720, 1366x768, and any window with browser chrome
@@ -836,12 +842,12 @@
   /* deep green slides (same green as the Snaggle slide) */
   .slide-shell.green { background:#212B18; }
   .slide.green { color:#F4ECE0; }
-  .slide.green .eyebrow { color:#E8A27F; }
+  .slide.green .eyebrow { color:#E8683B; }
   .slide.green h2 { color:#F4ECE0 !important; }
   .slide.green p { color:rgba(244,236,224,.75) !important; }
   .slide.green [style*="border-bottom:1.5px solid var(--ink)"] { border-bottom-color:rgba(244,236,224,.55) !important; color:rgba(244,236,224,.6) !important; }
   .slide.green [style*="border-bottom:1px solid var(--line)"] { border-bottom-color:rgba(244,236,224,.14) !important; }
-  .slide.green [style*="color:var(--pink)"] { color:#E8A27F !important; }
+  .slide.green [style*="color:var(--pink)"] { color:#E8683B !important; }
   .slide.green .principle { color:#B9CDA6; }
   /* same font as the homepage, for the personal quote */
   @font-face { font-family:'Fraunces'; src:url('fonts/fraunces-soft.woff2') format('woff2'); font-weight:300 600; font-style:normal; font-display:swap; }
@@ -862,11 +868,11 @@
   .cmp td { color:var(--muted); }
   .cmp .cmp-fl { background:#212B18; color:#F4ECE0; }
   .cmp thead .cmp-fl { color:#F4ECE0; border-bottom-color:#212B18; }
-  .cmp thead .cmp-fl small { color:#E8A27F; }
+  .cmp thead .cmp-fl small { color:#E8683B; }
   .cmp tbody tr:last-child .cmp-fl { border-radius:0 0 14px 14px; }
   .cmp tbody .cmp-fl { border-bottom-color:rgba(244,236,224,.12); }
   .cmp-y { display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--purple); margin-right:8px; vertical-align:middle; }
-  .cmp-fl .cmp-y { background:#E8A27F; }
+  .cmp-fl .cmp-y { background:#E8683B; }
   .cmp-t { vertical-align:middle; }
   .cmp-n { font-size:11px; color:rgba(99,104,92,.6); font-style:italic; }
   @media (max-width:700px){ .cmp{ font-size:11px; } .cmp th, .cmp td{ padding:9px 8px; } .cmp thead th{ font-size:12.5px; } .cmp-y{ margin-right:5px; } }
@@ -908,8 +914,8 @@
   .wr-learned b { font-family:'Manrope',sans-serif; font-weight:800; font-size:20px; line-height:1.1; color:var(--pink); flex:none; width:30px; }
   .wr-learned h3 { font-family:'Manrope',sans-serif; font-weight:800; font-size:15px; line-height:1.3; color:var(--ink); margin:0 0 3px; }
   .wr-learned p { font-size:12.5px; line-height:1.55; color:var(--muted); margin:0; }
-  .wr-next { margin-top:26px; max-width:1000px; background:#2F4A28; color:#F4ECE0; border-radius:18px 18px 18px 6px; padding:18px 24px; display:flex; gap:22px; align-items:baseline; }
-  .wr-next-label { flex:none; font-family:'Manrope',sans-serif; font-weight:800; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#E8A27F; }
+  .wr-next { margin-top:26px; max-width:1000px; background:#212B18; color:#F4ECE0; border-radius:18px 18px 18px 6px; padding:18px 24px; display:flex; gap:22px; align-items:baseline; }
+  .wr-next-label { flex:none; font-family:'Manrope',sans-serif; font-weight:800; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#E8683B; }
   .wr-next p { margin:0; font-size:13.5px; line-height:1.6; color:rgba(244,236,224,.88); }
   @media (max-width:860px){
     .wr-grid { grid-template-columns:1fr; gap:18px; }
@@ -946,7 +952,7 @@
    between, and come back on hover / keyboard focus / going back a slide. Phones get a hamburger. */
 body .portfolio-nav{
  --t-l:#232620;--k-l:#63685C;--s-l:rgba(35,38,32,.28);--a-l:#C1502E;
- --t-d:#FBFAF6;--k-d:rgba(251,250,246,.75);--s-d:rgba(251,250,246,.3);--a-d:#E8845F;
+ --t-d:#FBFAF6;--k-d:rgba(251,250,246,.75);--s-d:rgba(251,250,246,.3);--a-d:#E8683B;
  --pn-panel:#FBFAF6;--pn-font:'Manrope',system-ui,sans-serif;
  --c-text:var(--t-l);--c-link:var(--k-l);--c-sep:var(--s-l);--c-acc:var(--a-l);
  position:fixed;top:0;left:0;right:0;z-index:40;display:block;transform:none;max-width:none;width:auto;gap:0;
@@ -1403,7 +1409,7 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
       <h2 style="font-size:clamp(24px,3vw,32px); max-width:600px; margin-bottom:18px;">What's built, and what's next.</h2>
       
           <div class="meta-label" style="margin-bottom:10px;">Already in the app</div>
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(0, calc((100% - 60px) / 6))); justify-content:center; gap:12px; margin-bottom:22px;">
+          <div class="cl-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(0, calc((100% - 60px) / 6))); gap:12px; margin-bottom:22px;">
       
             <div class="card" style="text-align:center; padding:14px 8px; border-color:var(--purple);">
               <svg width="70" height="92" viewBox="-6 -32 102 134" style="margin:0 auto 6px;" role="img" aria-label="Princess Chip">
@@ -1467,7 +1473,7 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
       
           <div class="meta-label" style="margin-bottom:8px;">What Else Could Live Here</div>
           <p class="lead" style="margin-bottom:14px;">A concept sheet of early explorations for where the closet could go&nbsp;next.</p>
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(0, calc((100% - 60px) / 6))); justify-content:center; gap:12px;">
+          <div class="cl-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(0, calc((100% - 60px) / 6))); gap:12px;">
       
             <div class="card" style="text-align:center; padding:14px 8px;">
               <svg width="70" height="92" viewBox="-6 -32 102 134" style="margin:0 auto 6px;" role="img" aria-label="Beanie Chip">
