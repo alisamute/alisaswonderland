@@ -27,7 +27,7 @@
     --panel-2:#FFFFFF;
     --purple:#5C7A4E;
     --purple-deep:#3F5636;
-    --pink:#C1502E;
+    --pink:#B74C2C;   /* 4.9:1 on cream, 4.6:1 on the panel tone */
     --red:#A83D22;
     --ink:#232620;
     --muted:#63685C;
@@ -46,6 +46,12 @@
   a{ color:inherit; }
   button{ font-family:inherit; cursor:pointer; }
 
+  /* one backdrop behind the whole deck: its colour is blended from however much
+     of the screen each section covers, so light and dark wash into each other
+     on scroll instead of cutting */
+  .deck-bg{ position:fixed; inset:0; z-index:-1; pointer-events:none; background:var(--void); }
+  html.bg-wash, .bg-wash body{ background:transparent; }
+  .bg-wash .slide-shell{ background:transparent !important; }
   .deck{ width:100%; }
 
   .slide-shell{
@@ -61,6 +67,41 @@
     overflow:clip;
   }
   .slide-shell.panel{ background:var(--panel); }
+  /* tab group: several pages of one section folded onto a single slide */
+  .sv-tabs{ display:flex; gap:8px; flex-wrap:wrap; margin:0 0 24px; }
+  .sv-tab{ appearance:none; -webkit-appearance:none; background:transparent; color:inherit;
+    border:1px solid var(--line); opacity:.75; padding:0 16px; min-height:38px; border-radius:100px;
+    font:inherit; font-size:11px; font-weight:700; letter-spacing:.07em; text-transform:uppercase;
+    cursor:pointer; transition:opacity .2s, background .2s, color .2s, border-color .2s; }
+  .sv-tab:hover{ opacity:1; border-color:var(--purple); }
+  .sv-tab.on{ opacity:1; background:var(--purple); border-color:var(--purple); color:#fff; }
+  .sv-tab:focus-visible{ outline:2px solid var(--purple); outline-offset:2px; }
+  .sv-panel[hidden]{ display:none; }
+  /* the chip illustrations are a fixed 70px, which overflows the narrow
+     columns on a phone; let them shrink with their card */
+  #gp-closet svg{ max-width:100%; height:auto; }
+  /* a few of these panels came from slides that were dark green; the slide
+     takes that tone back while such a panel is the one showing */
+  .slide-shell[data-tone="dark"]{ color:#F4ECE0; }
+  .slide-shell[data-tone="dark"] .sv-tab{ border-color:rgba(244,236,224,.34); }
+  .slide-shell[data-tone="dark"] .sv-tab:hover{ border-color:#9BB36A; }
+  .slide-shell[data-tone="dark"] .sv-tab.on{ background:#9BB36A; border-color:#9BB36A; color:#1b2314; }
+  .slide-shell[data-tone="dark"] .sv-tab{ color:#F4ECE0; }
+  /* the brick red is for light slides; on the dark green ones it drops to 3:1,
+     so those use the same salmon the green slides already use */
+  .slide-shell[style*="#212B18"] .eyebrow,
+  .slide-shell[data-tone="dark"] .eyebrow{ color:#E8A27F; }
+  .slide-shell[style*="#212B18"] [style*="color:var(--pink)"],
+  .slide-shell[data-tone="dark"] [style*="color:var(--pink)"]{ color:#E8A27F !important; }
+  .sv-panel[data-skin="green"]{ color:#F4ECE0; }
+  .sv-panel[data-skin="green"] .eyebrow { color:#E8A27F; }
+  .sv-panel[data-skin="green"] h2 { color:#F4ECE0 !important; }
+  .sv-panel[data-skin="green"] p { color:rgba(244,236,224,.75) !important; }
+  .sv-panel[data-skin="green"] [style*="border-bottom:1.5px solid var(--ink)"] { border-bottom-color:rgba(244,236,224,.55) !important; color:rgba(244,236,224,.6) !important; }
+  .sv-panel[data-skin="green"] [style*="border-bottom:1px solid var(--line)"] { border-bottom-color:rgba(244,236,224,.14) !important; }
+  .sv-panel[data-skin="green"] [style*="color:var(--pink)"] { color:#E8A27F !important; }
+  .sv-panel[data-skin="green"] .principle { color:#B9CDA6; }
+  .deck-bg.tinting{ transition: background-color .45s ease; }
   .slide-shell.portal{ background: radial-gradient(ellipse at 50% 30%, #111B22 0%, #070908 78%); border-top:none; }
   .slide-shell:first-child{ border-top:none; }
 
@@ -247,9 +288,7 @@
     .deck .slide-shell .slide{opacity:1!important;transform:none!important;transition:none!important;}
   }
 
-  /* ---- phone-width fit: slides were running taller than the viewport, so with
-     scroll-snap on the bottom of the content got cut off. Scale type, padding
-     and media down so each slide fits the screen. ---- */
+  /* phone-width fit: slides were running taller than the viewport, so with */
   @media (max-width:600px){
     .slide{ padding:38px 20px; }
     .slide h1{ font-size:clamp(30px,9vw,44px) !important; }
@@ -315,7 +354,7 @@
   /* Moodboard: multi-panel brand board, laid out wide rather than tall.
      Scoped palette so it can use the app's true colors without touching
      the deck's global variables. */
-  .mb{ --mb-cream:#F7F5EF; --mb-green:#2F5D4A; --mb-thread:#3E7A5E; --mb-coral:#FF6A52;
+  .mb{ --mb-cream:#F7F5EF; --mb-green:#2F5D4A; --mb-thread:#3E7A5E; --mb-coral:#FF4D30;
        --mb-mint:#CDE7D8; --mb-ink:#16241E; --mb-snaggle:#8FA85C; }
   .mb-board{ display:grid; grid-template-columns:repeat(3,1fr); gap:11px; }
   .mb-panel{ background:#FBFAF6; border-radius:14px; padding:14px 16px;
@@ -428,11 +467,7 @@
     section[data-title="Persona"] .two-col.top > .col:last-child{ flex:1 1 100% !important; }
   }
 
-  /* ---------- widow control ----------
-     Handled at layout time so it keeps working at every viewport width instead
-     of being pinned by hardcoded non-breaking spaces. `balance` evens out the
-     lines of short headings; `pretty` stops a paragraph or list item ending on
-     a single-word line. Unsupported browsers fall back to normal wrapping. */
+  /* widow control */
   h1,h2,h3,h4{ text-wrap:balance; }
   p,li,.lead,.meta-value,.card p,.step p{ text-wrap:pretty; }
 
@@ -593,10 +628,7 @@
   }
   @media (prefers-reduced-motion: reduce){ .pager-btn{ transition:none; } }
 
-  /* ---------- before / after compare (shared across the case studies) ----------
-     Drag the handle (or use the arrow keys) to wipe between an earlier version
-     and the final one. Tabs swap which pair is showing. If an image file isn't
-     in img/ yet, that half shows a dashed slot with the exact filename to add. */
+  /* before / after compare (shared across the case studies) */
   .bx{ width:100%; max-width:var(--bx-w, 290px); margin:0 auto; }
   .bx-tabs{ display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-bottom:14px; }
   .bx-tab{ appearance:none; -webkit-appearance:none; background:transparent; color:inherit;
@@ -647,7 +679,7 @@
     .bx-split > .bx-body{ width:100%; }
   }
 
-  /* ---------- chapter rail: show that each section holds several pages ---------- */
+  /* chapter rail: show that each section holds several pages */
   .chapters .ch-head{ padding:0 0 10px 13px; font-size:8px; font-weight:800; letter-spacing:.14em;
     text-transform:uppercase; white-space:nowrap; opacity:.55; }
   .chapters .ch-head small{ display:block; margin-top:3px; font-size:7.5px; font-weight:600; letter-spacing:.06em; text-transform:none; opacity:.85; }
@@ -663,10 +695,7 @@
 
   :root{ --bx-accent:#C1502E; --bx-on:#fff; }
 
-  /* ================= interactive layer ================================
-     Same idea as the Docket case study: each slide's pieces arrive one
-     after another, and every page has something small to hover or tap.
-     Colors come from --lx-a (main accent) and --lx-b (second accent). */
+  /* interactive layer */
   .deck .slide-shell .slide > *:not(.blob){
     opacity:0; translate:0 16px;
     transition:opacity .65s cubic-bezier(.16,.84,.44,1) var(--d,0s), translate .65s cubic-bezier(.16,.84,.44,1) var(--d,0s);
@@ -680,13 +709,10 @@
 
   /* cards lift */
   .card{ transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease, opacity .25s ease; }
-  /* hover motion removed */
 
   /* list bullets */
   ul.tight li{ transition:translate .2s ease, color .2s ease; }
   ul.tight li::before{ transition:transform .2s ease, box-shadow .2s ease; }
-  /* hover motion removed */
-  /* hover motion removed */
 
   /* level path: hover a step and every step up to it lights up */
   .step-tracker{ position:relative; }
@@ -694,7 +720,6 @@
   .lx-lvl i{ display:block; height:100%; width:var(--lvl,0%); background:var(--lx-a); border-radius:3px; transition:width .35s cubic-bezier(.2,.8,.2,1); }
   .step{ cursor:default; transition:opacity .2s ease; }
   .step .num{ display:inline-block; transition:transform .2s cubic-bezier(.3,1.5,.5,1), color .2s ease; }
-  .step-tracker.lx-on .step:not(.clr){ opacity:.7; }
   .step.cur .num{ transform:scale(1.3) translateY(-2px); }
 
   /* spotlight: hover one, the rest step back */
@@ -720,13 +745,12 @@
 
   /* media frames */
   .lx-frame{ transition:transform .3s ease, box-shadow .3s ease; }
-  /* hover motion removed */
 
   @media (prefers-reduced-motion: reduce){
     .deck .slide-shell .slide > *:not(.blob), .deck .lx-stag{ opacity:1 !important; translate:none !important; transition:none !important; }
     .slide:not(.seen) .lx-bar{ width:auto !important; }
     .lx-wiggle:hover{ animation:none; }
-    .card:hover, /* hover motion removed */
+    .card:hover,
   }
 
   /* phones: the mascot and the text sat side by side and the text ran off
@@ -737,7 +761,7 @@
     [data-title="Gamification Concept"] > div > div:first-child > div{ width:210px !important; height:210px !important; }
     [data-title="Gamification Concept"] svg[width="320"]{ width:170px; height:auto; }
   }
-  /* ---- flosser: its own touches ---- */
+  /* flosser: its own touches */
   .deck{ --lx-a:var(--purple); --lx-b:var(--pink); --lx-shadow:rgba(36,48,30,.14); --lx-soft:rgba(92,122,78,.18); --lx-track:rgba(92,122,78,.12); --lx-tip-bg:#232620; }
   .step.clr .num{ color:var(--pink); }
   .card:hover{ border-color:var(--purple); }
@@ -749,7 +773,6 @@
 
   /* stats pop */
   .fl-stat{ transition:transform .25s ease; cursor:default; }
-  /* hover motion removed */
   .fl-stat:hover > div:first-child{ color:var(--pink) !important; }
 
   /* the habit loop spins when you touch it */
@@ -757,36 +780,28 @@
   .fl-loop:hover path[marker-end]{ animation:flMarch .7s linear infinite; }
   @keyframes flMarch{ to{ stroke-dashoffset:-16; } }
   .fl-loop circle[r="46"]{ transition:transform .3s ease; transform-box:fill-box; transform-origin:center; }
-  /* hover motion removed */
 
   /* research finding -> design response */
   .fl-trace{ transition:background-color .2s ease, padding .2s ease; border-radius:8px; }
   .fl-trace > div:nth-child(2){ transition:transform .25s ease; }
   .fl-trace > div:nth-child(3){ transition:color .2s ease; }
   .fl-trace:hover{ background:rgba(92,122,78,.08); }
-  /* hover motion removed */
   .fl-trace:hover > div:nth-child(3){ color:var(--pink); }
 
   /* donut: point at a slice or a label */
   .fl-donut circle{ transition:opacity .2s ease, stroke-width .2s ease; cursor:default; }
-  .fl-donut.lx-on circle:not(.on){ opacity:.25; }
   .fl-donut circle.on{ stroke-width:40; }
   .fl-legend > div{ cursor:default; transition:opacity .2s ease, font-weight .2s; border-radius:5px; }
-  .fl-legend.lx-on > div:not(.on){ opacity:.6; }
   .fl-legend > div.on{ font-weight:700; }
 
   /* moodboard + brand */
   .mb-sw .mb-chip{ transition:transform .22s cubic-bezier(.3,1.5,.5,1), box-shadow .22s ease; }
-  /* hover motion removed */
   .mb-shape svg{ transition:transform .25s cubic-bezier(.3,1.5,.5,1); }
-  /* hover motion removed */
   .mb-circle{ transition:transform .22s cubic-bezier(.3,1.5,.5,1); }
-  /* hover motion removed */
   .say-row:not(.say-head){ transition:background-color .2s ease; border-radius:6px; }
   .say-row:not(.say-head):hover{ background:rgba(92,122,78,.08); }
   /* hover dimming removed */
   .mean .sw{ transition:transform .2s cubic-bezier(.3,1.6,.5,1); }
-  /* hover motion removed */
 
   /* Snaggle lurks */
   .fl-snag{ transition:transform .4s ease, filter .4s ease; cursor:default; }
@@ -905,15 +920,10 @@
   /* reflection + tables + sources: hover layer */
   .wr-learned li { transition:opacity .25s ease, translate .25s ease; }
   .wr-learned li b { display:inline-block; transition:transform .25s cubic-bezier(.3,1.5,.5,1); transform-origin:left center; }
-  /* hover motion removed */
-  /* hover motion removed */
   .wr-next { transition:transform .25s ease, box-shadow .25s ease; }
-  /* hover motion removed */
   .sv-group li { transition:translate .2s ease; }
-  /* hover motion removed */
   .sv-group li .sv-n { transition:transform .2s ease; display:inline-block; }
-  /* hover motion removed */
-  @media (prefers-reduced-motion:reduce){ .wr-learned li:hover, /* hover motion removed */ /* hover motion removed */ }
+  @media (prefers-reduced-motion:reduce){ .wr-learned li:hover, }
   /* table: colors get stronger on the row you point at (no background highlight) */
   .cmp td, .cmp tbody th { transition:color .2s ease; }
   .cmp .cmp-y, .cmp .cmp-p { opacity:.55; transition:opacity .2s ease, box-shadow .2s ease, filter .2s ease; }
@@ -1048,18 +1058,17 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
   </nav>
 
   <nav class="chapters" aria-label="Case study sections">
-      <a href="#" data-slide="1">Overview</a>
-      <a href="#" data-slide="6">Research</a>
-      <a href="#" data-slide="12">Persona</a>
-      <a href="#" data-slide="14">Design</a>
-      <a href="#" data-slide="16">Testing</a>
-      <a href="#" data-slide="17">Iterations</a>
-      <a href="#" data-slide="18">Prototype</a>
-      <a href="#" data-slide="20">Gameplay</a>
-      <a href="#" data-slide="25">Branding</a>
-      <a href="#" data-slide="26">Wrap Up</a>
-      <a class="ch-next" href="nuance.html"><span>Next</span><b>Nuance &rarr;</b></a>
-  </nav>
+  <a href="#" data-slide="1">Overview</a>
+  <a href="#" data-slide="2">Prototype</a>
+  <a href="#" data-slide="5">Gameplay</a>
+  <a href="#" data-slide="6">Concept</a>
+  <a href="#" data-slide="10">Research</a>
+  <a href="#" data-slide="12">Persona</a>
+  <a href="#" data-slide="14">Design</a>
+  <a href="#" data-slide="16">Testing</a>
+  <a href="#" data-slide="17">Branding</a>
+  <a href="#" data-slide="19">Wrap Up</a>
+</nav>
 
 
   <div class="counter" id="counter">01 / 23</div>
@@ -1072,7 +1081,7 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
 
   <div class="deck" id="deck">
 
-  <!-- 3. COVER -->
+  <!-- 3. cover -->
   <div class="slide-shell"><section class="slide" data-title="Cover" style="align-items:center; text-align:center;">
     <div class="blob" style="width:520px;height:520px; background:var(--purple); top:-200px; left:50%; transform:translateX(-50%);"></div>
     <div class="eyebrow">UX/UI Case Study &middot; Mobile App</div>
@@ -1102,7 +1111,7 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
     </div>
   </div>
 
-  <!-- 4. WHY I BUILT THIS -->
+  <!-- 4. why i built this -->
   <div class="slide-shell panel"><section class="slide panel" data-title="Why I Built This">
     <div class="eyebrow">Personal Interest</div>
     <p class="hp-quote" style="font-family:'Fraunces',Georgia,serif; font-style:normal; font-weight:380; font-size:clamp(26px,3.6vw,38px); line-height:1.38; max-width:780px; color:#2F4A28;">
@@ -1111,16 +1120,452 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
     <p style="font-size:13px; color:var(--muted); max-width:600px; margin-top:22px;">My friends and family say they skip it too. So I knew this was a real problem.</p>
   </section></div>
 
-  <!-- 3b. HOW MIGHT WE -->
-  <div class="slide-shell green"><section class="slide green" data-title="How Might We">
+  <!-- 3b. how might we -->
+  <div class="slide-shell" style="background:#212B18;"><section class="slide" data-title="The Goal" style="color:var(--void);">
+    <div class="eyebrow" style="color:var(--pink);">The Design Goal</div>
+    <div style="display:flex; align-items:center; gap:32px; flex-wrap:wrap;">
+      <div style="font-family:'Manrope',sans-serif; font-weight:800; font-size:clamp(60px,9vw,100px); line-height:1; color:var(--void);">2</div>
+      <div style="font-size:28px; opacity:.5; color:var(--void);">&rarr;</div>
+      <div style="font-family:'Manrope',sans-serif; font-weight:800; font-size:clamp(60px,9vw,100px); line-height:1; color:var(--pink);">6</div>
+      <p style="font-size:14px; color:var(--void); opacity:.8; max-width:280px;">nights a week is the goal. It's a target, not a measured result&nbsp;yet.</p>
+    </div>
+  </section></div>
+
+  <!-- 15c. the experience -->
+  <div class="slide-shell"><section class="slide" data-title="The Experience">
+    <div class="eyebrow">The Experience</div>
+    <h2 style="font-size:clamp(26px,3.4vw,38px); max-width:640px; margin-bottom:30px; color:#2F4A28;">Three screens, one loop.</h2>
+    <div style="display:flex; gap:36px; justify-content:center; flex-wrap:wrap;">
+
+      <div style="text-align:center; max-width:min(200px,28vw);">
+        <div style="width:min(180px,27vw); border-radius:26px; border:1px solid var(--line); margin:0 auto; box-shadow:0 20px 40px rgba(0,0,0,.08); overflow:hidden; line-height:0;">
+          <img loading="lazy" decoding="async" src="img/flosser_home.png" alt="Flosser home screen showing Chip the tooth mascot, a 1-day streak, and the week's flossing checklist" style="width:100%; height:auto; display:block;">
+        </div>
+        <div class="meta-label" style="margin-top:12px;">Home</div>
+        <p style="font-size:11.5px; color:var(--muted); margin:2px 0 0;">Opens straight to Chip and today's streak, no setup screen in the way.</p>
+      </div>
+
+      <div style="text-align:center; max-width:min(200px,28vw);">
+        <div style="width:min(180px,27vw); border-radius:26px; border:1px solid var(--line); margin:0 auto; box-shadow:0 20px 40px rgba(0,0,0,.08); overflow:hidden; line-height:0;">
+          <img loading="lazy" decoding="async" src="img/flosser_timer.png" alt="Flosser timer screen with a 2-minute countdown ring and skip-timer option" style="width:100%; height:auto; display:block;">
+        </div>
+        <div class="meta-label" style="margin-top:12px;">Timer &amp; Guide</div>
+        <p style="font-size:11.5px; color:var(--muted); margin:2px 0 0;">A two-minute timer so you don't rush, guide open the whole time.</p>
+      </div>
+
+      <div style="text-align:center; max-width:min(200px,28vw);">
+        <div style="width:min(180px,27vw); border-radius:26px; border:1px solid var(--line); margin:0 auto; box-shadow:0 20px 40px rgba(0,0,0,.08); overflow:hidden; line-height:0;">
+          <img loading="lazy" decoding="async" src="img/flosser_friends.png" alt="Flosser friends activity screen showing each friend's weekly flossing streak" style="width:100%; height:auto; display:block;">
+        </div>
+        <div class="meta-label" style="margin-top:12px;">Friends</div>
+        <p style="font-size:11.5px; color:var(--muted); margin:2px 0 0;">See how friends are keeping up with their streaks, so you can hold each other&nbsp;accountable.</p>
+      </div>
+
+    </div>
+    <p style="font-size:13px; color:var(--muted); max-width:640px; margin:26px auto 0; text-align:center;">I added four features. A reminder, so you don't forget. A timer, so you don't rush. Friends, so you don't want to be the one who skipped. And Chip, a mascot who gives you a reason to come back&nbsp;tomorrow.</p>
+    <p style="text-align:center; margin-top:12px;"><a href="https://www.figma.com/proto/XsnrzTOWaJteE5XCSivBek/Flooser-Remake?node-id=4-1758" class="link" target="_blank" rel="noopener">Try the full prototype in Figma &rarr;</a></p>
+  </section></div>
+
+  <!-- 15b. iterations -->
+  <div class="slide-shell panel"><section class="slide panel" data-title="Iterations">
+    <div class="eyebrow">Design Evolution</div>
+    <h2 style="font-size:clamp(26px,3.4vw,38px); max-width:640px; margin-bottom:8px; color:#2F4A28;">From early prototype to final design.</h2>
+    <p class="lead" style="max-width:560px; margin-bottom:26px;">The first version worked, but nobody would want to open it. Pick a screen and drag to compare.</p>
+
+    <div class="bx-split" style="max-width:1000px;">
+<div class="bx" style="--bx-ratio:390/844; flex-basis:236px;">
+  <div class="bx-tabs" role="tablist" aria-label="Choose a screen to compare">
+    <button type="button" class="bx-tab on" role="tab" aria-selected="true" data-before="img/flosser_before_home.png" data-after="img/flosser_home.png" data-before-alt="Early home screen: a routine picker with the flossing guide, a Start Flossing timer card, weekly progress, and an Add New Routine button" data-after-alt="Final home screen: Chip the mascot, the week streak, and a Start Flossing button above a tab bar" data-l="Early" data-r="Final">Home</button>
+    <button type="button" class="bx-tab" role="tab" aria-selected="false" data-before="img/flosserrough_2.png" data-after="img/flosser_timer.png" data-before-alt="Early timer: countdown, flossing guide, and weekly progress stacked on one screen" data-after-alt="Final timer: a single two-minute ring with play and reset, guide moved to its own tab" data-l="Early" data-r="Final">Timer</button>
+    <button type="button" class="bx-tab" role="tab" aria-selected="false" data-before="img/flosser_before_friends.png" data-after="img/flosser_friends.png" data-before-alt="Early friends screen: your 1-day streak and a Share button above friends&#39; weekly scores like 4/7 days this week" data-after-alt="Final friends activity: streak rows, with a friend who is two days behind and Snaggle creeping in" data-l="Early" data-r="Final">Friends</button>
+  </div>
+  <div class="bx-frame" tabindex="0" role="slider" aria-label="Drag to compare: Home" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">
+    <div class="bx-layer after"><img loading="lazy" decoding="async" src="img/flosser_home.png" alt="Final home screen: Chip the mascot, the week streak, and a Start Flossing button above a tab bar"><div class="bx-ph"><b>After</b><span>Add this file</span><code>img/flosser_home.png</code></div></div>
+    <div class="bx-layer before"><img loading="lazy" decoding="async" src="img/flosser_before_home.png" alt="Early home screen: a routine picker with the flossing guide, a Start Flossing timer card, weekly progress, and an Add New Routine button"><div class="bx-ph"><b>Before</b><span>Add this file</span><code>img/flosser_before_home.png</code></div></div>
+    <span class="bx-tag l">Early</span><span class="bx-tag r">Final</span>
+    <span class="bx-line"></span><span class="bx-grip" aria-hidden="true">&#8596;</span>
+  </div>
+  <p class="bx-note"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M8 6 3 12l5 6M16 6l5 6-5 6"/></svg>Drag to compare</p>
+</div>
+      <div class="bx-body">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+      <div class="card"><div class="tag">Navigation</div><h3>Hamburger &rarr; tab bar</h3><p>Four sections used in a two-minute session shouldn't hide behind a menu icon.</p></div>
+      <div class="card"><div class="tag">Structure</div><h3>One screen &rarr; two</h3><p>Progress and Friends got split into their own tabs instead of competing for space.</p></div>
+      <div class="card"><div class="tag">Reward</div><h3>No mascot &rarr; Chip</h3><p>The reward part of the habit loop needed a face, so I made Chip.</p></div>
+      <div class="card"><div class="tag">Color</div><h3>Generic violet &rarr; warm palette</h3><p>Purple looked like every other wellness app. Cream, mint, and coral feel&nbsp;friendlier.</p></div>
+      <div class="card"><div class="tag">Accountability</div><h3>Flat stats &rarr; stakes</h3><p>"4/7 days" became "a few days behind, Snaggle's creeping in", so you can tell when a friend is falling behind.</p></div>
+      <div class="card"><div class="tag">Home Screen</div><h3>Routine list &rarr; Chip-first</h3><p>The old home screen was a routine picker with a guide. The new one opens on Chip, so you want to press start.</p></div>
+    </div>
+      </div>
+    </div>
+  </section></div>
+
+  <!-- 16. prototype -->
+  <div class="slide-shell"><section class="slide" data-title="Gameplay">
+    <div class="eyebrow">Gameplay</div>
+
+    <div class="sv-tabs" role="tablist" aria-label="Gameplay">
+      <button class="sv-tab on" type="button" role="tab" id="gp-tab-concept" aria-controls="gp-concept" aria-selected="true">Concept</button>
+      <button class="sv-tab" type="button" role="tab" id="gp-tab-lore" aria-controls="gp-lore" aria-selected="false">The villain</button>
+      <button class="sv-tab" type="button" role="tab" id="gp-tab-wins" aria-controls="gp-wins" aria-selected="false">If Snaggle wins</button>
+      <button class="sv-tab" type="button" role="tab" id="gp-tab-level" aria-controls="gp-level" aria-selected="false">Levelling</button>
+      <button class="sv-tab" type="button" role="tab" id="gp-tab-closet" aria-controls="gp-closet" aria-selected="false">The closet</button>
+    </div>
+
+    <div class="sv-panel" id="gp-concept" role="tabpanel" aria-labelledby="gp-tab-concept">
+      <div style="display:flex; align-items:center; gap:0; height:100%; position:relative;">
+            <div style="flex:0 0 48%; display:flex; align-items:center; justify-content:center; position:relative; margin-left:-3%;">
+              <div style="position:absolute; width:360px; height:360px; border-radius:50%; background:#F1F4EA;"></div>
+              <svg width="320" height="342" viewBox="0 0 90 100" style="position:relative; filter:drop-shadow(0 20px 30px rgba(0,0,0,.08));">
+                <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+                <circle cx="33" cy="42" r="4.5" fill="var(--ink)"/><circle cx="57" cy="42" r="4.5" fill="var(--ink)"/>
+                <circle cx="20" cy="48" r="6" fill="#FFB6A3" opacity="0.6"/><circle cx="70" cy="48" r="6" fill="#FFB6A3" opacity="0.6"/>
+                <path d="M33 58 Q45 68 57 58" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div style="flex:1; padding-left:20px;">
+              <h2 style="font-size:clamp(28px,3.6vw,40px); line-height:1.15; margin-bottom:24px;">A mascot to take care&nbsp;of.</h2>
+              <div style="display:flex; flex-direction:column; gap:14px; max-width:380px;">
+                <div><span style="font-size:10px; letter-spacing:.14em; text-transform:uppercase; font-weight:700; color:var(--muted);">Problem</span><p style="margin:2px 0 0; font-size:14px;">Missing a day feels like personal&nbsp;failure.</p></div>
+                <div><span style="font-size:10px; letter-spacing:.14em; text-transform:uppercase; font-weight:700; color:var(--pink);">Solution</span><p style="margin:2px 0 0; font-size:14px;">Give the consequence to Snaggle&nbsp;instead.</p></div>
+                <div><span style="font-size:10px; letter-spacing:.14em; text-transform:uppercase; font-weight:700; color:var(--purple-deep);">Result</span><p style="margin:2px 0 0; font-size:14px;">A reason to return, without feeling&nbsp;blamed.</p></div>
+              </div>
+              <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:28px;">
+                <svg width="26" height="28" viewBox="0 0 90 100"><path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="5"/></svg>
+                <span style="opacity:.35; font-size:12px;">&rarr;</span>
+                <svg width="22" height="24" viewBox="0 0 100 110"><circle cx="50" cy="52" r="42" fill="#8FA85C"/><circle cx="36" cy="44" r="6" fill="#2E3B1A"/><circle cx="64" cy="44" r="6" fill="#2E3B1A"/></svg>
+                <span style="opacity:.35; font-size:12px;">&rarr;</span>
+                <svg width="20" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--purple-deep)" stroke-width="2"><path d="M12 2c-2.5 0-4 2-4 4.5 0 2.5 1 5 1.4 6.9.25 1.3.9 2 1.6 2s1.1-.7 1.3-1.9c.25-1.1.3-2.1 1.7-2.1s1.25 1 1.5 2.1c.2 1.2.6 1.9 1.3 1.9s1.35-.7 1.6-2c.4-1.9 1.4-4.4 1.4-6.9C20 4 18.5 2 16 2c-1 0-1.75.4-2 .4S13 2 12 2z"/></svg>
+                <span style="opacity:.35; font-size:12px;">&rarr;</span>
+                <span class="pill grad" style="font-size:11px;">Chip recovers</span>
+              </div>
+            </div>
+          </div>
+    </div>
+
+    <div class="sv-panel" data-tone="dark" id="gp-lore" role="tabpanel" aria-labelledby="gp-tab-lore" hidden>
+      <div style="display:flex; align-items:center; gap:20px; height:100%;">
+            <div style="flex:1; max-width:380px; z-index:2;">
+              <h2 style="font-size:clamp(38px,5.4vw,60px); line-height:1; margin-bottom:18px; color:#F4ECE0;">Meet<br>Snaggle.</h2>
+              <p style="font-size:15px; line-height:1.7; opacity:.85; margin-bottom:24px;">Jealous of every smile that isn't his. Snaggle spreads grime whenever Chip is left unguarded, but consistency is his weakness. Every flossing session pushes him&nbsp;back.</p>
+              <div style="display:flex; flex-direction:column; gap:12px;">
+                <div><span style="font-size:10px; letter-spacing:.14em; text-transform:uppercase; font-weight:700; color:#E8A84F;">His Scheme</span><span style="font-size:13px; margin-left:8px; opacity:.85;">Spread grime.</span></div>
+                <div><span style="font-size:10px; letter-spacing:.14em; text-transform:uppercase; font-weight:700; color:#E8A84F;">His Weakness</span><span style="font-size:13px; margin-left:8px; opacity:.85;">Consistency.</span></div>
+                <div><span style="font-size:10px; letter-spacing:.14em; text-transform:uppercase; font-weight:700; color:#E8A84F;">His Enemy</span><span style="font-size:13px; margin-left:8px; opacity:.85;">Flossing.</span></div>
+              </div>
+            </div>
+            <div style="flex:0 0 48%; position:relative; display:flex; align-items:center; justify-content:center; margin-right:-6%; overflow:visible;">
+              <div style="position:absolute; width:420px; height:420px; border-radius:50%; background:#8FA85C; opacity:.18; filter:blur(60px);"></div>
+              <div style="position:absolute; top:14%; left:8%; width:7px; height:7px; border-radius:50%; background:#8FA85C; opacity:.7;"></div>
+              <div style="position:absolute; top:60%; left:2%; width:5px; height:5px; border-radius:50%; background:#6B8F3A; opacity:.6;"></div>
+              <div style="position:absolute; top:30%; right:6%; width:6px; height:6px; border-radius:50%; background:#8FA85C; opacity:.5;"></div>
+              <div style="position:absolute; bottom:12%; right:14%; width:8px; height:8px; border-radius:50%; background:#6B8F3A; opacity:.55;"></div>
+              <div style="position:absolute; top:8%; right:26%; width:4px; height:4px; border-radius:50%; background:#8FA85C; opacity:.6;"></div>
+              <img loading="lazy" decoding="async" src="img/snaggle.png" alt="Snaggle, the grime villain mascot, a spiky green blob with tendrils and a sly grin" style="width:300px; height:auto; position:relative;">
+            </div>
+          </div>
+    </div>
+
+    <div class="sv-panel" id="gp-wins" role="tabpanel" aria-labelledby="gp-tab-wins" hidden>
+      <h2 style="font-size:clamp(28px,3.6vw,42px); text-align:center; margin-bottom:10px; color:#2F4A28;">What happens when you stop?</h2>
+          <p class="lead" style="margin-bottom:10px; text-align:center; max-width:560px; margin-left:auto; margin-right:auto; text-wrap:balance;">Based on missed days in a row. When you miss days, Chip gets grimy.</p>
+          <p style="font-size:12.5px; line-height:1.7; color:var(--muted); text-align:center; max-width:600px; margin:0 auto 26px;">The streak stays where you left it, so you never lose what you earned. Snaggle moves slowly, over weeks. Your friends see your progress, and that's what keeps people&nbsp;honest.</p>
+          <div style="display:flex; align-items:flex-end; justify-content:center; gap:6px; flex-wrap:wrap;">
+      
+            <div style="text-align:center; width:150px;">
+              <svg width="110" height="122" viewBox="0 0 90 100" style="margin:0 auto 10px;">
+                <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+                <circle cx="33" cy="42" r="4.5" fill="var(--ink)"/><circle cx="57" cy="42" r="4.5" fill="var(--ink)"/>
+                <circle cx="20" cy="48" r="6" fill="#FFB6A3" opacity="0.6"/><circle cx="70" cy="48" r="6" fill="#FFB6A3" opacity="0.6"/>
+                <path d="M33 58 Q45 68 57 58" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+              </svg>
+              <div style="font-family:'Manrope',sans-serif; font-weight:800; font-size:18px;">Clear</div>
+              <div style="font-size:11px; color:var(--muted); margin-top:2px;">0 days</div>
+            </div>
+      
+            <div style="font-size:22px; opacity:.3; padding-bottom:34px;">&rarr;</div>
+      
+            <div style="text-align:center; width:150px;">
+              <svg width="110" height="122" viewBox="0 0 90 100" style="margin:0 auto 10px;">
+                <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+                <path d="M60 20 Q74 26 72 42 Q68 46 60 40 Q56 30 60 20 Z" fill="#8FA85C" opacity="0.85"/>
+                <circle cx="33" cy="42" r="4.5" fill="var(--ink)"/><circle cx="57" cy="40" r="4" fill="var(--ink)"/>
+                <circle cx="20" cy="48" r="6" fill="#FFB6A3" opacity="0.5"/>
+                <path d="M34 60 Q45 64 56 60" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+              </svg>
+              <div style="font-family:'Manrope',sans-serif; font-weight:800; font-size:18px;">Spotted</div>
+              <div style="font-size:11px; color:var(--muted); margin-top:2px;">3 days</div>
+            </div>
+      
+            <div style="font-size:22px; opacity:.3; padding-bottom:34px;">&rarr;</div>
+      
+            <div style="text-align:center; width:150px;">
+              <svg width="110" height="122" viewBox="0 0 90 100" style="margin:0 auto 10px;">
+                <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+                <path d="M58 16 Q78 24 76 46 Q74 58 62 56 Q54 44 58 16 Z" fill="#6B8F3A"/>
+                <path d="M62 34 Q68 38 66 44 Q60 46 58 40 Q58 36 62 34 Z" fill="#3F5423"/>
+                <circle cx="33" cy="44" r="4.5" fill="var(--ink)"/>
+                <path d="M50 38 Q57 34 63 38" fill="none" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round"/>
+                <path d="M30 40 Q26 36 22 40" fill="none" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round"/>
+                <path d="M34 64 Q45 60 56 64" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+              </svg>
+              <div style="font-family:'Manrope',sans-serif; font-weight:800; font-size:18px;">Worried</div>
+              <div style="font-size:11px; color:var(--muted); margin-top:2px;">1 week</div>
+            </div>
+      
+            <div style="font-size:22px; opacity:.3; padding-bottom:34px;">&rarr;</div>
+      
+            <div style="text-align:center; width:150px;">
+              <svg width="110" height="122" viewBox="0 0 90 100" style="margin:0 auto 10px;">
+                <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--red)" stroke-width="2.2"/>
+                <path d="M50 6 Q80 14 80 46 Q78 70 60 92 Q48 88 48 70 Q44 40 50 6 Z" fill="#4A6428"/>
+                <ellipse cx="64" cy="42" rx="9" ry="12" fill="#2E3B1A"/>
+                <circle cx="30" cy="46" r="4.5" fill="var(--ink)"/>
+                <path d="M48 40 Q56 33 64 38" fill="none" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round"/>
+                <path d="M27 42 Q22 36 17 41" fill="none" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round"/>
+                <path d="M30 66 Q45 76 55 68" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+              </svg>
+              <div style="font-family:'Manrope',sans-serif; font-weight:800; font-size:18px; color:var(--red);">Overrun</div>
+              <div style="font-size:11px; color:var(--muted); margin-top:2px;">2+ weeks</div>
+            </div>
+      
+          </div>
+          <p style="text-align:center; font-size:12.5px; color:var(--muted); margin-top:30px;">Every state is reversible. One ordinary session, and Chip starts clearing again.</p>
+    </div>
+
+    <div class="sv-panel" id="gp-level" role="tabpanel" aria-labelledby="gp-tab-level" hidden>
+      <h2 style="font-size:clamp(28px,3.6vw,42px); text-align:center; margin-bottom:36px;">Your smile evolves with you.</h2>
+      
+          <div style="display:flex; align-items:flex-end; justify-content:center; gap:6px; flex-wrap:wrap;">
+      
+            <div style="text-align:center; width:150px; position:relative;">
+              <svg width="100" height="112" viewBox="-6 -14 102 114" style="margin:0 auto 10px; position:relative;">
+                <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+                <circle cx="33" cy="42" r="4.5" fill="var(--ink)"/><circle cx="57" cy="42" r="4.5" fill="var(--ink)"/>
+                <path d="M33 58 Q45 68 57 58" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+              </svg>
+              <div style="font-family:'Manrope',sans-serif; font-weight:800; font-size:15px;">Bright Smile</div>
+            </div>
+      
+            <div style="font-size:18px; opacity:.3; padding-bottom:26px;">&rarr;</div>
+      
+            <div style="text-align:center; width:150px; position:relative;">
+              <div style="position:absolute; top:14px; left:50%; transform:translateX(-50%); width:100px; height:100px; border-radius:50%; background:#FFD9EC; opacity:.6; filter:blur(20px);"></div>
+              <svg width="100" height="112" viewBox="-6 -14 102 114" style="margin:0 auto 10px; position:relative;">
+                <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+                <circle cx="33" cy="42" r="4.5" fill="var(--ink)"/><circle cx="57" cy="42" r="4.5" fill="var(--ink)"/>
+                <path d="M33 58 Q45 68 57 58" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+                <path d="M68 18 L71 25 L78 27 L71 29 L68 36 L65 29 L58 27 L65 25 Z" fill="#FF9FC4"/>
+              </svg>
+              <div style="font-family:'Manrope',sans-serif; font-weight:800; font-size:15px;">Pearl Shine</div>
+            </div>
+      
+            <div style="font-size:18px; opacity:.3; padding-bottom:26px;">&rarr;</div>
+      
+            <div style="text-align:center; width:150px; position:relative;">
+              <div style="position:absolute; top:14px; left:50%; transform:translateX(-50%); width:100px; height:100px; border-radius:50%; background:#FFD166; opacity:.5; filter:blur(20px);"></div>
+              <svg width="100" height="112" viewBox="-6 -14 102 114" style="margin:0 auto 10px; position:relative;">
+                <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+                <circle cx="33" cy="42" r="4.5" fill="var(--ink)"/><circle cx="57" cy="42" r="4.5" fill="var(--ink)"/>
+                <path d="M33 58 Q45 68 57 58" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+                <path d="M26 12 L34 -2 L42 8 L45 -6 L48 8 L56 -2 L64 12 Z" fill="#FFD166" stroke="var(--ink)" stroke-width="1.4" stroke-linejoin="round"/>
+              </svg>
+              <div style="font-family:'Manrope',sans-serif; font-weight:800; font-size:15px;">Golden Grin</div>
+            </div>
+      
+            <div style="font-size:18px; opacity:.3; padding-bottom:26px;">&rarr;</div>
+      
+            <div style="text-align:center; width:150px; position:relative;">
+              <div style="position:absolute; top:14px; left:50%; transform:translateX(-50%); width:110px; height:110px; border-radius:50%; background:#BFE9F5; opacity:.6; filter:blur(22px);"></div>
+              <svg width="100" height="112" viewBox="-6 -14 102 114" style="margin:0 auto 10px; position:relative;">
+                <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+                <circle cx="33" cy="42" r="4.5" fill="var(--ink)"/><circle cx="57" cy="42" r="4.5" fill="var(--ink)"/>
+                <path d="M33 58 Q45 68 57 58" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+                <path d="M70 14 L73 21 L80 23 L73 25 L70 32 L67 25 L60 23 L67 21 Z" fill="#7EC8DB"/>
+                <path d="M18 60 L20 65 L25 67 L20 69 L18 74 L16 69 L11 67 L16 65 Z" fill="#7EC8DB"/>
+              </svg>
+              <div style="font-family:'Manrope',sans-serif; font-weight:800; font-size:15px;">Diamond Grin</div>
+            </div>
+      
+          </div>
+      
+          <div style="margin-top:44px; padding-top:24px; border-top:1px solid var(--line); display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap;">
+            <span class="meta-label" style="margin:0 10px 0 0;">Unlockable cosmetics</span>
+            <span class="pill" style="background:#F1F4EA; border-color:transparent;">Princess Chip</span>
+            <span class="pill" style="background:#F1F4EA; border-color:transparent;">Cool Chip</span>
+            <span class="pill" style="background:#F1F4EA; border-color:transparent;">Wizard Hat &middot; 60 days flossed</span>
+            <span class="pill grad">Diamond Aura &middot; top tier</span>
+          </div>
+          <p style="font-size:11.5px; color:var(--muted); text-align:center; margin-top:14px;">Purely cosmetic. Missing a day never costs you something you already earned.</p>
+    </div>
+
+    <div class="sv-panel" id="gp-closet" role="tabpanel" aria-labelledby="gp-tab-closet" hidden>
+      <h2 style="font-size:clamp(24px,3vw,32px); max-width:600px; margin-bottom:18px;">What's built, and what's next.</h2>
+      
+          <div class="meta-label" style="margin-bottom:10px;">Already in the app</div>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(0, calc((100% - 60px) / 6))); justify-content:center; gap:12px; margin-bottom:22px;">
+      
+            <div class="card" style="text-align:center; padding:14px 8px; border-color:var(--purple);">
+              <svg width="70" height="92" viewBox="-6 -32 102 134" style="margin:0 auto 6px;" role="img" aria-label="Princess Chip">
+                <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+                <path d="M20 78 Q45 66 70 78 L70 89 Q64 96 58 89 Q52 96 46 89 Q40 96 34 89 Q28 96 22 89 Z" fill="#FF9FC4" stroke="var(--ink)" stroke-width="1.3" stroke-linejoin="round"/>
+                <circle cx="19" cy="54" r="6" fill="#FFB6A3" opacity="0.6"/><circle cx="71" cy="54" r="6" fill="#FFB6A3" opacity="0.6"/>
+                <circle cx="33" cy="46" r="4.5" fill="var(--ink)"/><circle cx="57" cy="46" r="4.5" fill="var(--ink)"/>
+                <path d="M33 60 Q45 70 57 60" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+                <path d="M27 12 L27 -5 L36 4 L45 -16 L54 4 L63 -5 L63 12 Z" fill="#FFD166" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round"/>
+                <circle cx="45" cy="-16" r="2.8" fill="#A83D22"/><circle cx="27" cy="-5" r="2.2" fill="#FF9FC4"/><circle cx="63" cy="-5" r="2.2" fill="#FF9FC4"/>
+              </svg>
+              <div style="font-size:11px; font-weight:700;">Princess Chip</div>
+            </div>
+      
+            <div class="card" style="text-align:center; padding:14px 8px; border-color:var(--purple);">
+              <svg width="70" height="92" viewBox="-6 -32 102 134" style="margin:0 auto 6px;" role="img" aria-label="Cool Chip">
+                <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+                <path d="M20 76 Q45 66 70 76 L72 95 Q45 85 18 95 Z" fill="#5C7FB0" stroke="var(--ink)" stroke-width="1.3" stroke-linejoin="round"/>
+                <path d="M34 72 L45 87 L56 72 L53 93 L37 93 Z" fill="#F1F4EA" stroke="var(--ink)" stroke-width="1.2" stroke-linejoin="round"/>
+                <circle cx="19" cy="54" r="6" fill="#FFB6A3" opacity="0.45"/><circle cx="71" cy="54" r="6" fill="#FFB6A3" opacity="0.45"/>
+                <path d="M21 44 L11 40" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round"/>
+                <path d="M69 44 L79 40" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round"/>
+                <rect x="21" y="39" width="19" height="13" rx="6.5" fill="var(--ink)"/>
+                <rect x="50" y="39" width="19" height="13" rx="6.5" fill="var(--ink)"/>
+                <path d="M40 44 L50 44" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+                <path d="M25.5 42.5 L31 42.5" stroke="#fff" stroke-width="1.7" opacity="0.5" stroke-linecap="round"/>
+                <path d="M33 62 Q45 70 58 60" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+              </svg>
+              <div style="font-size:11px; font-weight:700;">Cool Chip</div>
+            </div>
+      
+            <div class="card" style="text-align:center; padding:14px 8px; border-color:var(--purple);">
+              <svg width="70" height="92" viewBox="-6 -32 102 134" style="margin:0 auto 6px;" role="img" aria-label="Wizard Hat">
+                <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+                <circle cx="33" cy="46" r="4.5" fill="var(--ink)"/><circle cx="57" cy="46" r="4.5" fill="var(--ink)"/>
+                <path d="M33 60 Q45 70 57 60" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+                <path d="M24 15 L40 -20 Q45 -30 51 -21 L66 15 Z" fill="#7C4FBF" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round"/>
+                <path d="M30 2 Q45 7 60 2" fill="none" stroke="#FFD166" stroke-width="3"/>
+                <ellipse cx="45" cy="15" rx="27" ry="6.5" fill="#7C4FBF" stroke="var(--ink)" stroke-width="1.6"/>
+                <path d="M48 -25 L49.6 -21.4 L53.4 -20 L49.6 -18.6 L48 -15 L46.4 -18.6 L42.6 -20 L46.4 -21.4 Z" fill="#FFD166" stroke="var(--ink)" stroke-width="0.8" stroke-linejoin="round"/>
+              </svg>
+              <div style="font-size:11px; font-weight:700;">Wizard Hat</div>
+            </div>
+      
+            <div class="card" style="text-align:center; padding:14px 8px; border-color:var(--purple);">
+              <svg width="70" height="92" viewBox="-6 -32 102 134" style="margin:0 auto 6px;" role="img" aria-label="Diamond Aura">
+                <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+                <circle cx="33" cy="46" r="4.5" fill="var(--ink)"/><circle cx="57" cy="46" r="4.5" fill="var(--ink)"/>
+                <path d="M33 60 Q45 70 57 60" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+                <ellipse cx="45" cy="44" rx="40" ry="44" fill="none" stroke="#BFE9F5" stroke-width="1.8" opacity="0.65"/>
+                <ellipse cx="45" cy="44" rx="46" ry="50" fill="none" stroke="#7EC8DB" stroke-width="2.6" opacity="0.85"/>
+                <path d="M80 3 L82.1 7.9 L87 10 L82.1 12.1 L80 17 L77.9 12.1 L73 10 L77.9 7.9 Z" fill="#7EC8DB"/>
+                <path d="M11 60 L12.8 64.2 L17 66 L12.8 67.8 L11 72 L9.2 67.8 L5 66 L9.2 64.2 Z" fill="#7EC8DB"/>
+                <path d="M72 81 L73.5 84.5 L77 86 L73.5 87.5 L72 91 L70.5 87.5 L67 86 L70.5 84.5 Z" fill="#7EC8DB"/>
+                <path d="M18 11.5 L19.4 14.7 L22.5 16 L19.4 17.4 L18 20.5 L16.6 17.4 L13.5 16 L16.6 14.7 Z" fill="#7EC8DB"/>
+              </svg>
+              <div style="font-size:11px; font-weight:700;">Diamond Aura</div>
+            </div>
+      
+          </div>
+      
+          <div class="meta-label" style="margin-bottom:8px;">What Else Could Live Here</div>
+          <p class="lead" style="margin-bottom:14px;">A concept sheet of early explorations for where the closet could go&nbsp;next.</p>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(0, calc((100% - 60px) / 6))); justify-content:center; gap:12px;">
+      
+            <div class="card" style="text-align:center; padding:14px 8px;">
+              <svg width="70" height="92" viewBox="-6 -32 102 134" style="margin:0 auto 6px;" role="img" aria-label="Beanie Chip">
+                <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+                <circle cx="33" cy="46" r="4.5" fill="var(--ink)"/><circle cx="57" cy="46" r="4.5" fill="var(--ink)"/>
+                <path d="M33 60 Q45 70 57 60" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+                <path d="M16 20 Q16 -12 45 -12 Q74 -12 74 20 Z" fill="#C1502E" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round"/>
+                <path d="M30 -7 L30 13 M45 -11 L45 13 M60 -7 L60 13" stroke="#A83D22" stroke-width="1.5" opacity="0.75"/>
+                <rect x="13" y="13" width="64" height="13" rx="6.5" fill="#A83D22" stroke="var(--ink)" stroke-width="1.6"/>
+                <circle cx="45" cy="-15" r="7" fill="#F1F4EA" stroke="var(--ink)" stroke-width="1.6"/>
+              </svg>
+              <div style="font-size:11px; font-weight:700;">Beanie Chip</div>
+            </div>
+      
+            <div class="card" style="text-align:center; padding:14px 8px;">
+              <svg width="70" height="92" viewBox="-6 -32 102 134" style="margin:0 auto 6px;" role="img" aria-label="Chef Chip">
+                <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+                <circle cx="33" cy="46" r="4.5" fill="var(--ink)"/><circle cx="57" cy="46" r="4.5" fill="var(--ink)"/>
+                <path d="M33 60 Q45 70 57 60" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+                <path d="M31 76 Q45 84 59 76 L57 90 Q45 95 33 90 Z" fill="#C1502E" stroke="var(--ink)" stroke-width="1.3" stroke-linejoin="round"/>
+                <path d="M20 14 C19 3 22 -5 30 -8 C33 -20 38 -25 45 -25 C52 -25 57 -20 60 -8 C68 -5 71 3 70 14 Z" fill="#fff" stroke="var(--ink)" stroke-width="1.7" stroke-linejoin="round"/>
+                <rect x="23" y="6" width="44" height="14" rx="3.5" fill="#fff" stroke="var(--ink)" stroke-width="1.7"/>
+              </svg>
+              <div style="font-size:11px; font-weight:700;">Chef Chip</div>
+            </div>
+      
+            <div class="card" style="text-align:center; padding:14px 8px;">
+              <svg width="70" height="92" viewBox="-6 -32 102 134" style="margin:0 auto 6px;" role="img" aria-label="Pirate Chip">
+                <defs><clipPath id="pirClip"><path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z"/></clipPath></defs>
+                <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+                <g clip-path="url(#pirClip)"><path d="M0 -6 H90 V22 Q45 30 0 22 Z" fill="#C1502E"/><circle cx="24" cy="10" r="2" fill="#F1F4EA" opacity="0.8"/><circle cx="45" cy="14" r="2" fill="#F1F4EA" opacity="0.8"/><circle cx="66" cy="10" r="2" fill="#F1F4EA" opacity="0.8"/></g>
+                <path d="M12 17 L-3 8 L1 22 L-5 31 L13 27 Z" fill="#A83D22" stroke="var(--ink)" stroke-width="1.3" stroke-linejoin="round"/>
+                <path d="M50 41 Q40 36 25 35" fill="none" stroke="var(--ink)" stroke-width="2" stroke-linecap="round"/>
+                <path d="M65 42 L80 40" stroke="var(--ink)" stroke-width="2" stroke-linecap="round"/>
+                <circle cx="33" cy="46" r="4.5" fill="var(--ink)"/>
+                <ellipse cx="57" cy="45" rx="8.5" ry="7.5" fill="var(--ink)"/>
+                <path d="M32 60 Q45 71 58 60" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+              </svg>
+              <div style="font-size:11px; font-weight:700;">Pirate Chip</div>
+            </div>
+      
+            <div class="card" style="text-align:center; padding:14px 8px;">
+              <svg width="70" height="92" viewBox="-6 -32 102 134" style="margin:0 auto 6px;" role="img" aria-label="Flower Chip">
+                <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+                <circle cx="33" cy="46" r="4.5" fill="var(--ink)"/><circle cx="57" cy="46" r="4.5" fill="var(--ink)"/>
+                <path d="M33 60 Q45 70 57 60" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+                <circle cx="19" cy="54" r="6" fill="#FFB6A3" opacity="0.5"/><circle cx="71" cy="54" r="6" fill="#FFB6A3" opacity="0.5"/>
+                <ellipse cx="9" cy="35" rx="6" ry="3.4" fill="#5C7A4E" transform="rotate(-32 9 35)"/>
+                <ellipse cx="81" cy="35" rx="6" ry="3.4" fill="#5C7A4E" transform="rotate(32 81 35)"/>
+                <circle cx="12" cy="28" r="3.2" fill="#FF9FC4"/><circle cx="20" cy="28" r="3.2" fill="#FF9FC4"/><circle cx="16" cy="24" r="3.2" fill="#FF9FC4"/><circle cx="16" cy="32" r="3.2" fill="#FF9FC4"/><circle cx="16" cy="28" r="2.5" fill="#FFD166"/>
+                <circle cx="22" cy="12" r="3.2" fill="#FFD166"/><circle cx="30" cy="12" r="3.2" fill="#FFD166"/><circle cx="26" cy="8" r="3.2" fill="#FFD166"/><circle cx="26" cy="16" r="3.2" fill="#FFD166"/><circle cx="26" cy="12" r="2.5" fill="#fff"/>
+                <circle cx="41" cy="4" r="3.2" fill="#FF9FC4"/><circle cx="49" cy="4" r="3.2" fill="#FF9FC4"/><circle cx="45" cy="0" r="3.2" fill="#FF9FC4"/><circle cx="45" cy="8" r="3.2" fill="#FF9FC4"/><circle cx="45" cy="4" r="2.5" fill="#FFD166"/>
+                <circle cx="60" cy="12" r="3.2" fill="#C1502E"/><circle cx="68" cy="12" r="3.2" fill="#C1502E"/><circle cx="64" cy="8" r="3.2" fill="#C1502E"/><circle cx="64" cy="16" r="3.2" fill="#C1502E"/><circle cx="64" cy="12" r="2.5" fill="#FFD166"/>
+                <circle cx="70" cy="28" r="3.2" fill="#FFD166"/><circle cx="78" cy="28" r="3.2" fill="#FFD166"/><circle cx="74" cy="24" r="3.2" fill="#FFD166"/><circle cx="74" cy="32" r="3.2" fill="#FFD166"/><circle cx="74" cy="28" r="2.5" fill="#fff"/>
+              </svg>
+              <div style="font-size:11px; font-weight:700;">Flower Chip</div>
+            </div>
+      
+            <div class="card" style="text-align:center; padding:14px 8px;">
+              <svg width="70" height="92" viewBox="-6 -32 102 134" style="margin:0 auto 6px;" role="img" aria-label="Astro Chip">
+                <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+                <circle cx="33" cy="46" r="4.5" fill="var(--ink)"/><circle cx="57" cy="46" r="4.5" fill="var(--ink)"/>
+                <path d="M33 60 Q45 70 57 60" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+                <ellipse cx="45" cy="44" rx="45" ry="49" fill="#BFE9F5" opacity="0.3"/>
+                <path d="M16 30 Q22 13 38 6" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity="0.75"/>
+                <ellipse cx="45" cy="44" rx="45" ry="49" fill="none" stroke="#5C7FB0" stroke-width="3"/>
+                <path d="M45 -5 L45 -18" stroke="#5C7FB0" stroke-width="3" stroke-linecap="round"/>
+                <circle cx="45" cy="-21" r="4" fill="#A83D22" stroke="var(--ink)" stroke-width="1.2"/>
+                <rect x="13" y="84" width="64" height="11" rx="5.5" fill="#5C7FB0" stroke="var(--ink)" stroke-width="1.4"/>
+              </svg>
+              <div style="font-size:11px; font-weight:700;">Astro Chip</div>
+            </div>
+      
+            <div class="card" style="text-align:center; padding:14px 8px;">
+              <svg width="70" height="92" viewBox="-6 -32 102 134" style="margin:0 auto 6px;" role="img" aria-label="Hero Chip">
+                <defs><clipPath id="heroClip"><path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z"/></clipPath></defs>
+                <path d="M24 54 Q45 46 66 54 L88 100 Q45 84 2 100 Z" fill="#5C7A4E" stroke="var(--ink)" stroke-width="1.4" stroke-linejoin="round"/>
+                <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
+                <g clip-path="url(#heroClip)"><path d="M2 33 Q45 26 88 33 L88 53 Q45 60 2 53 Z" fill="#3F5636"/></g>
+                <ellipse cx="33" cy="44" rx="6.5" ry="5.5" fill="#fff"/><ellipse cx="57" cy="44" rx="6.5" ry="5.5" fill="#fff"/>
+                <circle cx="33" cy="44" r="3.4" fill="var(--ink)"/><circle cx="57" cy="44" r="3.4" fill="var(--ink)"/>
+                <path d="M33 60 Q45 70 57 60" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+              </svg>
+              <div style="font-size:11px; font-weight:700;">Hero Chip</div>
+            </div>
+      
+          </div>
+    </div>
+  </section></div>
+<div class="slide-shell green"><section class="slide green" data-title="How Might We">
     <div class="eyebrow">How Might We</div>
     <h2 style="font-family:'Manrope',sans-serif; font-weight:800; font-size:clamp(30px,4.2vw,46px); line-height:1.35; max-width:820px;">
       How might we help people who struggle to floss build a simple daily habit, so they can improve their oral hygiene and feel more confident about their&nbsp;smile?
     </h2>
   </section></div>
 
-  <!-- 4b. WHY IT MATTERS -->
-    <!-- 4b. WHY IT MATTERS -->
+  <!-- 4b. why it matters -->
+    <!-- 4b. why it matters -->
   <div class="slide-shell panel"><section class="slide panel" data-title="Why It Matters">
     <div class="eyebrow">Background Research</div>
     <h2 style="font-size:clamp(28px,3.6vw,42px); max-width:700px; margin-bottom:30px; color:#2F4A28;">Skipping floss matters more than people think.</h2>
@@ -1163,7 +1608,7 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
       </div>
       <div style="width:1px; background:rgba(247,236,229,.18);"></div>
       <div style="flex:1; min-width:150px; padding:0 24px;">
-        <div style="font-family:'Manrope',sans-serif; font-weight:800; font-size:clamp(44px,6vw,64px); line-height:1; color:var(--pink); white-space:nowrap;">26<span style="font-size:.45em; opacity:.6;">%</span></div>
+        <div style="font-family:'Manrope',sans-serif; font-weight:800; font-size:clamp(44px,6vw,64px); line-height:1; color:var(--void); white-space:nowrap;">26<span style="font-size:.45em; opacity:.6;">%</span></div>
         <p style="font-size:12.5px; opacity:.7; margin-top:10px; max-width:190px; line-height:1.6; color:var(--void);">Say they always floss, from the same survey</p>
       </div>
       <div style="width:1px; background:rgba(247,236,229,.18);"></div>
@@ -1205,163 +1650,171 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
     </div>
   </section></div>
 
-  <!-- 5b. DESIGN PRINCIPLES -->
-  <div class="slide-shell panel"><section class="slide panel" data-title="Research">
-    <div class="eyebrow">Competitors</div>
-    <h2 style="font-size:clamp(24px,3vw,34px); max-width:760px; margin-bottom:10px; color:#2F4A28;">Dental apps remind you. Habit games reward you. None of them does both for flossing.</h2>
-    <p style="font-size:13px; color:var(--muted); max-width:660px; margin-bottom:20px;">I compared five apps using each app's own listing. Reminders and timers already exist. Rewards and friends only show up in a habit game or with a smart toothbrush. Flosser has both in a free, two-minute&nbsp;routine.</p>
-    <div class="cmp-wrap">
-      <table class="cmp cmp-6">
-        <thead><tr class="cmp-grp"><th></th><th colspan="4">Dental apps</th><th>Habit app</th><th class="cmp-fl"></th></tr><tr><th></th><th scope="col">Text2Floss</th><th scope="col">Toothy</th><th scope="col">Brush DJ</th><th scope="col">Oral-B</th><th scope="col">Habitica</th><th scope="col" class="cmp-fl">Flosser<small>My app</small></th></tr></thead>
-        <tbody><tr><th scope="row">Flossing reminders</th><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Text messages</span></td><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Premium</span></td><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Yes</span></td><td><span class="cmp-n">Not listed</span></td><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Any habit</span></td><td class="cmp-fl"><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">One a day</span></td></tr><tr><th scope="row">Timer or how-to guide</th><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Timer + videos</span></td><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Voice-guided</span></td><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Music timer + videos</span></td><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Brushing coach</span></td><td><span class="cmp-n">Not listed</span></td><td class="cmp-fl"><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">2-min timer + guide</span></td></tr><tr><th scope="row">Progress tracking</th><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Flossing report</span></td><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Statistics</span></td><td><span class="cmp-n">Not listed</span></td><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Weekly, monthly</span></td><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Streaks</span></td><td class="cmp-fl"><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Streak + calendar</span></td></tr><tr><th scope="row">Rewards to come back for</th><td><span class="cmp-n">Not listed</span></td><td><span class="cmp-n">Not listed</span></td><td><span class="cmp-n">Not listed</span></td><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Medals</span></td><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Gold, gear, pets</span></td><td class="cmp-fl"><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Chip + closet</span></td></tr><tr><th scope="row">Friends</th><td><span class="cmp-n">Not listed</span></td><td><span class="cmp-n">Not listed</span></td><td><span class="cmp-n">Not listed</span></td><td><span class="cmp-n">Not listed</span></td><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Parties</span></td><td class="cmp-fl"><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Friends tab</span></td></tr><tr><th scope="row">Works without extra hardware</th><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Yes</span></td><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Yes</span></td><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Yes</span></td><td><span class="cmp-x">Needs a smart toothbrush</span></td><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Yes</span></td><td class="cmp-fl"><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Yes</span></td></tr></tbody>
-      </table>
-    </div>
-    <p class="cmp-swipe">Swipe the table to see Flosser &rarr;</p>
-    <p class="cmp-foot">"Not listed" means the feature isn't mentioned in the app's own store page or website.</p>
-  </section></div>
+  <!-- 5b. design principles -->
+  <div class="slide-shell panel"><section class="slide" data-title="Research">
+    <div class="eyebrow">Research</div>
 
-  <!-- 7. TARGET AUDIENCE -->
-    <!-- 7b. WHO'S NOT FLOSSING (the number on its own) -->
-  <div class="slide-shell" style="background:#212B18;"><section class="slide" data-title="Who's Not Flossing" style="color:var(--void);">
-    <h2 style="font-family:'Manrope',sans-serif; font-weight:800; font-size:clamp(30px,3.8vw,44px); line-height:1.15; color:var(--pink); margin-bottom:22px;">Who I'm designing for.</h2>
-    <div style="display:flex; align-items:center; gap:48px; flex-wrap:wrap;">
-      <div style="font-family:'Manrope',sans-serif; font-weight:800; font-size:clamp(90px,13vw,160px); line-height:1; color:#F4ECE0;">35<span style="font-size:.4em; opacity:.6;">%</span></div>
-      <p style="font-size:18px; line-height:1.7; max-width:420px; color:var(--void); opacity:.85;">Never or rarely floss. That's more than a third of the people I surveyed. For them, Flosser is a way to&nbsp;start.</p>
+    <div class="sv-tabs" role="tablist" aria-label="Research">
+      <button class="sv-tab on" type="button" role="tab" id="rs-tab-comp" aria-controls="rs-comp" aria-selected="true">Competitors</button>
+      <button class="sv-tab" type="button" role="tab" id="rs-tab-who" aria-controls="rs-who" aria-selected="false">Who's not flossing</button>
+      <button class="sv-tab" type="button" role="tab" id="rs-tab-target" aria-controls="rs-target" aria-selected="false">Target audience</button>
     </div>
-  </section></div>
 
-  <!-- 7c. TARGET AUDIENCE (the chart behind the number) -->
-  <div class="slide-shell panel"><section class="slide panel" data-title="Target Audience">
-    <div class="eyebrow">Target Audience</div>
-    <div style="display:flex; align-items:center; gap:56px; flex-wrap:wrap;">
-      <div style="flex:1 1 340px; max-width:440px;">
-        <h2 style="font-size:clamp(26px,3.2vw,36px); margin-bottom:16px; color:#2F4A28;">Three kinds of people, one app.</h2>
-        <ul class="tight">
-          <li>People who don't floss enough</li>
-          <li>People who don't floss at all</li>
-          <li>People who want to take their oral health more seriously</li>
-        </ul>
-        <p style="font-size:13.5px; line-height:1.7; color:var(--muted); margin-top:16px;">About as many people never floss as floss every day. Flosser has to work for&nbsp;both.</p>
-      </div>
-      <div class="fl-chart" style="flex:0 1 340px; padding:4px 0; display:flex; flex-direction:column; align-items:center; gap:16px;">
-        <div style="font-size:11.5px; font-weight:500; color:var(--muted); text-align:center; letter-spacing:.01em;">How often do you floss?</div>
-        <svg viewBox="0 0 200 200" width="170" height="170" style="overflow:visible;">
-            <!-- donut chart: Never 26.1, Rarely 8.7, Sometimes 4.4, Multiple Times a Week 21.7, Often 13, Always 26.1 -->
-            <g transform="rotate(-90 100 100)">
-              <circle cx="100" cy="100" r="70" fill="none" stroke="#C1502E" stroke-width="34" stroke-dasharray="112.7 439.8" stroke-dashoffset="0.0"/>
-              <circle cx="100" cy="100" r="70" fill="none" stroke="#E08A62" stroke-width="34" stroke-dasharray="36.2 439.8" stroke-dashoffset="-114.7"/>
-              <circle cx="100" cy="100" r="70" fill="none" stroke="#E0A93E" stroke-width="34" stroke-dasharray="17.1 439.8" stroke-dashoffset="-153.0"/>
-              <circle cx="100" cy="100" r="70" fill="none" stroke="#A9C79A" stroke-width="34" stroke-dasharray="93.6 439.8" stroke-dashoffset="-172.1"/>
-              <circle cx="100" cy="100" r="70" fill="none" stroke="#7FC9A8" stroke-width="34" stroke-dasharray="55.4 439.8" stroke-dashoffset="-267.7"/>
-              <circle cx="100" cy="100" r="70" fill="none" stroke="#3F5636" stroke-width="34" stroke-dasharray="112.7 439.8" stroke-dashoffset="-325.1"/>
-            </g>
-            <text x="100" y="95" text-anchor="middle" font-family="Manrope" font-weight="800" font-size="26" fill="var(--ink)">23</text>
-            <text x="100" y="114" text-anchor="middle" font-family="Poppins" font-size="9" letter-spacing="1" fill="var(--muted)">RESPONSES</text>
-          </svg>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px 18px; width:100%; font-size:11.5px; color:var(--ink);">
-            <div style="display:flex; align-items:center; gap:7px;"><span style="width:9px;height:9px;border-radius:50%;background:#C1502E;display:inline-block;"></span>Never &middot; 26.1%</div>
-            <div style="display:flex; align-items:center; gap:7px;"><span style="width:9px;height:9px;border-radius:50%;background:#E08A62;display:inline-block;"></span>Rarely &middot; 8.7%</div>
-            <div style="display:flex; align-items:center; gap:7px;"><span style="width:9px;height:9px;border-radius:50%;background:#E0A93E;display:inline-block;"></span>Sometimes &middot; 4.4%</div>
-            <div style="display:flex; align-items:center; gap:7px;"><span style="width:9px;height:9px;border-radius:50%;background:#A9C79A;display:inline-block;"></span>A few times a week &middot; 21.7%</div>
-            <div style="display:flex; align-items:center; gap:7px;"><span style="width:9px;height:9px;border-radius:50%;background:#7FC9A8;display:inline-block;"></span>Often &middot; 13%</div>
-            <div style="display:flex; align-items:center; gap:7px;"><span style="width:9px;height:9px;border-radius:50%;background:#3F5636;display:inline-block;"></span>Always &middot; 26.1%</div>
+    <div class="sv-panel" id="rs-comp" role="tabpanel" aria-labelledby="rs-tab-comp">
+      <h2 style="font-size:clamp(24px,3vw,34px); max-width:760px; margin-bottom:10px; color:#2F4A28;">Dental apps remind you. Habit games reward you. None of them does both for flossing.</h2>
+          <p style="font-size:13px; color:var(--muted); max-width:660px; margin-bottom:20px;">I compared five apps using each app's own listing. Reminders and timers already exist. Rewards and friends only show up in a habit game or with a smart toothbrush. Flosser has both in a free, two-minute&nbsp;routine.</p>
+          <div class="cmp-wrap">
+            <table class="cmp cmp-6">
+              <thead><tr class="cmp-grp"><th></th><th colspan="4">Dental apps</th><th>Habit app</th><th class="cmp-fl"></th></tr><tr><th></th><th scope="col">Text2Floss</th><th scope="col">Toothy</th><th scope="col">Brush DJ</th><th scope="col">Oral-B</th><th scope="col">Habitica</th><th scope="col" class="cmp-fl">Flosser<small>My app</small></th></tr></thead>
+              <tbody><tr><th scope="row">Flossing reminders</th><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Text messages</span></td><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Premium</span></td><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Yes</span></td><td><span class="cmp-n">Not listed</span></td><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Any habit</span></td><td class="cmp-fl"><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">One a day</span></td></tr><tr><th scope="row">Timer or how-to guide</th><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Timer + videos</span></td><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Voice-guided</span></td><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Music timer + videos</span></td><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Brushing coach</span></td><td><span class="cmp-n">Not listed</span></td><td class="cmp-fl"><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">2-min timer + guide</span></td></tr><tr><th scope="row">Progress tracking</th><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Flossing report</span></td><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Statistics</span></td><td><span class="cmp-n">Not listed</span></td><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Weekly, monthly</span></td><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Streaks</span></td><td class="cmp-fl"><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Streak + calendar</span></td></tr><tr><th scope="row">Rewards to come back for</th><td><span class="cmp-n">Not listed</span></td><td><span class="cmp-n">Not listed</span></td><td><span class="cmp-n">Not listed</span></td><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Medals</span></td><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Gold, gear, pets</span></td><td class="cmp-fl"><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Chip + closet</span></td></tr><tr><th scope="row">Friends</th><td><span class="cmp-n">Not listed</span></td><td><span class="cmp-n">Not listed</span></td><td><span class="cmp-n">Not listed</span></td><td><span class="cmp-n">Not listed</span></td><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Parties</span></td><td class="cmp-fl"><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Friends tab</span></td></tr><tr><th scope="row">Works without extra hardware</th><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Yes</span></td><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Yes</span></td><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Yes</span></td><td><span class="cmp-x">Needs a smart toothbrush</span></td><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Yes</span></td><td class="cmp-fl"><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Yes</span></td></tr></tbody>
+            </table>
           </div>
-      </div>
+          <p class="cmp-swipe">Swipe the table to see Flosser &rarr;</p>
+          <p class="cmp-foot">"Not listed" means the feature isn't mentioned in the app's own store page or website.</p>
     </div>
-  </section></div>
-<div class="slide-shell panel"><section class="slide panel" data-title="Survey">
-    <div class="eyebrow">Survey</div>
-    <div class="two-col top">
-      <div class="col" style="flex:0 0 340px;">
-        <h2 style="font-size:clamp(26px,3.2vw,36px); margin-bottom:16px; color:#2F4A28;">Forgetting was the top reason.</h2>
-        <p style="font-size:14.5px; line-height:1.75; color:var(--muted);">
-          A reminder can fix that, so the first thing Flosser does is remind&nbsp;you.
-        </p>
-      </div>
-      <div class="col">
-        <div class="card fl-plain" style="padding:4px 0;">
-          <div style="font-size:13px; font-weight:700; margin-bottom:2px;">What factors influence whether or not you floss regularly?</div>
-          <div style="font-size:11px; color:var(--muted); margin-bottom:20px;">22 responses</div>
-          <div style="display:flex; flex-direction:column; gap:16px;">
-            <div>
-              <div style="display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:5px;"><span>Forgetfulness</span><b>17 &middot; 77.3%</b></div>
-              <div style="background:var(--panel-2); border-radius:6px; height:12px; overflow:hidden;"><div style="width:77.3%; height:100%; background:linear-gradient(90deg,#C1502E,#A83D22); border-radius:6px;"></div></div>
+
+    <div class="sv-panel" data-tone="dark" id="rs-who" role="tabpanel" aria-labelledby="rs-tab-who" hidden>
+      <h2 style="font-family:'Manrope',sans-serif; font-weight:800; font-size:clamp(30px,3.8vw,44px); line-height:1.15; color:var(--pink); margin-bottom:22px;">Who I'm designing for.</h2>
+          <div style="display:flex; align-items:center; gap:48px; flex-wrap:wrap;">
+            <div style="font-family:'Manrope',sans-serif; font-weight:800; font-size:clamp(90px,13vw,160px); line-height:1; color:#F4ECE0;">35<span style="font-size:.4em; opacity:.6;">%</span></div>
+            <p style="font-size:18px; line-height:1.7; max-width:420px; color:var(--void); opacity:.85;">Never or rarely floss. That's more than a third of the people I surveyed. For them, Flosser is a way to&nbsp;start.</p>
+          </div>
+    </div>
+
+    <div class="sv-panel" id="rs-target" role="tabpanel" aria-labelledby="rs-tab-target" hidden>
+      <div style="display:flex; align-items:center; gap:56px; flex-wrap:wrap;">
+            <div style="flex:1 1 340px; max-width:440px;">
+              <h2 style="font-size:clamp(26px,3.2vw,36px); margin-bottom:16px; color:#2F4A28;">Three kinds of people, one app.</h2>
+              <ul class="tight">
+                <li>People who don't floss enough</li>
+                <li>People who don't floss at all</li>
+                <li>People who want to take their oral health more seriously</li>
+              </ul>
+              <p style="font-size:13.5px; line-height:1.7; color:var(--muted); margin-top:16px;">About as many people never floss as floss every day. Flosser has to work for&nbsp;both.</p>
             </div>
-            <div>
-              <div style="display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:5px;"><span>Laziness</span><b>14 &middot; 63.6%</b></div>
-              <div style="background:var(--panel-2); border-radius:6px; height:12px; overflow:hidden;"><div style="width:63.6%; height:100%; background:linear-gradient(90deg,#C1502E,#A83D22); border-radius:6px;"></div></div>
-            </div>
-            <div>
-              <div style="display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:5px;"><span>Time constraints</span><b>7 &middot; 31.8%</b></div>
-              <div style="background:var(--panel-2); border-radius:6px; height:12px; overflow:hidden;"><div style="width:31.8%; height:100%; background:linear-gradient(90deg,#C1502E,#A83D22); border-radius:6px;"></div></div>
-            </div>
-            <div>
-              <div style="display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:5px;"><span>Discomfort or pain</span><b>4 &middot; 18.2%</b></div>
-              <div style="background:var(--panel-2); border-radius:6px; height:12px; overflow:hidden;"><div style="width:18.2%; height:100%; background:linear-gradient(90deg,#C1502E,#A83D22); border-radius:6px;"></div></div>
-            </div>
-            <div>
-              <div style="display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:5px;"><span>Perceived effectiveness of other methods</span><b>4 &middot; 18.2%</b></div>
-              <div style="background:var(--panel-2); border-radius:6px; height:12px; overflow:hidden;"><div style="width:18.2%; height:100%; background:linear-gradient(90deg,#C1502E,#A83D22); border-radius:6px;"></div></div>
+            <div class="fl-chart" style="flex:0 1 340px; padding:4px 0; display:flex; flex-direction:column; align-items:center; gap:16px;">
+              <div style="font-size:11.5px; font-weight:500; color:var(--muted); text-align:center; letter-spacing:.01em;">How often do you floss?</div>
+              <svg viewBox="0 0 200 200" width="170" height="170" style="overflow:visible;">
+                  <!-- donut chart: Never 26.1, Rarely 8.7, Sometimes 4.4, Multiple Times a Week 21.7, Often 13, Always 26.1 -->
+                  <g transform="rotate(-90 100 100)">
+                    <circle cx="100" cy="100" r="70" fill="none" stroke="#C1502E" stroke-width="34" stroke-dasharray="112.7 439.8" stroke-dashoffset="0.0"/>
+                    <circle cx="100" cy="100" r="70" fill="none" stroke="#E08A62" stroke-width="34" stroke-dasharray="36.2 439.8" stroke-dashoffset="-114.7"/>
+                    <circle cx="100" cy="100" r="70" fill="none" stroke="#E0A93E" stroke-width="34" stroke-dasharray="17.1 439.8" stroke-dashoffset="-153.0"/>
+                    <circle cx="100" cy="100" r="70" fill="none" stroke="#A9C79A" stroke-width="34" stroke-dasharray="93.6 439.8" stroke-dashoffset="-172.1"/>
+                    <circle cx="100" cy="100" r="70" fill="none" stroke="#7FC9A8" stroke-width="34" stroke-dasharray="55.4 439.8" stroke-dashoffset="-267.7"/>
+                    <circle cx="100" cy="100" r="70" fill="none" stroke="#3F5636" stroke-width="34" stroke-dasharray="112.7 439.8" stroke-dashoffset="-325.1"/>
+                  </g>
+                  <text x="100" y="95" text-anchor="middle" font-family="Manrope" font-weight="800" font-size="26" fill="var(--ink)">23</text>
+                  <text x="100" y="114" text-anchor="middle" font-family="Poppins" font-size="9" letter-spacing="1" fill="var(--muted)">RESPONSES</text>
+                </svg>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px 18px; width:100%; font-size:11.5px; color:var(--ink);">
+                  <div style="display:flex; align-items:center; gap:7px;"><span style="width:9px;height:9px;border-radius:50%;background:#C1502E;display:inline-block;"></span>Never &middot; 26.1%</div>
+                  <div style="display:flex; align-items:center; gap:7px;"><span style="width:9px;height:9px;border-radius:50%;background:#E08A62;display:inline-block;"></span>Rarely &middot; 8.7%</div>
+                  <div style="display:flex; align-items:center; gap:7px;"><span style="width:9px;height:9px;border-radius:50%;background:#E0A93E;display:inline-block;"></span>Sometimes &middot; 4.4%</div>
+                  <div style="display:flex; align-items:center; gap:7px;"><span style="width:9px;height:9px;border-radius:50%;background:#A9C79A;display:inline-block;"></span>A few times a week &middot; 21.7%</div>
+                  <div style="display:flex; align-items:center; gap:7px;"><span style="width:9px;height:9px;border-radius:50%;background:#7FC9A8;display:inline-block;"></span>Often &middot; 13%</div>
+                  <div style="display:flex; align-items:center; gap:7px;"><span style="width:9px;height:9px;border-radius:50%;background:#3F5636;display:inline-block;"></span>Always &middot; 26.1%</div>
+                </div>
             </div>
           </div>
-        </div>
-      </div>
     </div>
   </section></div>
+<div class="slide-shell panel"><section class="slide" data-title="Survey & Insights">
+    <div class="eyebrow">Survey &amp; Insights</div>
 
-  <!-- 9. AUDIENCE INSIGHTS -->
-  <div class="slide-shell"><section class="slide" data-title="Audience Insights">
-    <div class="eyebrow">Audience Interview &amp; Strategy</div>
-    <h2 style="font-size:clamp(24px,3vw,34px); max-width:680px; margin-bottom:10px; color:#2F4A28;">Then I interviewed five people.</h2>
-    <p style="font-size:12.5px; color:var(--muted); max-width:640px; margin-bottom:18px;">I wanted to know why people struggle to floss. Is it forgetting, low motivation, not knowing how, or not seeing the point?</p>
-    <div class="two-col top">
-      <div class="col" style="flex:0 0 150px;">
-        <div class="meta-label">Interviewed</div>
-        <div class="meta-value" style="line-height:1.9; font-size:13px;">Jessica<br>Gabe<br>Kathy<br>Rachel<br>Mike</div>
-      </div>
-      <div class="col">
-        <ul class="tight">
-          <li>"I need annoying reminders or I won't floss at all." <span style="opacity:.5;">&middot; Jessica</span></li>
-          <li>"I only floss at night, I just need a notification to make sure I don't forget." <span style="opacity:.5;">&middot; Gabe</span></li>
-          <li>"I will only use the app if it comes with the product." <span style="opacity:.5;">&middot; Kathy</span></li>
-          <li>"Dentists need to convince me to use the app." <span style="opacity:.5;">&middot; Rachel</span></li>
-        </ul>
-      </div>
+    <div class="sv-tabs" role="tablist" aria-label="Survey & Insights">
+      <button class="sv-tab on" type="button" role="tab" id="si-tab-survey" aria-controls="si-survey" aria-selected="true">Survey</button>
+      <button class="sv-tab" type="button" role="tab" id="si-tab-inter" aria-controls="si-inter" aria-selected="false">Interviews</button>
+      <button class="sv-tab" type="button" role="tab" id="si-tab-design" aria-controls="si-design" aria-selected="false">Into design</button>
     </div>
-    <div class="card" style="margin-top:20px; max-width:700px; border-color:var(--purple);">
-      <p style="font-size:12.5px; line-height:1.6; color:var(--ink); margin:0;">A 2025 study of university students found the same pattern: limited knowledge, fatigue, busy schedules, and cost were the main reasons people struggled with good oral health habits.<sup class="src-n">9</sup></p>
-      <p style="font-size:10.5px; color:var(--muted); margin-top:8px;">Azam et al., BMC Public Health, 2025</p>
+
+    <div class="sv-panel" id="si-survey" role="tabpanel" aria-labelledby="si-tab-survey">
+      <div class="two-col top">
+            <div class="col" style="flex:0 0 340px;">
+              <h2 style="font-size:clamp(26px,3.2vw,36px); margin-bottom:16px; color:#2F4A28;">Forgetting was the top reason.</h2>
+              <p style="font-size:14.5px; line-height:1.75; color:var(--muted);">
+                A reminder can fix that, so the first thing Flosser does is remind&nbsp;you.
+              </p>
+            </div>
+            <div class="col">
+              <div class="card fl-plain" style="padding:4px 0;">
+                <div style="font-size:13px; font-weight:700; margin-bottom:2px;">What factors influence whether or not you floss regularly?</div>
+                <div style="font-size:11px; color:var(--muted); margin-bottom:20px;">22 responses</div>
+                <div style="display:flex; flex-direction:column; gap:16px;">
+                  <div>
+                    <div style="display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:5px;"><span>Forgetfulness</span><b>17 &middot; 77.3%</b></div>
+                    <div style="background:var(--panel-2); border-radius:6px; height:12px; overflow:hidden;"><div style="width:77.3%; height:100%; background:linear-gradient(90deg,#C1502E,#A83D22); border-radius:6px;"></div></div>
+                  </div>
+                  <div>
+                    <div style="display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:5px;"><span>Laziness</span><b>14 &middot; 63.6%</b></div>
+                    <div style="background:var(--panel-2); border-radius:6px; height:12px; overflow:hidden;"><div style="width:63.6%; height:100%; background:linear-gradient(90deg,#C1502E,#A83D22); border-radius:6px;"></div></div>
+                  </div>
+                  <div>
+                    <div style="display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:5px;"><span>Time constraints</span><b>7 &middot; 31.8%</b></div>
+                    <div style="background:var(--panel-2); border-radius:6px; height:12px; overflow:hidden;"><div style="width:31.8%; height:100%; background:linear-gradient(90deg,#C1502E,#A83D22); border-radius:6px;"></div></div>
+                  </div>
+                  <div>
+                    <div style="display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:5px;"><span>Discomfort or pain</span><b>4 &middot; 18.2%</b></div>
+                    <div style="background:var(--panel-2); border-radius:6px; height:12px; overflow:hidden;"><div style="width:18.2%; height:100%; background:linear-gradient(90deg,#C1502E,#A83D22); border-radius:6px;"></div></div>
+                  </div>
+                  <div>
+                    <div style="display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:5px;"><span>Perceived effectiveness of other methods</span><b>4 &middot; 18.2%</b></div>
+                    <div style="background:var(--panel-2); border-radius:6px; height:12px; overflow:hidden;"><div style="width:18.2%; height:100%; background:linear-gradient(90deg,#C1502E,#A83D22); border-radius:6px;"></div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+    </div>
+
+    <div class="sv-panel" id="si-inter" role="tabpanel" aria-labelledby="si-tab-inter" hidden>
+      <h2 style="font-size:clamp(24px,3vw,34px); max-width:680px; margin-bottom:10px; color:#2F4A28;">Then I interviewed five people.</h2>
+          <p style="font-size:12.5px; color:var(--muted); max-width:640px; margin-bottom:18px;">I wanted to know why people struggle to floss. Is it forgetting, low motivation, not knowing how, or not seeing the point?</p>
+          <div class="two-col top">
+            <div class="col" style="flex:0 0 150px;">
+              <div class="meta-label">Interviewed</div>
+              <div class="meta-value" style="line-height:1.9; font-size:13px;">Jessica<br>Gabe<br>Kathy<br>Rachel<br>Mike</div>
+            </div>
+            <div class="col">
+              <ul class="tight">
+                <li>"I need annoying reminders or I won't floss at all." <span style="opacity:.5;">&middot; Jessica</span></li>
+                <li>"I only floss at night, I just need a notification to make sure I don't forget." <span style="opacity:.5;">&middot; Gabe</span></li>
+                <li>"I will only use the app if it comes with the product." <span style="opacity:.5;">&middot; Kathy</span></li>
+                <li>"Dentists need to convince me to use the app." <span style="opacity:.5;">&middot; Rachel</span></li>
+              </ul>
+            </div>
+          </div>
+          <div class="card" style="margin-top:20px; max-width:700px; border-color:var(--purple);">
+            <p style="font-size:12.5px; line-height:1.6; color:var(--ink); margin:0;">A 2025 study of university students found the same pattern: limited knowledge, fatigue, busy schedules, and cost were the main reasons people struggled with good oral health habits.<sup class="src-n">9</sup></p>
+            <p style="font-size:10.5px; color:var(--muted); margin-top:8px;">Azam et al., BMC Public Health, 2025</p>
+          </div>
+    </div>
+
+    <div class="sv-panel" data-tone="dark" data-skin="green" id="si-design" role="tabpanel" aria-labelledby="si-tab-design" hidden>
+      <h2 style="font-size:clamp(24px,3vw,32px); max-width:640px; margin-bottom:8px; color:#2F4A28;">Every feature comes from something someone said.</h2>
+          <p style="font-size:13px; color:var(--muted); max-width:620px; margin-bottom:22px;">Three principles came out of it: remind, don't nag; reward consistency, not perfection; and make progress feel alive.</p>
+          <div style="max-width:780px;">
+            <div style="display:grid; grid-template-columns:1fr 32px 1fr; gap:0; font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; font-weight:700; color:var(--muted); padding-bottom:10px; border-bottom:1.5px solid var(--ink);">
+              <div>What people told me</div><div></div><div>What I designed</div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 32px 1fr; gap:0; align-items:center; padding:14px 0; border-bottom:1px solid var(--line);">
+              <div style="font-size:13.5px;">People forget to floss</div><div style="color:var(--pink); text-align:center;">&rarr;</div><div style="font-size:13.5px; font-weight:600;">One daily reminder, on by default, never more than one<span class="principle">Principle: Remind, don't nag</span></div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 32px 1fr; gap:0; align-items:center; padding:14px 0; border-bottom:1px solid var(--line);">
+              <div style="font-size:13.5px;">Flossing feels like a chore</div><div style="color:var(--pink); text-align:center;">&rarr;</div><div style="font-size:13.5px; font-weight:600;">A short, guided 2-minute routine</div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 32px 1fr; gap:0; align-items:center; padding:14px 0; border-bottom:1px solid var(--line);">
+              <div style="font-size:13.5px;">People lose motivation over time</div><div style="color:var(--pink); text-align:center;">&rarr;</div><div style="font-size:13.5px; font-weight:600;">A streak that holds when you miss a day, instead of resetting to zero<span class="principle">Principle: Reward consistency, not perfection</span></div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 32px 1fr; gap:0; align-items:center; padding:14px 0; border-bottom:1px solid var(--line);">
+              <div style="font-size:13.5px;">People respond to accountability</div><div style="color:var(--pink); text-align:center;">&rarr;</div><div style="font-size:13.5px; font-weight:600;">Friends, so you can see each other's streaks</div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 32px 1fr; gap:0; align-items:center; padding:14px 0;">
+              <div style="font-size:13.5px;">Gamification can feel punishing</div><div style="color:var(--pink); text-align:center;">&rarr;</div><div style="font-size:13.5px; font-weight:600;">Chip and cosmetic rewards, never penalties<span class="principle">Principle: Make progress feel alive</span></div>
+            </div>
+          </div>
     </div>
   </section></div>
-
-  <!-- 10. PERSONA -->
-    <!-- 5c. FROM INSIGHT TO DESIGN (now also holds the three design principles) -->
-  <div class="slide-shell green"><section class="slide green" data-title="From Insight to Design">
-    <div class="eyebrow">Turning Research Into Decisions</div>
-    <h2 style="font-size:clamp(24px,3vw,32px); max-width:640px; margin-bottom:8px; color:#2F4A28;">Every feature comes from something someone said.</h2>
-    <p style="font-size:13px; color:var(--muted); max-width:620px; margin-bottom:22px;">Three principles came out of it: remind, don't nag; reward consistency, not perfection; and make progress feel alive.</p>
-    <div style="max-width:780px;">
-      <div style="display:grid; grid-template-columns:1fr 32px 1fr; gap:0; font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; font-weight:700; color:var(--muted); padding-bottom:10px; border-bottom:1.5px solid var(--ink);">
-        <div>What people told me</div><div></div><div>What I designed</div>
-      </div>
-      <div style="display:grid; grid-template-columns:1fr 32px 1fr; gap:0; align-items:center; padding:14px 0; border-bottom:1px solid var(--line);">
-        <div style="font-size:13.5px;">People forget to floss</div><div style="color:var(--pink); text-align:center;">&rarr;</div><div style="font-size:13.5px; font-weight:600;">One daily reminder, on by default, never more than one<span class="principle">Principle: Remind, don't nag</span></div>
-      </div>
-      <div style="display:grid; grid-template-columns:1fr 32px 1fr; gap:0; align-items:center; padding:14px 0; border-bottom:1px solid var(--line);">
-        <div style="font-size:13.5px;">Flossing feels like a chore</div><div style="color:var(--pink); text-align:center;">&rarr;</div><div style="font-size:13.5px; font-weight:600;">A short, guided 2-minute routine</div>
-      </div>
-      <div style="display:grid; grid-template-columns:1fr 32px 1fr; gap:0; align-items:center; padding:14px 0; border-bottom:1px solid var(--line);">
-        <div style="font-size:13.5px;">People lose motivation over time</div><div style="color:var(--pink); text-align:center;">&rarr;</div><div style="font-size:13.5px; font-weight:600;">A streak that holds when you miss a day, instead of resetting to zero<span class="principle">Principle: Reward consistency, not perfection</span></div>
-      </div>
-      <div style="display:grid; grid-template-columns:1fr 32px 1fr; gap:0; align-items:center; padding:14px 0; border-bottom:1px solid var(--line);">
-        <div style="font-size:13.5px;">People respond to accountability</div><div style="color:var(--pink); text-align:center;">&rarr;</div><div style="font-size:13.5px; font-weight:600;">Friends, so you can see each other's streaks</div>
-      </div>
-      <div style="display:grid; grid-template-columns:1fr 32px 1fr; gap:0; align-items:center; padding:14px 0;">
-        <div style="font-size:13.5px;">Gamification can feel punishing</div><div style="color:var(--pink); text-align:center;">&rarr;</div><div style="font-size:13.5px; font-weight:600;">Chip and cosmetic rewards, never penalties<span class="principle">Principle: Make progress feel alive</span></div>
-      </div>
-    </div>
-  </section></div>
-
 <div class="slide-shell panel"><section class="slide panel" data-title="Persona">
     <div class="eyebrow">Persona</div>
     <p style="font-size:12px; color:var(--muted); margin-bottom:18px; max-width:600px;">Emily is based on what people told me. They forget, and most reminder apps feel too strict.</p>
@@ -1383,7 +1836,7 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
     </div>
   </section></div>
 
-  <!-- 11. STORYBOARD -->
+  <!-- 11. storyboard -->
   <div class="slide-shell"><section class="slide" data-title="Storyboard">
     <div class="eyebrow">Emily's Story</div>
     <h2 style="font-size:clamp(24px,3vw,34px); max-width:680px; margin-bottom:22px; color:#2F4A28;">One night in Emily's week.</h2>
@@ -1397,7 +1850,7 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
     </div>
   </section></div>
 
-  <!-- 12. MOODBOARD -->
+  <!-- 12. moodboard -->
   <div class="slide-shell panel"><section class="slide panel" data-title="Moodboard">
     <div class="mb">
       <div class="eyebrow">Moodboard &middot; Brand World</div>
@@ -1505,7 +1958,7 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
     </div>
   </section></div>
 
-  <!-- 14. TASK FLOW -->
+  <!-- 14. task flow -->
   <div class="slide-shell panel"><section class="slide panel" data-title="Task Flow">
     <div class="eyebrow">Task Flow</div>
     <h2 style="font-size:clamp(24px,3vw,34px); max-width:680px; margin-bottom:10px; color:#2F4A28;">Her first two minutes in the app.</h2>
@@ -1522,7 +1975,7 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
     <p style="font-size:12.5px; color:var(--muted); margin-top:10px;">Flossing days now live in Settings, defaulted to every day, rather than gating onboarding. Someone building a daily habit shouldn't have to configure it first.</p>
   </section></div>
 
-  <!-- 15. TESTING RESULTS -->
+  <!-- 15. testing results -->
   <div class="slide-shell"><section class="slide" data-title="Testing and Results">
     <div class="eyebrow">Focus Group &amp; Results</div>
     <h2 style="font-size:clamp(22px,2.6vw,30px); max-width:680px; margin-bottom:12px; color:#2F4A28;">I watched three people use it. I made three changes.</h2>
@@ -1562,442 +2015,7 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
     </div>
   </section></div>
 
-  <!-- 15b. THE GOAL -->
-  <div class="slide-shell" style="background:#212B18;"><section class="slide" data-title="The Goal" style="color:var(--void);">
-    <div class="eyebrow" style="color:var(--pink);">The Design Goal</div>
-    <div style="display:flex; align-items:center; gap:32px; flex-wrap:wrap;">
-      <div style="font-family:'Manrope',sans-serif; font-weight:800; font-size:clamp(60px,9vw,100px); line-height:1; color:var(--void);">2</div>
-      <div style="font-size:28px; opacity:.5; color:var(--void);">&rarr;</div>
-      <div style="font-family:'Manrope',sans-serif; font-weight:800; font-size:clamp(60px,9vw,100px); line-height:1; color:var(--pink);">6</div>
-      <p style="font-size:14px; color:var(--void); opacity:.8; max-width:280px;">nights a week is the goal. It's a target, not a measured result&nbsp;yet.</p>
-    </div>
-  </section></div>
-
-  <!-- 15c. THE EXPERIENCE -->
-  <div class="slide-shell"><section class="slide" data-title="The Experience">
-    <div class="eyebrow">The Experience</div>
-    <h2 style="font-size:clamp(26px,3.4vw,38px); max-width:640px; margin-bottom:30px; color:#2F4A28;">Three screens, one loop.</h2>
-    <div style="display:flex; gap:36px; justify-content:center; flex-wrap:wrap;">
-
-      <div style="text-align:center; max-width:min(200px,28vw);">
-        <div style="width:min(180px,27vw); border-radius:26px; border:1px solid var(--line); margin:0 auto; box-shadow:0 20px 40px rgba(0,0,0,.08); overflow:hidden; line-height:0;">
-          <img loading="lazy" decoding="async" src="img/flosser_home.png" alt="Flosser home screen showing Chip the tooth mascot, a 1-day streak, and the week's flossing checklist" style="width:100%; height:auto; display:block;">
-        </div>
-        <div class="meta-label" style="margin-top:12px;">Home</div>
-        <p style="font-size:11.5px; color:var(--muted); margin:2px 0 0;">Opens straight to Chip and today's streak, no setup screen in the way.</p>
-      </div>
-
-      <div style="text-align:center; max-width:min(200px,28vw);">
-        <div style="width:min(180px,27vw); border-radius:26px; border:1px solid var(--line); margin:0 auto; box-shadow:0 20px 40px rgba(0,0,0,.08); overflow:hidden; line-height:0;">
-          <img loading="lazy" decoding="async" src="img/flosser_timer.png" alt="Flosser timer screen with a 2-minute countdown ring and skip-timer option" style="width:100%; height:auto; display:block;">
-        </div>
-        <div class="meta-label" style="margin-top:12px;">Timer &amp; Guide</div>
-        <p style="font-size:11.5px; color:var(--muted); margin:2px 0 0;">A two-minute timer so you don't rush, guide open the whole time.</p>
-      </div>
-
-      <div style="text-align:center; max-width:min(200px,28vw);">
-        <div style="width:min(180px,27vw); border-radius:26px; border:1px solid var(--line); margin:0 auto; box-shadow:0 20px 40px rgba(0,0,0,.08); overflow:hidden; line-height:0;">
-          <img loading="lazy" decoding="async" src="img/flosser_friends.png" alt="Flosser friends activity screen showing each friend's weekly flossing streak" style="width:100%; height:auto; display:block;">
-        </div>
-        <div class="meta-label" style="margin-top:12px;">Friends</div>
-        <p style="font-size:11.5px; color:var(--muted); margin:2px 0 0;">See how friends are keeping up with their streaks, so you can hold each other&nbsp;accountable.</p>
-      </div>
-
-    </div>
-    <p style="font-size:13px; color:var(--muted); max-width:640px; margin:26px auto 0; text-align:center;">I added four features. A reminder, so you don't forget. A timer, so you don't rush. Friends, so you don't want to be the one who skipped. And Chip, a mascot who gives you a reason to come back&nbsp;tomorrow.</p>
-    <p style="text-align:center; margin-top:12px;"><a href="https://www.figma.com/proto/XsnrzTOWaJteE5XCSivBek/Flooser-Remake?node-id=4-1758" class="link" target="_blank" rel="noopener">Try the full prototype in Figma &rarr;</a></p>
-  </section></div>
-
-  <!-- 15b. ITERATIONS -->
-  <div class="slide-shell panel"><section class="slide panel" data-title="Iterations">
-    <div class="eyebrow">Design Evolution</div>
-    <h2 style="font-size:clamp(26px,3.4vw,38px); max-width:640px; margin-bottom:8px; color:#2F4A28;">From early prototype to final design.</h2>
-    <p class="lead" style="max-width:560px; margin-bottom:26px;">The first version worked, but nobody would want to open it. Pick a screen and drag to compare.</p>
-
-    <div class="bx-split" style="max-width:1000px;">
-<div class="bx" style="--bx-ratio:390/844; flex-basis:236px;">
-  <div class="bx-tabs" role="tablist" aria-label="Choose a screen to compare">
-    <button type="button" class="bx-tab on" role="tab" aria-selected="true" data-before="img/flosser_before_home.png" data-after="img/flosser_home.png" data-before-alt="Early home screen: a routine picker with the flossing guide, a Start Flossing timer card, weekly progress, and an Add New Routine button" data-after-alt="Final home screen: Chip the mascot, the week streak, and a Start Flossing button above a tab bar" data-l="Early" data-r="Final">Home</button>
-    <button type="button" class="bx-tab" role="tab" aria-selected="false" data-before="img/flosserrough_2.png" data-after="img/flosser_timer.png" data-before-alt="Early timer: countdown, flossing guide, and weekly progress stacked on one screen" data-after-alt="Final timer: a single two-minute ring with play and reset, guide moved to its own tab" data-l="Early" data-r="Final">Timer</button>
-    <button type="button" class="bx-tab" role="tab" aria-selected="false" data-before="img/flosser_before_friends.png" data-after="img/flosser_friends.png" data-before-alt="Early friends screen: your 1-day streak and a Share button above friends&#39; weekly scores like 4/7 days this week" data-after-alt="Final friends activity: streak rows, with a friend who is two days behind and Snaggle creeping in" data-l="Early" data-r="Final">Friends</button>
-  </div>
-  <div class="bx-frame" tabindex="0" role="slider" aria-label="Drag to compare: Home" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">
-    <div class="bx-layer after"><img loading="lazy" decoding="async" src="img/flosser_home.png" alt="Final home screen: Chip the mascot, the week streak, and a Start Flossing button above a tab bar"><div class="bx-ph"><b>After</b><span>Add this file</span><code>img/flosser_home.png</code></div></div>
-    <div class="bx-layer before"><img loading="lazy" decoding="async" src="img/flosser_before_home.png" alt="Early home screen: a routine picker with the flossing guide, a Start Flossing timer card, weekly progress, and an Add New Routine button"><div class="bx-ph"><b>Before</b><span>Add this file</span><code>img/flosser_before_home.png</code></div></div>
-    <span class="bx-tag l">Early</span><span class="bx-tag r">Final</span>
-    <span class="bx-line"></span><span class="bx-grip" aria-hidden="true">&#8596;</span>
-  </div>
-  <p class="bx-note"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M8 6 3 12l5 6M16 6l5 6-5 6"/></svg>Drag to compare</p>
-</div>
-      <div class="bx-body">
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-      <div class="card"><div class="tag">Navigation</div><h3>Hamburger &rarr; tab bar</h3><p>Four sections used in a two-minute session shouldn't hide behind a menu icon.</p></div>
-      <div class="card"><div class="tag">Structure</div><h3>One screen &rarr; two</h3><p>Progress and Friends got split into their own tabs instead of competing for space.</p></div>
-      <div class="card"><div class="tag">Reward</div><h3>No mascot &rarr; Chip</h3><p>The reward part of the habit loop needed a face, so I made Chip.</p></div>
-      <div class="card"><div class="tag">Color</div><h3>Generic violet &rarr; warm palette</h3><p>Purple looked like every other wellness app. Cream, mint, and coral feel&nbsp;friendlier.</p></div>
-      <div class="card"><div class="tag">Accountability</div><h3>Flat stats &rarr; stakes</h3><p>"4/7 days" became "a few days behind, Snaggle's creeping in", so you can tell when a friend is falling behind.</p></div>
-      <div class="card"><div class="tag">Home Screen</div><h3>Routine list &rarr; Chip-first</h3><p>The old home screen was a routine picker with a guide. The new one opens on Chip, so you want to press start.</p></div>
-    </div>
-      </div>
-    </div>
-  </section></div>
-
-  <!-- 16. PROTOTYPE -->
-  <div class="slide-shell"><section class="slide" data-title="Gamification Concept">
-    <div style="display:flex; align-items:center; gap:0; height:100%; position:relative;">
-      <div style="flex:0 0 48%; display:flex; align-items:center; justify-content:center; position:relative; margin-left:-3%;">
-        <div style="position:absolute; width:360px; height:360px; border-radius:50%; background:#F1F4EA;"></div>
-        <svg width="320" height="342" viewBox="0 0 90 100" style="position:relative; filter:drop-shadow(0 20px 30px rgba(0,0,0,.08));">
-          <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
-          <circle cx="33" cy="42" r="4.5" fill="var(--ink)"/><circle cx="57" cy="42" r="4.5" fill="var(--ink)"/>
-          <circle cx="20" cy="48" r="6" fill="#FFB6A3" opacity="0.6"/><circle cx="70" cy="48" r="6" fill="#FFB6A3" opacity="0.6"/>
-          <path d="M33 58 Q45 68 57 58" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
-        </svg>
-      </div>
-      <div style="flex:1; padding-left:20px;">
-        <div class="eyebrow">The Idea</div>
-        <h2 style="font-size:clamp(28px,3.6vw,40px); line-height:1.15; margin-bottom:24px;">A mascot to take care&nbsp;of.</h2>
-        <div style="display:flex; flex-direction:column; gap:14px; max-width:380px;">
-          <div><span style="font-size:10px; letter-spacing:.14em; text-transform:uppercase; font-weight:700; color:var(--muted);">Problem</span><p style="margin:2px 0 0; font-size:14px;">Missing a day feels like personal&nbsp;failure.</p></div>
-          <div><span style="font-size:10px; letter-spacing:.14em; text-transform:uppercase; font-weight:700; color:var(--pink);">Solution</span><p style="margin:2px 0 0; font-size:14px;">Give the consequence to Snaggle&nbsp;instead.</p></div>
-          <div><span style="font-size:10px; letter-spacing:.14em; text-transform:uppercase; font-weight:700; color:var(--purple-deep);">Result</span><p style="margin:2px 0 0; font-size:14px;">A reason to return, without feeling&nbsp;blamed.</p></div>
-        </div>
-        <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:28px;">
-          <svg width="26" height="28" viewBox="0 0 90 100"><path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="5"/></svg>
-          <span style="opacity:.35; font-size:12px;">&rarr;</span>
-          <svg width="22" height="24" viewBox="0 0 100 110"><circle cx="50" cy="52" r="42" fill="#8FA85C"/><circle cx="36" cy="44" r="6" fill="#2E3B1A"/><circle cx="64" cy="44" r="6" fill="#2E3B1A"/></svg>
-          <span style="opacity:.35; font-size:12px;">&rarr;</span>
-          <svg width="20" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--purple-deep)" stroke-width="2"><path d="M12 2c-2.5 0-4 2-4 4.5 0 2.5 1 5 1.4 6.9.25 1.3.9 2 1.6 2s1.1-.7 1.3-1.9c.25-1.1.3-2.1 1.7-2.1s1.25 1 1.5 2.1c.2 1.2.6 1.9 1.3 1.9s1.35-.7 1.6-2c.4-1.9 1.4-4.4 1.4-6.9C20 4 18.5 2 16 2c-1 0-1.75.4-2 .4S13 2 12 2z"/></svg>
-          <span style="opacity:.35; font-size:12px;">&rarr;</span>
-          <span class="pill grad" style="font-size:11px;">Chip recovers</span>
-        </div>
-      </div>
-    </div>
-  </section></div>
-
-  <!-- SNAGGLE LORE -->
-  <div class="slide-shell" style="background:#212B18;"><section class="slide" data-title="Snaggle and the Lore" style="color:#F4ECE0; overflow:visible;">
-    <div style="display:flex; align-items:center; gap:20px; height:100%;">
-      <div style="flex:1; max-width:380px; z-index:2;">
-        <div class="eyebrow" style="color:#E8A84F;">The Villain</div>
-        <h2 style="font-size:clamp(38px,5.4vw,60px); line-height:1; margin-bottom:18px; color:#F4ECE0;">Meet<br>Snaggle.</h2>
-        <p style="font-size:15px; line-height:1.7; opacity:.85; margin-bottom:24px;">Jealous of every smile that isn't his. Snaggle spreads grime whenever Chip is left unguarded, but consistency is his weakness. Every flossing session pushes him&nbsp;back.</p>
-        <div style="display:flex; flex-direction:column; gap:12px;">
-          <div><span style="font-size:10px; letter-spacing:.14em; text-transform:uppercase; font-weight:700; color:#E8A84F;">His Scheme</span><span style="font-size:13px; margin-left:8px; opacity:.85;">Spread grime.</span></div>
-          <div><span style="font-size:10px; letter-spacing:.14em; text-transform:uppercase; font-weight:700; color:#E8A84F;">His Weakness</span><span style="font-size:13px; margin-left:8px; opacity:.85;">Consistency.</span></div>
-          <div><span style="font-size:10px; letter-spacing:.14em; text-transform:uppercase; font-weight:700; color:#E8A84F;">His Enemy</span><span style="font-size:13px; margin-left:8px; opacity:.85;">Flossing.</span></div>
-        </div>
-      </div>
-      <div style="flex:0 0 48%; position:relative; display:flex; align-items:center; justify-content:center; margin-right:-6%; overflow:visible;">
-        <div style="position:absolute; width:420px; height:420px; border-radius:50%; background:#8FA85C; opacity:.18; filter:blur(60px);"></div>
-        <div style="position:absolute; top:14%; left:8%; width:7px; height:7px; border-radius:50%; background:#8FA85C; opacity:.7;"></div>
-        <div style="position:absolute; top:60%; left:2%; width:5px; height:5px; border-radius:50%; background:#6B8F3A; opacity:.6;"></div>
-        <div style="position:absolute; top:30%; right:6%; width:6px; height:6px; border-radius:50%; background:#8FA85C; opacity:.5;"></div>
-        <div style="position:absolute; bottom:12%; right:14%; width:8px; height:8px; border-radius:50%; background:#6B8F3A; opacity:.55;"></div>
-        <div style="position:absolute; top:8%; right:26%; width:4px; height:4px; border-radius:50%; background:#8FA85C; opacity:.6;"></div>
-        <img loading="lazy" decoding="async" src="img/snaggle.png" alt="Snaggle, the grime villain mascot, a spiky green blob with tendrils and a sly grin" style="width:300px; height:auto; position:relative;">
-      </div>
-    </div>
-  </section></div>
-
-  <!-- NEGLECT STATE -->
-  <div class="slide-shell panel"><section class="slide panel" data-title="If Snaggle Wins">
-    <div class="eyebrow" style="text-align:center; justify-content:center;">The System</div>
-    <h2 style="font-size:clamp(28px,3.6vw,42px); text-align:center; margin-bottom:10px; color:#2F4A28;">What happens when you stop?</h2>
-    <p class="lead" style="margin-bottom:10px; text-align:center; max-width:560px; margin-left:auto; margin-right:auto; text-wrap:balance;">Based on missed days in a row. When you miss days, Chip gets grimy.</p>
-    <p style="font-size:12.5px; line-height:1.7; color:var(--muted); text-align:center; max-width:600px; margin:0 auto 26px;">The streak stays where you left it, so you never lose what you earned. Snaggle moves slowly, over weeks. Your friends see your progress, and that's what keeps people&nbsp;honest.</p>
-    <div style="display:flex; align-items:flex-end; justify-content:center; gap:6px; flex-wrap:wrap;">
-
-      <div style="text-align:center; width:150px;">
-        <svg width="110" height="122" viewBox="0 0 90 100" style="margin:0 auto 10px;">
-          <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
-          <circle cx="33" cy="42" r="4.5" fill="var(--ink)"/><circle cx="57" cy="42" r="4.5" fill="var(--ink)"/>
-          <circle cx="20" cy="48" r="6" fill="#FFB6A3" opacity="0.6"/><circle cx="70" cy="48" r="6" fill="#FFB6A3" opacity="0.6"/>
-          <path d="M33 58 Q45 68 57 58" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
-        </svg>
-        <div style="font-family:'Manrope',sans-serif; font-weight:800; font-size:18px;">Clear</div>
-        <div style="font-size:11px; color:var(--muted); margin-top:2px;">0 days</div>
-      </div>
-
-      <div style="font-size:22px; opacity:.3; padding-bottom:34px;">&rarr;</div>
-
-      <div style="text-align:center; width:150px;">
-        <svg width="110" height="122" viewBox="0 0 90 100" style="margin:0 auto 10px;">
-          <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
-          <path d="M60 20 Q74 26 72 42 Q68 46 60 40 Q56 30 60 20 Z" fill="#8FA85C" opacity="0.85"/>
-          <circle cx="33" cy="42" r="4.5" fill="var(--ink)"/><circle cx="57" cy="40" r="4" fill="var(--ink)"/>
-          <circle cx="20" cy="48" r="6" fill="#FFB6A3" opacity="0.5"/>
-          <path d="M34 60 Q45 64 56 60" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
-        </svg>
-        <div style="font-family:'Manrope',sans-serif; font-weight:800; font-size:18px;">Spotted</div>
-        <div style="font-size:11px; color:var(--muted); margin-top:2px;">3 days</div>
-      </div>
-
-      <div style="font-size:22px; opacity:.3; padding-bottom:34px;">&rarr;</div>
-
-      <div style="text-align:center; width:150px;">
-        <svg width="110" height="122" viewBox="0 0 90 100" style="margin:0 auto 10px;">
-          <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
-          <path d="M58 16 Q78 24 76 46 Q74 58 62 56 Q54 44 58 16 Z" fill="#6B8F3A"/>
-          <path d="M62 34 Q68 38 66 44 Q60 46 58 40 Q58 36 62 34 Z" fill="#3F5423"/>
-          <circle cx="33" cy="44" r="4.5" fill="var(--ink)"/>
-          <path d="M50 38 Q57 34 63 38" fill="none" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round"/>
-          <path d="M30 40 Q26 36 22 40" fill="none" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round"/>
-          <path d="M34 64 Q45 60 56 64" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
-        </svg>
-        <div style="font-family:'Manrope',sans-serif; font-weight:800; font-size:18px;">Worried</div>
-        <div style="font-size:11px; color:var(--muted); margin-top:2px;">1 week</div>
-      </div>
-
-      <div style="font-size:22px; opacity:.3; padding-bottom:34px;">&rarr;</div>
-
-      <div style="text-align:center; width:150px;">
-        <svg width="110" height="122" viewBox="0 0 90 100" style="margin:0 auto 10px;">
-          <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--red)" stroke-width="2.2"/>
-          <path d="M50 6 Q80 14 80 46 Q78 70 60 92 Q48 88 48 70 Q44 40 50 6 Z" fill="#4A6428"/>
-          <ellipse cx="64" cy="42" rx="9" ry="12" fill="#2E3B1A"/>
-          <circle cx="30" cy="46" r="4.5" fill="var(--ink)"/>
-          <path d="M48 40 Q56 33 64 38" fill="none" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round"/>
-          <path d="M27 42 Q22 36 17 41" fill="none" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round"/>
-          <path d="M30 66 Q45 76 55 68" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
-        </svg>
-        <div style="font-family:'Manrope',sans-serif; font-weight:800; font-size:18px; color:var(--red);">Overrun</div>
-        <div style="font-size:11px; color:var(--muted); margin-top:2px;">2+ weeks</div>
-      </div>
-
-    </div>
-    <p style="text-align:center; font-size:12.5px; color:var(--muted); margin-top:30px;">Every state is reversible. One ordinary session, and Chip starts clearing again.</p>
-  </section></div>
-
-  <!-- LEVELING & CLOSET -->
-  <div class="slide-shell panel"><section class="slide panel" data-title="Leveling and Closet">
-    <div class="eyebrow" style="text-align:center; justify-content:center;">The Reward</div>
-    <h2 style="font-size:clamp(28px,3.6vw,42px); text-align:center; margin-bottom:36px;">Your smile evolves with you.</h2>
-
-    <div style="display:flex; align-items:flex-end; justify-content:center; gap:6px; flex-wrap:wrap;">
-
-      <div style="text-align:center; width:150px; position:relative;">
-        <svg width="100" height="112" viewBox="-6 -14 102 114" style="margin:0 auto 10px; position:relative;">
-          <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
-          <circle cx="33" cy="42" r="4.5" fill="var(--ink)"/><circle cx="57" cy="42" r="4.5" fill="var(--ink)"/>
-          <path d="M33 58 Q45 68 57 58" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
-        </svg>
-        <div style="font-family:'Manrope',sans-serif; font-weight:800; font-size:15px;">Bright Smile</div>
-      </div>
-
-      <div style="font-size:18px; opacity:.3; padding-bottom:26px;">&rarr;</div>
-
-      <div style="text-align:center; width:150px; position:relative;">
-        <div style="position:absolute; top:14px; left:50%; transform:translateX(-50%); width:100px; height:100px; border-radius:50%; background:#FFD9EC; opacity:.6; filter:blur(20px);"></div>
-        <svg width="100" height="112" viewBox="-6 -14 102 114" style="margin:0 auto 10px; position:relative;">
-          <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
-          <circle cx="33" cy="42" r="4.5" fill="var(--ink)"/><circle cx="57" cy="42" r="4.5" fill="var(--ink)"/>
-          <path d="M33 58 Q45 68 57 58" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
-          <path d="M68 18 L71 25 L78 27 L71 29 L68 36 L65 29 L58 27 L65 25 Z" fill="#FF9FC4"/>
-        </svg>
-        <div style="font-family:'Manrope',sans-serif; font-weight:800; font-size:15px;">Pearl Shine</div>
-      </div>
-
-      <div style="font-size:18px; opacity:.3; padding-bottom:26px;">&rarr;</div>
-
-      <div style="text-align:center; width:150px; position:relative;">
-        <div style="position:absolute; top:14px; left:50%; transform:translateX(-50%); width:100px; height:100px; border-radius:50%; background:#FFD166; opacity:.5; filter:blur(20px);"></div>
-        <svg width="100" height="112" viewBox="-6 -14 102 114" style="margin:0 auto 10px; position:relative;">
-          <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
-          <circle cx="33" cy="42" r="4.5" fill="var(--ink)"/><circle cx="57" cy="42" r="4.5" fill="var(--ink)"/>
-          <path d="M33 58 Q45 68 57 58" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
-          <path d="M26 12 L34 -2 L42 8 L45 -6 L48 8 L56 -2 L64 12 Z" fill="#FFD166" stroke="var(--ink)" stroke-width="1.4" stroke-linejoin="round"/>
-        </svg>
-        <div style="font-family:'Manrope',sans-serif; font-weight:800; font-size:15px;">Golden Grin</div>
-      </div>
-
-      <div style="font-size:18px; opacity:.3; padding-bottom:26px;">&rarr;</div>
-
-      <div style="text-align:center; width:150px; position:relative;">
-        <div style="position:absolute; top:14px; left:50%; transform:translateX(-50%); width:110px; height:110px; border-radius:50%; background:#BFE9F5; opacity:.6; filter:blur(22px);"></div>
-        <svg width="100" height="112" viewBox="-6 -14 102 114" style="margin:0 auto 10px; position:relative;">
-          <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
-          <circle cx="33" cy="42" r="4.5" fill="var(--ink)"/><circle cx="57" cy="42" r="4.5" fill="var(--ink)"/>
-          <path d="M33 58 Q45 68 57 58" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
-          <path d="M70 14 L73 21 L80 23 L73 25 L70 32 L67 25 L60 23 L67 21 Z" fill="#7EC8DB"/>
-          <path d="M18 60 L20 65 L25 67 L20 69 L18 74 L16 69 L11 67 L16 65 Z" fill="#7EC8DB"/>
-        </svg>
-        <div style="font-family:'Manrope',sans-serif; font-weight:800; font-size:15px;">Diamond Grin</div>
-      </div>
-
-    </div>
-
-    <div style="margin-top:44px; padding-top:24px; border-top:1px solid var(--line); display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap;">
-      <span class="meta-label" style="margin:0 10px 0 0;">Unlockable cosmetics</span>
-      <span class="pill" style="background:#F1F4EA; border-color:transparent;">Princess Chip</span>
-      <span class="pill" style="background:#F1F4EA; border-color:transparent;">Cool Chip</span>
-      <span class="pill" style="background:#F1F4EA; border-color:transparent;">Wizard Hat &middot; 60 days flossed</span>
-      <span class="pill grad">Diamond Aura &middot; top tier</span>
-    </div>
-    <p style="font-size:11.5px; color:var(--muted); text-align:center; margin-top:14px;">Purely cosmetic. Missing a day never costs you something you already earned.</p>
-  </section></div>
-
-  <!-- 17b. CLOSET CONCEPTS -->
-  <div class="slide-shell panel"><section class="slide panel" data-title="Closet Concepts">
-    <div class="eyebrow">The Full Wardrobe</div>
-    <h2 style="font-size:clamp(24px,3vw,32px); max-width:600px; margin-bottom:18px;">What's built, and what's next.</h2>
-
-    <div class="meta-label" style="margin-bottom:10px;">Already in the app</div>
-    <div style="display:grid; grid-template-columns:repeat(6,1fr); gap:12px; margin-bottom:22px;">
-
-      <div class="card" style="text-align:center; padding:14px 8px; border-color:var(--purple);">
-        <svg width="70" height="92" viewBox="-6 -32 102 134" style="margin:0 auto 6px;" role="img" aria-label="Princess Chip">
-          <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
-          <path d="M20 78 Q45 66 70 78 L70 89 Q64 96 58 89 Q52 96 46 89 Q40 96 34 89 Q28 96 22 89 Z" fill="#FF9FC4" stroke="var(--ink)" stroke-width="1.3" stroke-linejoin="round"/>
-          <circle cx="19" cy="54" r="6" fill="#FFB6A3" opacity="0.6"/><circle cx="71" cy="54" r="6" fill="#FFB6A3" opacity="0.6"/>
-          <circle cx="33" cy="46" r="4.5" fill="var(--ink)"/><circle cx="57" cy="46" r="4.5" fill="var(--ink)"/>
-          <path d="M33 60 Q45 70 57 60" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
-          <path d="M27 12 L27 -5 L36 4 L45 -16 L54 4 L63 -5 L63 12 Z" fill="#FFD166" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round"/>
-          <circle cx="45" cy="-16" r="2.8" fill="#A83D22"/><circle cx="27" cy="-5" r="2.2" fill="#FF9FC4"/><circle cx="63" cy="-5" r="2.2" fill="#FF9FC4"/>
-        </svg>
-        <div style="font-size:11px; font-weight:700;">Princess Chip</div>
-      </div>
-
-      <div class="card" style="text-align:center; padding:14px 8px; border-color:var(--purple);">
-        <svg width="70" height="92" viewBox="-6 -32 102 134" style="margin:0 auto 6px;" role="img" aria-label="Cool Chip">
-          <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
-          <path d="M20 76 Q45 66 70 76 L72 95 Q45 85 18 95 Z" fill="#5C7FB0" stroke="var(--ink)" stroke-width="1.3" stroke-linejoin="round"/>
-          <path d="M34 72 L45 87 L56 72 L53 93 L37 93 Z" fill="#F1F4EA" stroke="var(--ink)" stroke-width="1.2" stroke-linejoin="round"/>
-          <circle cx="19" cy="54" r="6" fill="#FFB6A3" opacity="0.45"/><circle cx="71" cy="54" r="6" fill="#FFB6A3" opacity="0.45"/>
-          <path d="M21 44 L11 40" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round"/>
-          <path d="M69 44 L79 40" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round"/>
-          <rect x="21" y="39" width="19" height="13" rx="6.5" fill="var(--ink)"/>
-          <rect x="50" y="39" width="19" height="13" rx="6.5" fill="var(--ink)"/>
-          <path d="M40 44 L50 44" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
-          <path d="M25.5 42.5 L31 42.5" stroke="#fff" stroke-width="1.7" opacity="0.5" stroke-linecap="round"/>
-          <path d="M33 62 Q45 70 58 60" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
-        </svg>
-        <div style="font-size:11px; font-weight:700;">Cool Chip</div>
-      </div>
-
-      <div class="card" style="text-align:center; padding:14px 8px; border-color:var(--purple);">
-        <svg width="70" height="92" viewBox="-6 -32 102 134" style="margin:0 auto 6px;" role="img" aria-label="Wizard Hat">
-          <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
-          <circle cx="33" cy="46" r="4.5" fill="var(--ink)"/><circle cx="57" cy="46" r="4.5" fill="var(--ink)"/>
-          <path d="M33 60 Q45 70 57 60" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
-          <path d="M24 15 L40 -20 Q45 -30 51 -21 L66 15 Z" fill="#7C4FBF" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round"/>
-          <path d="M30 2 Q45 7 60 2" fill="none" stroke="#FFD166" stroke-width="3"/>
-          <ellipse cx="45" cy="15" rx="27" ry="6.5" fill="#7C4FBF" stroke="var(--ink)" stroke-width="1.6"/>
-          <path d="M48 -25 L49.6 -21.4 L53.4 -20 L49.6 -18.6 L48 -15 L46.4 -18.6 L42.6 -20 L46.4 -21.4 Z" fill="#FFD166" stroke="var(--ink)" stroke-width="0.8" stroke-linejoin="round"/>
-        </svg>
-        <div style="font-size:11px; font-weight:700;">Wizard Hat</div>
-      </div>
-
-      <div class="card" style="text-align:center; padding:14px 8px; border-color:var(--purple);">
-        <svg width="70" height="92" viewBox="-6 -32 102 134" style="margin:0 auto 6px;" role="img" aria-label="Diamond Aura">
-          <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
-          <circle cx="33" cy="46" r="4.5" fill="var(--ink)"/><circle cx="57" cy="46" r="4.5" fill="var(--ink)"/>
-          <path d="M33 60 Q45 70 57 60" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
-          <ellipse cx="45" cy="44" rx="40" ry="44" fill="none" stroke="#BFE9F5" stroke-width="1.8" opacity="0.65"/>
-          <ellipse cx="45" cy="44" rx="46" ry="50" fill="none" stroke="#7EC8DB" stroke-width="2.6" opacity="0.85"/>
-          <path d="M80 3 L82.1 7.9 L87 10 L82.1 12.1 L80 17 L77.9 12.1 L73 10 L77.9 7.9 Z" fill="#7EC8DB"/>
-          <path d="M11 60 L12.8 64.2 L17 66 L12.8 67.8 L11 72 L9.2 67.8 L5 66 L9.2 64.2 Z" fill="#7EC8DB"/>
-          <path d="M72 81 L73.5 84.5 L77 86 L73.5 87.5 L72 91 L70.5 87.5 L67 86 L70.5 84.5 Z" fill="#7EC8DB"/>
-          <path d="M18 11.5 L19.4 14.7 L22.5 16 L19.4 17.4 L18 20.5 L16.6 17.4 L13.5 16 L16.6 14.7 Z" fill="#7EC8DB"/>
-        </svg>
-        <div style="font-size:11px; font-weight:700;">Diamond Aura</div>
-      </div>
-
-    </div>
-
-    <div class="meta-label" style="margin-bottom:8px;">What Else Could Live Here</div>
-    <p class="lead" style="margin-bottom:14px;">A concept sheet of early explorations for where the closet could go&nbsp;next.</p>
-    <div style="display:grid; grid-template-columns:repeat(6,1fr); gap:12px;">
-
-      <div class="card" style="text-align:center; padding:14px 8px;">
-        <svg width="70" height="92" viewBox="-6 -32 102 134" style="margin:0 auto 6px;" role="img" aria-label="Beanie Chip">
-          <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
-          <circle cx="33" cy="46" r="4.5" fill="var(--ink)"/><circle cx="57" cy="46" r="4.5" fill="var(--ink)"/>
-          <path d="M33 60 Q45 70 57 60" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
-          <path d="M16 20 Q16 -12 45 -12 Q74 -12 74 20 Z" fill="#C1502E" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round"/>
-          <path d="M30 -7 L30 13 M45 -11 L45 13 M60 -7 L60 13" stroke="#A83D22" stroke-width="1.5" opacity="0.75"/>
-          <rect x="13" y="13" width="64" height="13" rx="6.5" fill="#A83D22" stroke="var(--ink)" stroke-width="1.6"/>
-          <circle cx="45" cy="-15" r="7" fill="#F1F4EA" stroke="var(--ink)" stroke-width="1.6"/>
-        </svg>
-        <div style="font-size:11px; font-weight:700;">Beanie Chip</div>
-      </div>
-
-      <div class="card" style="text-align:center; padding:14px 8px;">
-        <svg width="70" height="92" viewBox="-6 -32 102 134" style="margin:0 auto 6px;" role="img" aria-label="Chef Chip">
-          <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
-          <circle cx="33" cy="46" r="4.5" fill="var(--ink)"/><circle cx="57" cy="46" r="4.5" fill="var(--ink)"/>
-          <path d="M33 60 Q45 70 57 60" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
-          <path d="M31 76 Q45 84 59 76 L57 90 Q45 95 33 90 Z" fill="#C1502E" stroke="var(--ink)" stroke-width="1.3" stroke-linejoin="round"/>
-          <path d="M20 14 C19 3 22 -5 30 -8 C33 -20 38 -25 45 -25 C52 -25 57 -20 60 -8 C68 -5 71 3 70 14 Z" fill="#fff" stroke="var(--ink)" stroke-width="1.7" stroke-linejoin="round"/>
-          <rect x="23" y="6" width="44" height="14" rx="3.5" fill="#fff" stroke="var(--ink)" stroke-width="1.7"/>
-        </svg>
-        <div style="font-size:11px; font-weight:700;">Chef Chip</div>
-      </div>
-
-      <div class="card" style="text-align:center; padding:14px 8px;">
-        <svg width="70" height="92" viewBox="-6 -32 102 134" style="margin:0 auto 6px;" role="img" aria-label="Pirate Chip">
-          <defs><clipPath id="pirClip"><path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z"/></clipPath></defs>
-          <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
-          <g clip-path="url(#pirClip)"><path d="M0 -6 H90 V22 Q45 30 0 22 Z" fill="#C1502E"/><circle cx="24" cy="10" r="2" fill="#F1F4EA" opacity="0.8"/><circle cx="45" cy="14" r="2" fill="#F1F4EA" opacity="0.8"/><circle cx="66" cy="10" r="2" fill="#F1F4EA" opacity="0.8"/></g>
-          <path d="M12 17 L-3 8 L1 22 L-5 31 L13 27 Z" fill="#A83D22" stroke="var(--ink)" stroke-width="1.3" stroke-linejoin="round"/>
-          <path d="M50 41 Q40 36 25 35" fill="none" stroke="var(--ink)" stroke-width="2" stroke-linecap="round"/>
-          <path d="M65 42 L80 40" stroke="var(--ink)" stroke-width="2" stroke-linecap="round"/>
-          <circle cx="33" cy="46" r="4.5" fill="var(--ink)"/>
-          <ellipse cx="57" cy="45" rx="8.5" ry="7.5" fill="var(--ink)"/>
-          <path d="M32 60 Q45 71 58 60" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
-        </svg>
-        <div style="font-size:11px; font-weight:700;">Pirate Chip</div>
-      </div>
-
-      <div class="card" style="text-align:center; padding:14px 8px;">
-        <svg width="70" height="92" viewBox="-6 -32 102 134" style="margin:0 auto 6px;" role="img" aria-label="Flower Chip">
-          <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
-          <circle cx="33" cy="46" r="4.5" fill="var(--ink)"/><circle cx="57" cy="46" r="4.5" fill="var(--ink)"/>
-          <path d="M33 60 Q45 70 57 60" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
-          <circle cx="19" cy="54" r="6" fill="#FFB6A3" opacity="0.5"/><circle cx="71" cy="54" r="6" fill="#FFB6A3" opacity="0.5"/>
-          <ellipse cx="9" cy="35" rx="6" ry="3.4" fill="#5C7A4E" transform="rotate(-32 9 35)"/>
-          <ellipse cx="81" cy="35" rx="6" ry="3.4" fill="#5C7A4E" transform="rotate(32 81 35)"/>
-          <circle cx="12" cy="28" r="3.2" fill="#FF9FC4"/><circle cx="20" cy="28" r="3.2" fill="#FF9FC4"/><circle cx="16" cy="24" r="3.2" fill="#FF9FC4"/><circle cx="16" cy="32" r="3.2" fill="#FF9FC4"/><circle cx="16" cy="28" r="2.5" fill="#FFD166"/>
-          <circle cx="22" cy="12" r="3.2" fill="#FFD166"/><circle cx="30" cy="12" r="3.2" fill="#FFD166"/><circle cx="26" cy="8" r="3.2" fill="#FFD166"/><circle cx="26" cy="16" r="3.2" fill="#FFD166"/><circle cx="26" cy="12" r="2.5" fill="#fff"/>
-          <circle cx="41" cy="4" r="3.2" fill="#FF9FC4"/><circle cx="49" cy="4" r="3.2" fill="#FF9FC4"/><circle cx="45" cy="0" r="3.2" fill="#FF9FC4"/><circle cx="45" cy="8" r="3.2" fill="#FF9FC4"/><circle cx="45" cy="4" r="2.5" fill="#FFD166"/>
-          <circle cx="60" cy="12" r="3.2" fill="#C1502E"/><circle cx="68" cy="12" r="3.2" fill="#C1502E"/><circle cx="64" cy="8" r="3.2" fill="#C1502E"/><circle cx="64" cy="16" r="3.2" fill="#C1502E"/><circle cx="64" cy="12" r="2.5" fill="#FFD166"/>
-          <circle cx="70" cy="28" r="3.2" fill="#FFD166"/><circle cx="78" cy="28" r="3.2" fill="#FFD166"/><circle cx="74" cy="24" r="3.2" fill="#FFD166"/><circle cx="74" cy="32" r="3.2" fill="#FFD166"/><circle cx="74" cy="28" r="2.5" fill="#fff"/>
-        </svg>
-        <div style="font-size:11px; font-weight:700;">Flower Chip</div>
-      </div>
-
-      <div class="card" style="text-align:center; padding:14px 8px;">
-        <svg width="70" height="92" viewBox="-6 -32 102 134" style="margin:0 auto 6px;" role="img" aria-label="Astro Chip">
-          <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
-          <circle cx="33" cy="46" r="4.5" fill="var(--ink)"/><circle cx="57" cy="46" r="4.5" fill="var(--ink)"/>
-          <path d="M33 60 Q45 70 57 60" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
-          <ellipse cx="45" cy="44" rx="45" ry="49" fill="#BFE9F5" opacity="0.3"/>
-          <path d="M16 30 Q22 13 38 6" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity="0.75"/>
-          <ellipse cx="45" cy="44" rx="45" ry="49" fill="none" stroke="#5C7FB0" stroke-width="3"/>
-          <path d="M45 -5 L45 -18" stroke="#5C7FB0" stroke-width="3" stroke-linecap="round"/>
-          <circle cx="45" cy="-21" r="4" fill="#A83D22" stroke="var(--ink)" stroke-width="1.2"/>
-          <rect x="13" y="84" width="64" height="11" rx="5.5" fill="#5C7FB0" stroke="var(--ink)" stroke-width="1.4"/>
-        </svg>
-        <div style="font-size:11px; font-weight:700;">Astro Chip</div>
-      </div>
-
-      <div class="card" style="text-align:center; padding:14px 8px;">
-        <svg width="70" height="92" viewBox="-6 -32 102 134" style="margin:0 auto 6px;" role="img" aria-label="Hero Chip">
-          <defs><clipPath id="heroClip"><path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z"/></clipPath></defs>
-          <path d="M24 54 Q45 46 66 54 L88 100 Q45 84 2 100 Z" fill="#5C7A4E" stroke="var(--ink)" stroke-width="1.4" stroke-linejoin="round"/>
-          <path d="M45 4 C70 4 82 24 80 46 C78 66 70 96 58 96 C50 96 48 74 45 74 C42 74 40 96 32 96 C20 96 12 66 10 46 C8 24 20 4 45 4 Z" fill="#fff" stroke="var(--ink)" stroke-width="2.2"/>
-          <g clip-path="url(#heroClip)"><path d="M2 33 Q45 26 88 33 L88 53 Q45 60 2 53 Z" fill="#3F5636"/></g>
-          <ellipse cx="33" cy="44" rx="6.5" ry="5.5" fill="#fff"/><ellipse cx="57" cy="44" rx="6.5" ry="5.5" fill="#fff"/>
-          <circle cx="33" cy="44" r="3.4" fill="var(--ink)"/><circle cx="57" cy="44" r="3.4" fill="var(--ink)"/>
-          <path d="M33 60 Q45 70 57 60" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
-        </svg>
-        <div style="font-size:11px; font-weight:700;">Hero Chip</div>
-      </div>
-
-    </div>
-  </section></div>
-
-  <!-- 18. BRANDING -->
+  <!-- 15b. the goal -->
   <div class="slide-shell"><section class="slide" data-title="Branding Guidelines">
     <div class="eyebrow">Branding Guidelines</div>
     <h2 style="font-size:clamp(24px,3.1vw,34px); max-width:640px; margin-bottom:6px; color:#2F4A28;">The mascots are the brand.</h2>
@@ -2086,7 +2104,7 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
     </div>
   </section></div>
 
-  <!-- 19. WRAP UP -->
+  <!-- 19. wrap up -->
   <div class="slide-shell panel"><section class="slide panel" data-title="Wrap Up">
     <div class="eyebrow">Reflection</div>
     <h2 style="font-size:clamp(26px,3.2vw,38px); max-width:760px; margin-bottom:26px; color:#2F4A28;">I started with a reminder app and ended with a habit app.</h2>
@@ -2113,14 +2131,14 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
     </div>
   </section></div>
 
-  <!-- 28. SOURCES -->
+  <!-- 28. sources -->
   <div class="slide-shell panel"><section class="slide panel" data-title="Sources">
     <div class="eyebrow">Sources</div>
     <h2 style="font-size:clamp(24px,3vw,34px); margin-bottom:22px; color:#2F4A28;">Sources.</h2>
     <div class="sv-grid"><div class="sv-group"><div class="meta-label">Health</div><ul><li><span class="sv-n">1</span><span><a href="https://www.nidcr.nih.gov/health-info/gum-disease" target="_blank" rel="noopener">National Institute of Dental and Craniofacial Research, Periodontal (Gum) Disease</a></span></li><li><span class="sv-n">2</span><span><a href="https://www.nia.nih.gov/news/large-study-links-gum-disease-dementia" target="_blank" rel="noopener">National Institute on Aging, Large study links gum disease with dementia (2020)</a></span></li><li><span class="sv-n">3</span><span><a href="https://www.ada.org/resources/ada-library/oral-health-topics/floss" target="_blank" rel="noopener">American Dental Association, Dental Floss and Interdental Cleaners</a></span></li><li><span class="sv-n">4</span><span><a href="https://www.drbicuspid.com/dental-hygiene/article/15671238/only-1-in-3-adults-in-the-us-floss-intervention-needed" target="_blank" rel="noopener">Liang et al., flossing among US adults, NHANES 2009 to 2020, Journal of the American Dental Association (2024)</a></span></li></ul></div><div class="sv-group"><div class="meta-label">Habits</div><ul><li><span class="sv-n">5</span><span><a href="https://kclpure.kcl.ac.uk/portal/en/publications/forming-a-flossing-habit-an-exploratory-study-of-the-psychologica/" target="_blank" rel="noopener">Judah, Gardner &amp; Aunger, Forming a flossing habit, British Journal of Health Psychology (2013)</a></span></li><li><span class="sv-n">6</span><span><a href="https://eprints.whiterose.ac.uk/id/eprint/87431/" target="_blank" rel="noopener">Harkin et al., Does monitoring goal progress promote goal attainment?, Psychological Bulletin (2016)</a></span></li><li><span class="sv-n">7</span><span>Charles Duhigg, The Power of Habit (2012)</span></li><li><span class="sv-n">8</span><span>BJ Fogg, Stanford Behavior Design Lab, Tiny Habits (2019)</span></li><li><span class="sv-n">9</span><span><a href="https://link.springer.com/article/10.1186/s12889-025-25042-8" target="_blank" rel="noopener">Azam et al., Barriers and facilitators to achieving optimal oral health behaviours in university students, BMC Public Health (2025)</a></span></li></ul></div><div class="sv-group"><div class="meta-label">Competitors</div><ul><li><span class="sv-n sv-dot"></span><span><a href="https://texttofloss.com/" target="_blank" rel="noopener">Text 2 Floss, official site</a></span></li><li><span class="sv-n sv-dot"></span><span><a href="https://apps.apple.com/us/app/toothy-toothbrush-timer/id1453139747" target="_blank" rel="noopener">Toothy: Toothbrush Timer, App Store listing</a></span></li><li><span class="sv-n sv-dot"></span><span><a href="https://www.brushdj.com/" target="_blank" rel="noopener">Brush DJ, official site</a></span></li><li><span class="sv-n sv-dot"></span><span><a href="https://oralb.com/en-us/oral-b-app/" target="_blank" rel="noopener">Oral-B App, official page</a></span></li><li><span class="sv-n sv-dot"></span><span><a href="https://apps.apple.com/us/app/habitica-gamified-taskmanager/id994882113" target="_blank" rel="noopener">Habitica: Gamified Taskmanager, App Store listing</a></span></li></ul></div><div class="sv-group"><div class="meta-label">My own research</div><ul><li><span class="sv-n sv-dot"></span><span>Survey of 23 people on how often they floss and what gets in the way</span></li><li><span class="sv-n sv-dot"></span><span>One-on-one interviews with 5 people</span></li><li><span class="sv-n sv-dot"></span><span>Focus group with 3 people testing the prototype</span></li></ul></div></div>
   </section></div>
 
-  <!-- 27. THANK YOU -->
+  <!-- 27. thank you -->
   <div class="slide-shell"><section class="slide" data-title="Thank You" style="align-items:center; text-align:center;">
     <div class="blob" style="width:480px;height:480px; background:var(--purple); opacity:.16; top:-170px; left:50%; transform:translateX(-50%);"></div>
 
@@ -2153,7 +2171,7 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
     <div style="font-size:13px; color:var(--muted); margin-top:3px;">Product Designer &middot; UX/UI</div>
       <nav class="cs-end" aria-label="Case study navigation">
       <a href="index.html#work"><span aria-hidden="true">&larr;</span> All Case Studies</a>
-      <a class="next" href="nuance.html">Next &middot; Nuance <span aria-hidden="true">&rarr;</span></a>
+      <a class="next" href="docket.html">Next &middot; Docket <span aria-hidden="true">&rarr;</span></a>
     </nav>
   </section></div>
 
@@ -2173,7 +2191,7 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
      painted background and flip. Beats checking class names, since some shells
      are darkened by an inline style and carry no class at all. */
   function isLight(el){
-    var m = getComputedStyle(el).backgroundColor.match(/[\d.]+/g);
+    var m = ((el.dataset && el.dataset.bg) || getComputedStyle(el).backgroundColor).match(/[\d.]+/g);
     if (!m || (m.length > 3 && parseFloat(m[3]) === 0)) return false;
     var lin = function(v){ v = v/255; return v <= .03928 ? v/12.92 : Math.pow((v+.055)/1.055, 2.4); };
     return (.2126*lin(+m[0]) + .7152*lin(+m[1]) + .0722*lin(+m[2])) > .45;
@@ -2315,7 +2333,7 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
     var prev = null;
     function isDark(el){
       while (el && el !== document.documentElement){
-        var m = (getComputedStyle(el).backgroundColor || '').match(/[\d.]+/g);
+        var m = (((el.dataset && el.dataset.bg) || getComputedStyle(el).backgroundColor) || '').match(/[\d.]+/g);
         if (m && (m.length < 4 || +m[3] > .5)){
           return (.299*m[0] + .587*m[1] + .114*m[2]) / 255 < .45;
         }
@@ -2715,5 +2733,128 @@ window.lxSetup = function(){
 
 
 
+
+<script>
+(function () {
+  var deck = document.querySelector('.deck');
+  var shells = deck ? [].slice.call(deck.querySelectorAll('.slide-shell')) : [];
+  if (!deck || !shells.length) return;
+
+  function rgb(str) {
+    var m = String(str).match(/(\d+(?:\.\d+)?)/g);
+    return m && m.length >= 3 ? [+m[0], +m[1], +m[2]] : null;
+  }
+  /* read what each section is painted now, before the backdrop takes over */
+  var cols = shells.map(function (el) {
+    var cs = getComputedStyle(el);
+    var c = rgb(cs.backgroundColor) || rgb(cs.backgroundImage) || [251, 250, 246];
+    el.dataset.bg = el.dataset.bgBase = 'rgb(' + c[0] + ',' + c[1] + ',' + c[2] + ')';
+    return c;
+  });
+
+  var bg = document.createElement('div');
+  bg.className = 'deck-bg';
+  bg.setAttribute('aria-hidden', 'true');
+  deck.parentNode.insertBefore(bg, deck);
+  document.documentElement.classList.add('bg-wash');
+
+  var ticking = false, last = '';
+  function paint() {
+    ticking = false;
+    var vh = window.innerHeight, r = 0, g = 0, b = 0, total = 0;
+    for (var i = 0; i < shells.length; i++) {
+      var box = shells[i].getBoundingClientRect();
+      var seen = Math.min(box.bottom, vh) - Math.max(box.top, 0);
+      if (seen <= 0) continue;
+      var c = shells[i].dataset.bgOverride ? rgb(shells[i].dataset.bgOverride) : cols[i];
+      r += c[0] * seen; g += c[1] * seen; b += c[2] * seen;
+      total += seen;
+    }
+    if (!total) return;
+    var next = 'rgb(' + Math.round(r / total) + ',' + Math.round(g / total) + ',' + Math.round(b / total) + ')';
+    if (next !== last) { bg.style.background = last = next; }
+  }
+  function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(paint); } }
+  addEventListener('scroll', onScroll, { passive: true });
+  addEventListener('resize', onScroll);
+  paint();
+  dispatchEvent(new Event('scroll'));   /* let the chrome re-read the stored colours */
+})();
+</script>
+<script>
+[].forEach.call(document.querySelectorAll('.sv-tabs'), function (group) {
+  var tabs = [].slice.call(group.querySelectorAll('.sv-tab'));
+  if (!tabs.length) return;
+  /* every panel is as tall as the tallest, so the tabs stay put instead of
+     jumping up and down as you click between them */
+  var panels = tabs.map(function (t) { return document.getElementById(t.getAttribute('aria-controls')); }).filter(Boolean);
+  /* an embedded prototype that boots inside a hidden panel has no size yet and
+     comes up blank, so hold its src back until its tab is opened. It also means
+     only the prototype you are looking at is running. */
+  panels.forEach(function (p) {
+    if (!p.hidden) return;
+    [].forEach.call(p.querySelectorAll('iframe[src]'), function (f) {
+      f.setAttribute('data-src', f.getAttribute('src'));
+      f.removeAttribute('src');
+    });
+  });
+  function load(p) {
+    [].forEach.call(p.querySelectorAll('iframe[data-src]'), function (f) {
+      f.setAttribute('src', f.getAttribute('data-src'));
+      f.removeAttribute('data-src');
+    });
+    if (window.ksFit) requestAnimationFrame(window.ksFit);
+  }
+  function size() {
+    var was = panels.map(function (p) { return p.hidden; });
+    panels.forEach(function (p) { p.style.minHeight = ''; });
+    var tall = 0;
+    panels.forEach(function (p, i) {
+      panels.forEach(function (q, j) { q.hidden = j !== i; });
+      tall = Math.max(tall, p.offsetHeight);
+    });
+    panels.forEach(function (p, i) { p.hidden = was[i]; p.style.minHeight = tall + 'px'; });
+  }
+  function show(id) {
+    tabs.forEach(function (t) {
+      var on = t.getAttribute('aria-controls') === id;
+      t.classList.toggle('on', on);
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      var panel = document.getElementById(t.getAttribute('aria-controls'));
+      if (panel) { panel.hidden = !on; if (on) load(panel); }
+      if (on && panel) tone(panel);
+    });
+  }
+  function tone(panel) {
+    var shell = group.closest('.slide-shell');
+    if (!shell) return;
+    var dark = panel.dataset.tone === 'dark';
+    if (dark) { shell.dataset.tone = 'dark'; shell.dataset.bgOverride = 'rgb(33,43,24)'; shell.dataset.bg = 'rgb(33,43,24)'; }
+    else { delete shell.dataset.tone; delete shell.dataset.bgOverride; shell.dataset.bg = shell.dataset.bgBase || shell.dataset.bg; }
+    var bg = document.querySelector('.deck-bg');
+    if (bg) { bg.classList.add('tinting'); clearTimeout(tone._t); tone._t = setTimeout(function(){ bg.classList.remove('tinting'); }, 500); }
+    dispatchEvent(new Event('scroll'));
+  }
+  tabs.forEach(function (t, i) {
+    t.addEventListener('click', function () { show(t.getAttribute('aria-controls')); });
+    t.addEventListener('keydown', function (e) {
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+      e.preventDefault();
+      var next = tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length];
+      next.focus(); show(next.getAttribute('aria-controls'));
+    });
+  });
+  var pend; function resize() { clearTimeout(pend); pend = setTimeout(size, 60); }
+  size();
+  addEventListener('load', resize);
+  panels.forEach(function (p) {
+    [].forEach.call(p.querySelectorAll('img'), function (im) {
+      if (im.loading === 'lazy') im.loading = 'eager';
+      if (!im.complete) im.addEventListener('load', resize, { once: true });
+    });
+  });
+  var rsz; addEventListener('resize', function () { clearTimeout(rsz); rsz = setTimeout(size, 150); });
+});
+</script>
 </body>
 </html>

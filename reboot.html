@@ -61,6 +61,16 @@
     overflow:clip;
   }
   .slide-shell.panel{ background:var(--panel); }
+  /* tab group: several pages of one section folded onto a single slide */
+  .sv-tabs{ display:flex; gap:8px; flex-wrap:wrap; margin:0 0 24px; }
+  .sv-tab{ appearance:none; -webkit-appearance:none; background:transparent; color:inherit;
+    border:1px solid rgba(242,241,245,.28); opacity:.7; padding:0 16px; min-height:38px; border-radius:100px;
+    font:inherit; font-size:11px; font-weight:700; letter-spacing:.07em; text-transform:uppercase;
+    cursor:pointer; transition:opacity .2s, background .2s, color .2s, border-color .2s; }
+  .sv-tab:hover{ opacity:1; border-color:var(--cyan); }
+  .sv-tab.on{ opacity:1; background:var(--purple); border-color:var(--purple); color:#fff; }
+  .sv-tab:focus-visible{ outline:2px solid var(--cyan); outline-offset:2px; }
+  .sv-panel[hidden]{ display:none; }
   .slide-shell.portal{ background: radial-gradient(ellipse at 50% 30%, #111B22 0%, #070908 78%); border-top:none; }
   .slide-shell:first-child{ border-top:none; }
 
@@ -115,7 +125,7 @@
   .card p{ font-size:12.5px; line-height:1.55; opacity:.7; margin:0; }
   .grid-3{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:20px; }
   .grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:20px; }
-  /* ---------- For You feed (added after later feedback) ---------- */
+  /* For You feed */
   .fy-wrap{ display:grid; grid-template-columns:minmax(0,1fr) 260px; gap:48px; align-items:start; margin-top:22px; }
   .fy-wrap.fy-top-align{ margin-top:0; }
   .fy-top-align .fy-steps, .fy-top-align .tw-compare{ margin-top:22px; }
@@ -172,7 +182,7 @@
   @media(max-width:900px){ .fy-wrap{ grid-template-columns:1fr; gap:30px; } .fy-menu{ right:-10px; } }
 
 
-  /* ---------- mockup phone (matches real app screenshots) ---------- */
+  /* mockup phone (matches real app screenshots) */
   .mockup-phone{
     width:132px; aspect-ratio:9/18.5; background:var(--phone-bg);
     border-radius:22px; border:1px solid rgba(255,255,255,.08);
@@ -204,7 +214,7 @@
   .g5{ background:linear-gradient(135deg,#3a2a1a,#8a5a2a); }
   .g6{ background:linear-gradient(135deg,#1a1a3a,#4a4a8a); }
 
-  /* ---------- persona tabs ---------- */
+  /* persona tabs */
   .tab-row{ display:flex; gap:10px; margin-bottom:26px; flex-wrap:wrap; }
   /* the tabs look like static chips, so say plainly that they switch the panel */
   .tab-hint{ font-family:'Exo 2',sans-serif; font-size:11.5px; color:var(--muted); margin:0 0 12px; display:flex; align-items:center; gap:7px; }
@@ -213,8 +223,11 @@
   .tab-btn.active{ opacity:1; border-color:var(--cyan); color:var(--cyan); background:rgba(45,226,255,.08); }
   .tab-panel{ display:none; }
   .tab-panel.active{ display:block; }
+  /* the Task line was wrapping at the shared 560px lead width; it fits on one
+     line across the panel */
+  .tab-panel > .lead{ max-width:none; }
 
-  /* ---------- frequency chart ---------- */
+  /* frequency chart */
   .chart{ margin-top:10px; }
   .chart-row{ display:flex; align-items:center; gap:14px; margin-bottom:20px; }
   .chart-label{ width:230px; font-size:13px; line-height:1.4; flex-shrink:0; }
@@ -224,14 +237,14 @@
   .step-tracker{ display:flex; gap:0; margin-top:26px; flex-wrap:wrap; }
   .step{ flex:1; min-width:150px; padding:16px 16px 16px 0; position:relative; }
   .step .num{ font-family:'Audiowide',sans-serif; font-size:20px; background:var(--grad); -webkit-background-clip:text; background-clip:text; color:transparent; }
-  .step p{ font-size:12.5px; line-height:1.5; opacity:.75; margin:6px 0 0; }
+  .step p{ font-size:12.5px; line-height:1.5; margin:6px 0 0; }
   /* the connector arrow sat at right:-4px, i.e. past its own step and directly
      on top of the next step's number, so it read as a smudge rather than a
      link. the numerals already carry the sequence, so it is gone. */
 
   .link{ background:var(--grad); -webkit-background-clip:text; background-clip:text; color:transparent; font-weight:600; text-decoration:none; font-family:'Exo 2',sans-serif; font-size:13px; }
 
-  /* ---------- portfolio bookends ---------- */
+  /* portfolio bookends */
   .slide.portal{ color: var(--p-bone); align-items:center; text-align:center; justify-content:center; }
   .portal-eyebrow{ font-family:'Cinzel',serif; font-weight:600; letter-spacing:.32em; text-transform:uppercase; font-size:12px; color:var(--p-gold); margin-bottom:22px; }
   .portal-title{ font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:500; font-size:clamp(38px,6vw,60px); line-height:1.15; max-width:760px; color:var(--p-bone); }
@@ -248,7 +261,7 @@
   .flash-overlay.flash-in{ opacity:1; transition:opacity .5s ease-in; }
   .flash-overlay.flash-out{ opacity:0; transition:opacity .6s ease-out; }
 
-  /* ---------- arcade cabinet + coin-drop mechanic (Doorway) ---------- */
+  /* arcade cabinet + coin-drop mechanic (Doorway) */
   .arcade-frame{
     position:relative; width:160px; height:300px; margin-bottom:26px;
   }
@@ -329,7 +342,7 @@
     .portfolio-nav ul{ display:none; }
   }
 
-  /* ---------- HOLOGRAPHIC / HUD UPGRADE ---------- */
+  /* HOLOGRAPHIC / HUD UPGRADE */
   .slide-shell:not(.portal){
     background-image:
       linear-gradient(var(--void), var(--void)),
@@ -419,9 +432,7 @@
     .deck .slide-shell .slide{opacity:1!important;transform:none!important;transition:none!important;}
   }
 
-  /* ---- phone-width fit: slides were running taller than the viewport, so with
-     scroll-snap on the bottom of the content got cut off. Scale type, padding
-     and media down so each slide fits the screen. ---- */
+  /* phone-width fit: slides were running taller than the viewport, so with */
   @media (max-width:600px){
     .slide{ padding:38px 20px; }
     .slide h1{ font-size:clamp(30px,9vw,44px) !important; }
@@ -461,11 +472,7 @@
     section[data-title="Persona"] .two-col.top > .col:last-child{ flex:1 1 100% !important; }
   }
 
-  /* ---------- widow control ----------
-     Handled at layout time so it keeps working at every viewport width instead
-     of being pinned by hardcoded non-breaking spaces. `balance` evens out the
-     lines of short headings; `pretty` stops a paragraph or list item ending on
-     a single-word line. Unsupported browsers fall back to normal wrapping. */
+  /* widow control */
   h1,h2,h3,h4{ text-wrap:balance; }
   p,li,.lead,.meta-value,.card p,.step p{ text-wrap:pretty; }
 
@@ -626,7 +633,7 @@
   }
   @media (prefers-reduced-motion: reduce){ .pager-btn{ transition:none; } }
 
-  /* ---------- chapter rail: show that each section holds several pages ---------- */
+  /* chapter rail: show that each section holds several pages */
   .chapters .ch-head{ padding:0 0 10px 13px; font-size:8px; font-weight:800; letter-spacing:.14em;
     text-transform:uppercase; white-space:nowrap; opacity:.55; }
   .chapters .ch-head small{ display:block; margin-top:3px; font-size:7.5px; font-weight:600; letter-spacing:.06em; text-transform:none; opacity:.85; }
@@ -640,10 +647,7 @@
   .chapters .ch-ticks i:hover{ opacity:.9; }
   @media (prefers-reduced-motion: reduce){ .chapters .ch-ticks i{ transition:none; } }
 
-  /* ---------- before / after compare (shared across the case studies) ----------
-     Drag the handle (or use the arrow keys) to wipe between an earlier version
-     and the final one. Tabs swap which pair is showing. If an image file isn't
-     in img/ yet, that half shows a dashed slot with the exact filename to add. */
+  /* before / after compare (shared across the case studies) */
   .bx{ width:100%; max-width:var(--bx-w, 290px); margin:0 auto; }
   .bx-tabs{ display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-bottom:14px; }
   .bx-tab{ appearance:none; -webkit-appearance:none; background:transparent; color:inherit;
@@ -696,10 +700,7 @@
 
   :root{ --bx-accent:#2DE2FF; --bx-on:#141416; }
 
-  /* ================= interactive layer ================================
-     Same idea as the Docket case study (pieces arrive one after another,
-     every page has something small to hover), done in Reboot's own
-     neon-arcade language instead of Docket's paper one. */
+  /* interactive layer */
 
   /* each slide's pieces power on one after another */
   .deck .slide-shell .slide > *:not(.blob):not(.scan-sweep){
@@ -747,7 +748,6 @@
   ul.tight li{ transition:opacity .2s ease, translate .2s ease; }
   ul.tight li::before{ transition:box-shadow .2s ease, transform .2s ease; }
   ul.tight li:hover{ opacity:1; }
-  /* hover motion removed */
 
   /* how might we: the rule turns into the gradient */
   .rb-hmw{ transition:border-color .3s ease; position:relative; }
@@ -758,7 +758,6 @@
   .rb-sources > div{ position:relative; transition:translate .22s ease; }
   .rb-sources > div::before{ content:''; position:absolute; left:-16px; top:4px; bottom:20px; width:2px; background:var(--cyan); box-shadow:0 0 10px var(--cyan); opacity:0; transition:opacity .22s ease; }
   .rb-sources > div:last-child::before{ bottom:4px; }
-  /* hover motion removed */
   .rb-sources > div:hover::before{ opacity:1; }
   .rb-duel .card{ transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease, opacity .25s ease, filter .25s ease; }
   /* hover dimming removed */
@@ -779,10 +778,6 @@
 
   /* personas: the HUD brackets lock on */
   .hud-frame::before, .hud-frame::after, .hud-frame .hud-corner-tl, .hud-frame .hud-corner-br{ transition:transform .3s cubic-bezier(.3,1.4,.5,1), filter .3s ease; }
-  /* hover motion removed */
-  /* hover motion removed */
-  /* hover motion removed */
-  /* hover motion removed */
   .hud-frame:hover .hud-tag{ animation:rbBlink .9s steps(2,end) infinite; }
   @keyframes rbBlink{ 50%{ opacity:.35; } }
   .hud-frame img{ transition:filter .3s ease; }
@@ -795,14 +790,12 @@
   .step{ transition:opacity .2s ease; cursor:default; }
   .step .num{ display:inline-block; transition:transform .2s ease, filter .2s ease; }
   .step p{ transition:opacity .2s ease; }
-  .step-tracker.rb-on .step:not(.clr){ opacity:.7; }
   .step.clr .num{ filter:drop-shadow(0 0 8px rgba(255,61,154,.7)); }
   .step.clr p{ opacity:1; }
   .step.cur .num{ transform:scale(1.25) translateY(-2px); }
 
   /* moodboard: swatches and type samples */
   .rb-sw{ position:relative; cursor:default; transition:transform .2s cubic-bezier(.3,1.5,.5,1), box-shadow .2s ease; outline:none; }
-  /* hover motion removed */
   .rb-sw::after{ content:attr(data-tip); position:absolute; left:50%; bottom:calc(100% + 10px); translate:-50% 4px; white-space:nowrap;
     font-family:'Exo 2',sans-serif; font-size:10.5px; font-weight:600; letter-spacing:.06em; color:var(--ink);
     background:rgba(12,12,14,.92); border:1px solid rgba(45,226,255,.4); padding:5px 9px; border-radius:4px;
@@ -813,7 +806,6 @@
   .rb-fonts span{ display:inline-block; transition:color .2s ease, text-shadow .2s ease, transform .2s ease; cursor:default; }
   .rb-fonts span:hover{ font-family:var(--ff); color:var(--cyan); }
   .hud-frame img[src*="moodboard"]{ transition:transform .6s cubic-bezier(.2,.8,.2,1); }
-  /* hover motion removed */
 
   /* testing: one player at a time */
   .rb-players > .col{ transition:opacity .25s ease; padding:10px 12px; margin:-10px -12px; border-radius:10px; }
@@ -830,7 +822,6 @@
   .tw-compare li.lit::before{ box-shadow:0 0 8px var(--pink); transform:scale(1.4); }
   .fy-steps .card.lit{ transform:translateY(-4px); border-color:rgba(45,226,255,.55); box-shadow:0 14px 34px rgba(0,0,0,.45), 0 0 26px rgba(45,226,255,.2); }
   [data-lt]{ transition:box-shadow .2s ease, background-color .2s ease, opacity .2s ease, transform .2s ease; }
-  .fy-phone.rb-dim [data-lt]:not(.lit){ opacity:.65; }
   [data-lt].lit{ opacity:1; box-shadow:0 0 0 1.5px var(--cyan), 0 0 16px rgba(45,226,255,.55); border-radius:6px; }
   .fy-tile.lit{ transform:scale(1.04); z-index:2; }
   .fy-menu.lit{ box-shadow:0 0 0 1.5px var(--pink), 0 0 20px rgba(255,61,154,.55), 0 16px 30px rgba(0,0,0,.5); transform:scale(1.05); }
@@ -849,7 +840,6 @@
   .rb-screen{ transition:box-shadow .3s ease, transform .3s ease; }
   .rb-screen:hover{ box-shadow:0 30px 60px rgba(0,0,0,.35), 0 0 0 1px rgba(45,226,255,.55), 0 0 34px rgba(45,226,255,.22) !important; }
   .rb-brand img{ transition:transform .6s cubic-bezier(.2,.8,.2,1), filter .3s ease; }
-  /* hover motion removed */
   /* round 2: arcade "waiting for players" screen */
   .rb-queue{ position:relative; border-radius:12px; padding:22px 24px 20px; overflow:hidden;
     background:linear-gradient(180deg, rgba(139,92,246,.10), rgba(12,12,14,.6)), repeating-linear-gradient(0deg, rgba(255,255,255,.035) 0 1px, transparent 1px 3px);
@@ -912,9 +902,7 @@
   }
   /* tables + sources: hover layer */
   .sv-group li { transition:translate .2s ease; }
-  /* hover motion removed */
   .sv-dot { transition:transform .2s ease, box-shadow .2s ease; }
-  /* hover motion removed */
   /* table: colors get stronger on the row you point at (no background highlight) */
   .cmp td, .cmp tbody th { transition:color .2s ease; }
   .cmp .cmp-y, .cmp .cmp-p { opacity:.55; transition:opacity .2s ease, box-shadow .2s ease, filter .2s ease; }
@@ -1047,15 +1035,14 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
   </nav>
 
   <nav class="chapters" aria-label="Case study sections">
-      <a href="#" data-slide="1">Overview</a>
-      <a href="#" data-slide="3">Research</a>
-      <a href="#" data-slide="5">Persona</a>
-      <a href="#" data-slide="7">Design</a>
-      <a href="#" data-slide="9">Testing</a>
-      <a href="#" data-slide="13">Prototype</a>
-      <a href="#" data-slide="17">Branding</a>
-      <a href="#" data-slide="18">Wrap Up</a>
-      <a class="ch-next" href="flosser.html"><span>Next</span><b>Flosser &rarr;</b></a>
+  <a href="#" data-slide="1">Overview</a>
+  <a href="#" data-slide="2">Prototype</a>
+  <a href="#" data-slide="4">Research</a>
+  <a href="#" data-slide="5">Persona</a>
+  <a href="#" data-slide="7">Design</a>
+  <a href="#" data-slide="9">Testing</a>
+  <a href="#" data-slide="11">Branding</a>
+  <a href="#" data-slide="12">Wrap Up</a>
   </nav>
 
 
@@ -1070,7 +1057,7 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
 
   <div class="deck" id="deck">
 
-  <!-- 2. COVER -->
+  <!-- 2. cover -->
   <div class="slide-shell"><section class="slide" data-title="Cover" style="align-items:center; text-align:center;">
     <div class="scan-sweep"></div>
     <div class="blob" style="width:520px;height:520px; background:radial-gradient(circle, var(--purple), transparent 70%); top:-180px; left:50%; transform:translateX(-50%);"></div>
@@ -1094,7 +1081,7 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
     </div>
   </div>
 
-  <!-- 3. WHY I BUILT THIS -->
+  <!-- 3. why i built this -->
   <div class="slide-shell panel"><section class="slide panel" data-title="Why I Built This">
     <div class="eyebrow">Personal Interest</div>
     <p class="lead" style="max-width:760px; margin-top:6px; margin-bottom:26px;">When I look up a build, an outfit, or a walkthrough, I bounce between Pinterest, YouTube, Discord, and wiki pages. I lose my place every time I switch apps.</p>
@@ -1115,8 +1102,73 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
     </div>
   </section></div>
 
-  <!-- 4. THE BIG IDEA -->
-  <div class="slide-shell"><section class="slide" data-title="The Big Idea">
+  <!-- 4. the big idea -->
+  <div class="slide-shell panel"><section class="slide" data-title="Prototype">
+    <div class="eyebrow">Prototype</div>
+
+    <div class="sv-tabs" role="tablist" aria-label="Prototype">
+      <button class="sv-tab on" type="button" role="tab" id="pt-tab-explore" aria-controls="pt-explore" aria-selected="true">Explore</button>
+      <button class="sv-tab" type="button" role="tab" id="pt-tab-boards" aria-controls="pt-boards" aria-selected="false">Boards</button>
+      <button class="sv-tab" type="button" role="tab" id="pt-tab-guides" aria-controls="pt-guides" aria-selected="false">Guides</button>
+      <button class="sv-tab" type="button" role="tab" id="pt-tab-motion" aria-controls="pt-motion" aria-selected="false">Motion</button>
+    </div>
+
+    <div class="sv-panel" id="pt-explore" role="tabpanel" aria-labelledby="pt-tab-explore">
+      <div class="two-col">
+            <div class="col" style="max-width:420px;">
+              <h2 style="font-size:38px; line-height:1.15;">Explore what you like.</h2>
+              <p class="lead" style="margin-top:16px;">Mod pack showcases, gameplay highlights, and console tutorials, all in one feed.</p>
+              <a href="https://www.figma.com/proto/HQadzgQPnOnY0y8I1S6nNK/reboot?node-id=467-1643" class="proto-btn" target="_blank" rel="noopener">View Prototype &rarr;</a>
+            </div>
+            <div class="col" style="display:flex; justify-content:center;">
+              <div class="rb-screen" style="position:relative; width:100%; max-width:480px; aspect-ratio:800/450; border-radius:6px; overflow:hidden; box-shadow:0 30px 60px rgba(0,0,0,.35);">
+                <iframe loading="lazy" title="Reboot interactive prototype: Explore flow" style="width:100%; height:100%; border:none;" src="https://embed.figma.com/proto/HQadzgQPnOnY0y8I1S6nNK/reboot?node-id=467-1643&p=f&scaling=scale-down&content-scaling=fixed&page-id=467%3A769&starting-point-node-id=467%3A1643&show-proto-sidebar=1&embed-host=share" allowfullscreen></iframe>
+                <div style="position:absolute; bottom:10px; right:10px; pointer-events:none; background:rgba(10,10,14,.72); backdrop-filter:blur(6px); color:#fff; font-size:10px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; padding:6px 10px; border-radius:100px; display:flex; align-items:center; gap:5px;">&#8595; Scroll inside to see more</div>
+              </div>
+            </div>
+          </div>
+    </div>
+
+    <div class="sv-panel" id="pt-boards" role="tabpanel" aria-labelledby="pt-tab-boards" hidden>
+      <div class="two-col">
+            <div class="col" style="max-width:420px;">
+              <h2 style="font-size:38px; line-height:1.15;">Boards that stay&nbsp;organized.</h2>
+              <p class="lead" style="margin-top:16px;">Sub-boards for every project keep builds, outfits, and inspiration sorted.</p>
+              <a href="https://www.figma.com/proto/HQadzgQPnOnY0y8I1S6nNK/reboot?node-id=467-1409" class="proto-btn" target="_blank" rel="noopener">View Prototype &rarr;</a>
+            </div>
+            <div class="col" style="display:flex; justify-content:center;">
+              <div class="rb-screen" style="position:relative; width:100%; max-width:480px; aspect-ratio:800/450; border-radius:6px; overflow:hidden; box-shadow:0 30px 60px rgba(0,0,0,.35);">
+                <iframe loading="lazy" title="Reboot interactive prototype: Boards flow" style="width:100%; height:100%; border:none;" src="https://embed.figma.com/proto/HQadzgQPnOnY0y8I1S6nNK/reboot?node-id=467-1409&p=f&scaling=scale-down&content-scaling=fixed&page-id=467%3A769&starting-point-node-id=467%3A1409&show-proto-sidebar=1&embed-host=share" allowfullscreen></iframe>
+                <div style="position:absolute; bottom:10px; right:10px; pointer-events:none; background:rgba(10,10,14,.72); backdrop-filter:blur(6px); color:#fff; font-size:10px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; padding:6px 10px; border-radius:100px; display:flex; align-items:center; gap:5px;">&#8595; Scroll inside to see more</div>
+              </div>
+            </div>
+          </div>
+    </div>
+
+    <div class="sv-panel" id="pt-guides" role="tabpanel" aria-labelledby="pt-tab-guides" hidden>
+      <div class="two-col">
+            <div class="col" style="max-width:420px;">
+              <h2 style="font-size:38px; line-height:1.15;">Help when you're stuck.</h2>
+              <p class="lead" style="margin-top:16px;">Step-by-step guides for puzzles and bosses, right in the&nbsp;app.</p>
+              <a href="https://www.figma.com/proto/HQadzgQPnOnY0y8I1S6nNK/reboot?node-id=467-1536" class="proto-btn" target="_blank" rel="noopener">View Prototype &rarr;</a>
+            </div>
+            <div class="col" style="display:flex; justify-content:center;">
+              <div class="rb-screen" style="position:relative; width:100%; max-width:480px; aspect-ratio:800/450; border-radius:6px; overflow:hidden; box-shadow:0 30px 60px rgba(0,0,0,.35);">
+                <iframe loading="lazy" title="Reboot interactive prototype: Guided Walkthroughs flow" style="width:100%; height:100%; border:none;" src="https://embed.figma.com/proto/HQadzgQPnOnY0y8I1S6nNK/reboot?node-id=467-1536&p=f&scaling=scale-down&content-scaling=fixed&page-id=467%3A769&starting-point-node-id=467%3A1536&show-proto-sidebar=1&embed-host=share" allowfullscreen></iframe>
+                <div style="position:absolute; bottom:10px; right:10px; pointer-events:none; background:rgba(10,10,14,.72); backdrop-filter:blur(6px); color:#fff; font-size:10px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; padding:6px 10px; border-radius:100px; display:flex; align-items:center; gap:5px;">&#8595; Scroll inside to see more</div>
+              </div>
+            </div>
+          </div>
+    </div>
+
+    <div class="sv-panel" id="pt-motion" role="tabpanel" aria-labelledby="pt-tab-motion" hidden>
+      <h2 style="font-size:30px; max-width:640px; margin-bottom:26px; text-align:center; margin-left:auto; margin-right:auto;">The walkthrough video.</h2>
+          <div class="rb-screen" style="width:100%; max-width:820px; aspect-ratio:16/9; border-radius:6px; overflow:hidden; box-shadow:0 30px 60px rgba(0,0,0,.35); margin:0 auto;">
+            <iframe loading="lazy" style="width:100%; height:100%; border:none;" src="https://player.vimeo.com/video/1183231700" title="Reboot motion graphic" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+          </div>
+    </div>
+  </section></div>
+<div class="slide-shell"><section class="slide" data-title="The Big Idea">
     <div class="eyebrow">The Big Idea</div>
     <h2 class="chrome-text" style="font-size:30px; max-width:640px; font-weight:400;">Pinterest, built for gamers.</h2>
     <div class="grid-3" style="max-width:820px;">
@@ -1126,38 +1178,42 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
     </div>
   </section></div>
 
-  <!-- 5. RESEARCH & COMPETITORS -->
-  <div class="slide-shell panel"><section class="slide panel" data-title="Research">
-    <div class="eyebrow">Competitors</div>
-    <h2 style="font-family:'Outfit',sans-serif; font-weight:700; font-size:clamp(24px,3vw,34px); line-height:1.2; max-width:760px; margin:6px 0 10px;">Gamers use four apps, and each one does one job.</h2>
-    <p style="font-size:13px; opacity:.7; max-width:660px; margin-bottom:20px;">I compared the apps gamers told me they use, based on each app's own pages. Pinterest sorts ideas. HallOfFramed shows them off. Reddit and Steam help when you're stuck. Reboot puts all of it in one app, made only for&nbsp;games.</p>
-    <div class="cmp-wrap"><table class="cmp"><thead><tr><th></th><th scope="col">Pinterest</th><th scope="col">HallOfFramed</th><th scope="col">Reddit</th><th scope="col">Steam Guides</th><th scope="col" class="cmp-me">Reboot<small>My app</small></th></tr></thead><tbody><tr><th scope="row">Built for gamers</th><td><span class="cmp-p" aria-label="Partly"></span><span class="cmp-t">Any topic</span></td><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Game screenshots</span></td><td><span class="cmp-p" aria-label="Partly"></span><span class="cmp-t">Gaming communities</span></td><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Player-written guides</span></td><td class="cmp-me"><span class="cmp-y"></span><span class="cmp-t">Only games</span></td></tr><tr><th scope="row">Feed picked from what you like</th><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Home feed</span></td><td><span class="cmp-n">Not listed</span></td><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Home feed</span></td><td><span class="cmp-n">Not listed</span></td><td class="cmp-me"><span class="cmp-y"></span><span class="cmp-t">For You feed</span></td></tr><tr><th scope="row">Boards to sort ideas</th><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Boards + sections</span></td><td><span class="cmp-n">Not listed</span></td><td><span class="cmp-p" aria-label="Partly"></span><span class="cmp-t">Saved posts</span></td><td><span class="cmp-n">Not listed</span></td><td class="cmp-me"><span class="cmp-y"></span><span class="cmp-t">Boards + sub-boards</span></td></tr><tr><th scope="row">Step-by-step help when stuck</th><td><span class="cmp-n">Not listed</span></td><td><span class="cmp-n">Not listed</span></td><td><span class="cmp-p" aria-label="Partly"></span><span class="cmp-t">Community threads</span></td><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Step-by-step guides</span></td><td class="cmp-me"><span class="cmp-y"></span><span class="cmp-t">Step-by-step guides</span></td></tr></tbody></table></div>
-    <p class="cmp-foot">"Not listed" means the feature isn't mentioned in the app's own store page, website or help pages.</p><p class="cmp-swipe">Swipe the table to compare &rarr;</p>
-  </section></div>
+  <!-- 5. research & competitors -->
+  <div class="slide-shell panel"><section class="slide" data-title="Research">
+    <div class="eyebrow">Research</div>
 
-  <!-- 6. AUDIENCE INSIGHTS + CHART -->
-  <div class="slide-shell"><section class="slide" data-title="Audience Insights">
-    <div class="eyebrow">Focus Group Findings</div>
-    <div class="two-col top">
-      <div class="col" style="flex:0 0 220px;">
-        <div class="meta-label">Participants</div>
-        <div class="meta-value" style="line-height:1.9;">Xally<br>Kathy<br>Isabella</div>
-        <p style="font-size:12px; opacity:.55; margin-top:8px;">March 2026</p>
-      </div>
-      <div class="col">
-        <div class="meta-label" style="margin-bottom:14px;">How many of the 3 participants raised each issue</div>
-        <div class="chart">
-          <div class="chart-row"><div class="chart-label">Confused where to start / Explore not visible</div><div class="chart-track"><div class="chart-fill" style="width:100%;">3 / 3</div></div></div>
-          <div class="chart-row"><div class="chart-label">Tight spacing felt visually overwhelming</div><div class="chart-track"><div class="chart-fill" style="width:66%;">2 / 3</div></div></div>
-          <div class="chart-row"><div class="chart-label">Wanted clearer step-by-step guidance</div><div class="chart-track"><div class="chart-fill" style="width:100%;">3 / 3</div></div></div>
-        </div>
-      </div>
+    <div class="sv-tabs" role="tablist" aria-label="Research">
+      <button class="sv-tab on" type="button" role="tab" id="rs-tab-comp" aria-controls="rs-comp" aria-selected="true">Competitors</button>
+      <button class="sv-tab" type="button" role="tab" id="rs-tab-focus" aria-controls="rs-focus" aria-selected="false">Focus group</button>
     </div>
-    <p style="font-size:13px; opacity:.55; margin-top:24px; max-width:600px;">From the session and app reviews: gamers use Pinterest, TikTok, and screenshots, and they lose track of ideas. They want one app to find and save them.</p>
-  </section></div>
 
-  <!-- 7. PERSONAS -->
-  <div class="slide-shell panel"><section class="slide panel" data-title="Personas">
+    <div class="sv-panel" id="rs-comp" role="tabpanel" aria-labelledby="rs-tab-comp">
+      <h2 style="font-family:'Outfit',sans-serif; font-weight:700; font-size:clamp(24px,3vw,34px); line-height:1.2; max-width:760px; margin:6px 0 10px;">Gamers use four apps, and each one does one job.</h2>
+          <p style="font-size:13px; opacity:.7; max-width:660px; margin-bottom:20px;">I compared the apps gamers told me they use, based on each app's own pages. Pinterest sorts ideas. HallOfFramed shows them off. Reddit and Steam help when you're stuck. Reboot puts all of it in one app, made only for&nbsp;games.</p>
+          <div class="cmp-wrap"><table class="cmp"><thead><tr><th></th><th scope="col">Pinterest</th><th scope="col">HallOfFramed</th><th scope="col">Reddit</th><th scope="col">Steam Guides</th><th scope="col" class="cmp-me">Reboot<small>My app</small></th></tr></thead><tbody><tr><th scope="row">Built for gamers</th><td><span class="cmp-p" aria-label="Partly"></span><span class="cmp-t">Any topic</span></td><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Game screenshots</span></td><td><span class="cmp-p" aria-label="Partly"></span><span class="cmp-t">Gaming communities</span></td><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Player-written guides</span></td><td class="cmp-me"><span class="cmp-y"></span><span class="cmp-t">Only games</span></td></tr><tr><th scope="row">Feed picked from what you like</th><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Home feed</span></td><td><span class="cmp-n">Not listed</span></td><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Home feed</span></td><td><span class="cmp-n">Not listed</span></td><td class="cmp-me"><span class="cmp-y"></span><span class="cmp-t">For You feed</span></td></tr><tr><th scope="row">Boards to sort ideas</th><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Boards + sections</span></td><td><span class="cmp-n">Not listed</span></td><td><span class="cmp-p" aria-label="Partly"></span><span class="cmp-t">Saved posts</span></td><td><span class="cmp-n">Not listed</span></td><td class="cmp-me"><span class="cmp-y"></span><span class="cmp-t">Boards + sub-boards</span></td></tr><tr><th scope="row">Step-by-step help when stuck</th><td><span class="cmp-n">Not listed</span></td><td><span class="cmp-n">Not listed</span></td><td><span class="cmp-p" aria-label="Partly"></span><span class="cmp-t">Community threads</span></td><td><span class="cmp-y" aria-label="Yes"></span><span class="cmp-t">Step-by-step guides</span></td><td class="cmp-me"><span class="cmp-y"></span><span class="cmp-t">Step-by-step guides</span></td></tr></tbody></table></div>
+          <p class="cmp-foot">"Not listed" means the feature isn't mentioned in the app's own store page, website or help pages.</p><p class="cmp-swipe">Swipe the table to compare &rarr;</p>
+    </div>
+
+    <div class="sv-panel" id="rs-focus" role="tabpanel" aria-labelledby="rs-tab-focus" hidden>
+      <div class="two-col top">
+            <div class="col" style="flex:0 0 220px;">
+              <div class="meta-label">Participants</div>
+              <div class="meta-value" style="line-height:1.9;">Xally<br>Kathy<br>Isabella</div>
+              <p style="font-size:12px; opacity:.55; margin-top:8px;">March 2026</p>
+            </div>
+            <div class="col">
+              <div class="meta-label" style="margin-bottom:14px;">How many of the 3 participants raised each issue</div>
+              <div class="chart">
+                <div class="chart-row"><div class="chart-label">Confused where to start / Explore not visible</div><div class="chart-track"><div class="chart-fill" style="width:100%;">3 / 3</div></div></div>
+                <div class="chart-row"><div class="chart-label">Tight spacing felt visually overwhelming</div><div class="chart-track"><div class="chart-fill" style="width:66%;">2 / 3</div></div></div>
+                <div class="chart-row"><div class="chart-label">Wanted clearer step-by-step guidance</div><div class="chart-track"><div class="chart-fill" style="width:100%;">3 / 3</div></div></div>
+              </div>
+            </div>
+          </div>
+          <p style="font-size:13px; opacity:.55; margin-top:24px; max-width:600px;">From the session and app reviews: gamers use Pinterest, TikTok, and screenshots, and they lose track of ideas. They want one app to find and save them.</p>
+    </div>
+  </section></div>
+<div class="slide-shell panel"><section class="slide panel" data-title="Personas">
     <div class="eyebrow">Personas</div>
     <p class="tab-hint"><svg viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V6a2 2 0 0 1 4 0v5"/><path d="M13 11V9a2 2 0 0 1 4 0v2"/><path d="M17 11v-1a2 2 0 0 1 4 0v6a5 5 0 0 1-5 5h-3a6 6 0 0 1-6-6v-4a2 2 0 0 1 4 0"/></svg>Click a name to see that persona.</p>
     <div class="tab-row">
@@ -1233,7 +1289,7 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
     </div>
   </section></div>
 
-  <!-- 8. STORYBOARD -->
+  <!-- 8. storyboard -->
   <div class="slide-shell"><section class="slide" data-title="Storyboard">
     <div class="eyebrow">Ava's Story</div>
     <div class="step-tracker">
@@ -1246,7 +1302,7 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
     </div>
   </section></div>
 
-  <!-- 9. MOODBOARD -->
+  <!-- 9. moodboard -->
   <div class="slide-shell panel"><section class="slide panel" data-title="Moodboard">
     <div class="eyebrow">Moodboard</div>
     <h2 style="font-size:28px; margin-bottom:20px;">Neon arcade, cyberpunk edge</h2>
@@ -1270,7 +1326,7 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
     </div>
   </section></div>
 
-  <!-- 11. TASK FLOW -->
+  <!-- 11. task flow -->
   <div class="slide-shell panel"><section class="slide panel" data-title="Task Flow">
     <div class="eyebrow">Task Flow</div>
     <p class="tab-hint"><svg viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V6a2 2 0 0 1 4 0v5"/><path d="M13 11V9a2 2 0 0 1 4 0v2"/><path d="M17 11v-1a2 2 0 0 1 4 0v6a5 5 0 0 1-5 5h-3a6 6 0 0 1-6-6v-4a2 2 0 0 1 4 0"/></svg>Click a name to see that task flow.</p>
@@ -1314,7 +1370,7 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
     </div>
   </section></div>
 
-  <!-- 12. TESTING RESULTS -->
+  <!-- 12. testing results -->
   <div class="slide-shell"><section class="slide" data-title="Testing and Results">
     <div class="eyebrow">Focus Group &amp; Results</div>
     <span class="pill grad" style="margin-bottom:16px; display:inline-block;">Focus Group</span>
@@ -1348,175 +1404,118 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
     </div>
   </section></div>
 
-  <!-- 13. PROTOTYPE -->
+  <!-- 13. prototype -->
   
-  <div class="slide-shell panel"><section class="slide panel" data-title="For You">
-    <div class="fy-wrap fy-top-align">
-      <div>
-        <div class="eyebrow">More Feedback &middot; The For You Feed</div>
-      <h2 class="chrome-text" style="font-size:30px; max-width:680px; font-weight:400;">For You should mean for you.</h2>
-      <p class="lead" style="max-width:640px; margin-top:10px;">A friend tried the prototype. His feed kept showing cute posts and PC hardware, and he only cares about creative screenshots and guides. So Explore is now a For You page. It only shows what you say you like.</p>
+  <div class="slide-shell panel"><section class="slide" data-title="More Feedback">
+    <div class="eyebrow">More Feedback</div>
 
-        <div class="fy-steps">
-          <div class="card" data-lk="pick"><span class="num">1</span><div><h3>You pick</h3><p>The first time you open Reboot, you choose what you like: creative shots, guides, builds, or outfits. Nothing else shows up until you add it.</p></div></div>
-          <div class="card" data-lk="learn"><span class="num">2</span><div><h3>It learns from you</h3><p>Every heart, repost, and save brings more of the same. Posts you scroll past don't get pushed.</p></div></div>
-          <div class="card" data-lk="no"><span class="num">3</span><div><h3>You can say no</h3><p>Tap Not for me to hide a whole topic, like cute posts or PC setups.</p></div></div>
-        </div>
-        <div class="fy-rule"><b>The rule:</b> if you didn't pick it, save it, or heart something like it, it stays out of For You.</div>
-      </div>
-      <div>
-        <div class="fy-phone" aria-hidden="true">
-          <div class="fy-top"><div class="fy-toggle"><span class="on">For You</span><span>Following</span></div></div>
-          <div class="fy-tuned" data-lt="pick">Tuned to: <i>Creative shots</i><i>Guides</i><u>Edit</u></div>
-          <div class="fy-grid">
-            <div class="fy-tile tall g2" data-lt="learn"><small>Because you like: Creative shots</small></div>
-            <div class="fy-tile g1"><small>Guide: hidden Minecraft bases</small></div>
-            <div class="fy-tile g3" data-lt="learn"><small>Because you saved: Photo mode</small></div>
-            <div class="fy-tile g6"><small>Guide: Zelda shrine route</small></div>
-            <div class="fy-tile g5" data-lt="learn"><small>Because you like: Guides</small></div>
+    <div class="sv-tabs" role="tablist" aria-label="More Feedback">
+      <button class="sv-tab on" type="button" role="tab" id="fb-tab-foryou" aria-controls="fb-foryou" aria-selected="true">The For You feed</button>
+      <button class="sv-tab" type="button" role="tab" id="fb-tab-timeline" aria-controls="fb-timeline" aria-selected="false">The approach</button>
+      <button class="sv-tab" type="button" role="tab" id="fb-tab-again" aria-controls="fb-again" aria-selected="false">Asking again</button>
+    </div>
+
+    <div class="sv-panel" id="fb-foryou" role="tabpanel" aria-labelledby="fb-tab-foryou">
+      <div class="fy-wrap fy-top-align">
+            <div>
+            <h2 class="chrome-text" style="font-size:30px; max-width:680px; font-weight:400;">For You should mean for you.</h2>
+            <p class="lead" style="max-width:640px; margin-top:10px;">A friend tried the prototype. His feed kept showing cute posts and PC hardware, and he only cares about creative screenshots and guides. So Explore is now a For You page. It only shows what you say you like.</p>
+      
+              <div class="fy-steps">
+                <div class="card" data-lk="pick"><span class="num">1</span><div><h3>You pick</h3><p>The first time you open Reboot, you choose what you like: creative shots, guides, builds, or outfits. Nothing else shows up until you add it.</p></div></div>
+                <div class="card" data-lk="learn"><span class="num">2</span><div><h3>It learns from you</h3><p>Every heart, repost, and save brings more of the same. Posts you scroll past don't get pushed.</p></div></div>
+                <div class="card" data-lk="no"><span class="num">3</span><div><h3>You can say no</h3><p>Tap Not for me to hide a whole topic, like cute posts or PC setups.</p></div></div>
+              </div>
+              <div class="fy-rule"><b>The rule:</b> if you didn't pick it, save it, or heart something like it, it stays out of For You.</div>
+            </div>
+            <div>
+              <div class="fy-phone" aria-hidden="true">
+                <div class="fy-top"><div class="fy-toggle"><span class="on">For You</span><span>Following</span></div></div>
+                <div class="fy-tuned" data-lt="pick">Tuned to: <i>Creative shots</i><i>Guides</i><u>Edit</u></div>
+                <div class="fy-grid">
+                  <div class="fy-tile tall g2" data-lt="learn"><small>Because you like: Creative shots</small></div>
+                  <div class="fy-tile g1"><small>Guide: hidden Minecraft bases</small></div>
+                  <div class="fy-tile g3" data-lt="learn"><small>Because you saved: Photo mode</small></div>
+                  <div class="fy-tile g6"><small>Guide: Zelda shrine route</small></div>
+                  <div class="fy-tile g5" data-lt="learn"><small>Because you like: Guides</small></div>
+                </div>
+                <div class="fy-menu" data-lt="no"><div>Save to board</div><div class="hot">Not for me</div><div>Hide "cute posts"</div></div>
+              </div>
+              <p class="fy-cap">Concept for the next version. The Figma prototype doesn't have this yet.</p>
+            </div>
           </div>
-          <div class="fy-menu" data-lt="no"><div>Save to board</div><div class="hot">Not for me</div><div>Hide "cute posts"</div></div>
-        </div>
-        <p class="fy-cap">Concept for the next version. The Figma prototype doesn't have this yet.</p>
-      </div>
     </div>
-  </section></div>
 
-  <!-- MORE LIKE TWITTER (added after later feedback) -->
-  <div class="slide-shell"><section class="slide" data-title="More Like a Timeline">
-    <div class="fy-wrap fy-top-align">
-      <div>
-        <div class="eyebrow">More Feedback &middot; The Approach</div>
-      <h2 class="chrome-text" style="font-size:30px; max-width:680px; font-weight:400;">Less pinboard, more timeline.</h2>
-      <p class="lead" style="max-width:640px; margin-top:10px;">The same friend said Reboot should feel less like a pinboard and more like a feed of real players. A lot of gamers don't use Pinterest at all. So now every post comes from a person, with a caption and replies, instead of an anonymous pin. Reboot keeps its name.</p>
-
-        <div class="tw-compare">
-          <div class="card"><div class="tag">Before &middot; like Pinterest</div><h3>A grid of pins</h3><ul>
-            <li>Images without a person attached.</li>
-            <li>Saving to boards is the main action.</li>
-            <li>Works best for artsy browsing.</li></ul></div>
-          <div class="card now"><div class="tag">Now &middot; a timeline of posts</div><h3>Posts from gamers</h3><ul>
-            <li data-lk="post">Every post has a person, a caption and a time.</li>
-            <li data-lk="acts">Reply, repost, heart, and save.</li>
-            <li data-lk="tabs">A Following tab next to For You.</li>
-            <li data-lk="thread">Guides can be threads, one step per post.</li></ul></div>
-        </div>
-        <div class="fy-rule" style="border-color:var(--pink); background:rgba(255,61,154,.06);"><b style="color:var(--pink);">What stays:</b> Boards are still there for saving and sharing ideas. Only the feed changes.</div>
-      </div>
-      <div>
-        <div class="fy-phone" aria-hidden="true">
-          <div class="fy-tabs" data-lt="tabs"><span class="on">For You</span><span>Following</span></div>
-          <div class="fy-tuned">Tuned to: <i>Creative shots</i><i>Guides</i><u>Edit</u></div>
-          <div class="fy-feed">
-            <div class="fy-post"><span class="fy-av g2"></span><div>
-              <div class="fy-who" data-lt="post"><b>pixelframe</b> <span>@pixelframe &middot; 2h</span></div>
-              <div class="fy-txt" data-lt="post">Photo mode at sunset. No filters, just waited for the light.</div>
-              <div class="fy-img g2"></div>
-              <div class="fy-acts" data-lt="acts"><span>&#8617; 14</span><span>&#8635; 32</span><span>&#9825; 210</span><span>Save</span></div>
-              <div class="fy-why">Because you like: Creative shots</div></div></div>
-            <div class="fy-post"><span class="fy-av g1"></span><div>
-              <div class="fy-who" data-lt="post"><b>questnotes</b> <span>@questnotes &middot; 5h</span></div>
-              <div class="fy-txt" data-lt="post thread">Every hidden shrine in the first area, in order. Thread 1/6</div>
-              <div class="fy-img g6" style="height:44px;"></div>
-              <div class="fy-acts" data-lt="acts"><span>&#8617; 41</span><span>&#8635; 88</span><span>&#9825; 530</span><span>Save</span></div>
-              <div class="fy-why">Because you like: Guides</div></div></div>
+    <div class="sv-panel" id="fb-timeline" role="tabpanel" aria-labelledby="fb-tab-timeline" hidden>
+      <div class="fy-wrap fy-top-align">
+            <div>
+            <h2 class="chrome-text" style="font-size:30px; max-width:680px; font-weight:400;">Less pinboard, more timeline.</h2>
+            <p class="lead" style="max-width:640px; margin-top:10px;">The same friend said Reboot should feel less like a pinboard and more like a feed of real players. A lot of gamers don't use Pinterest at all. So now every post comes from a person, with a caption and replies, instead of an anonymous pin. Reboot keeps its name.</p>
+      
+              <div class="tw-compare">
+                <div class="card"><div class="tag">Before &middot; like Pinterest</div><h3>A grid of pins</h3><ul>
+                  <li>Images without a person attached.</li>
+                  <li>Saving to boards is the main action.</li>
+                  <li>Works best for artsy browsing.</li></ul></div>
+                <div class="card now"><div class="tag">Now &middot; a timeline of posts</div><h3>Posts from gamers</h3><ul>
+                  <li data-lk="post">Every post has a person, a caption and a time.</li>
+                  <li data-lk="acts">Reply, repost, heart, and save.</li>
+                  <li data-lk="tabs">A Following tab next to For You.</li>
+                  <li data-lk="thread">Guides can be threads, one step per post.</li></ul></div>
+              </div>
+              <div class="fy-rule" style="border-color:var(--pink); background:rgba(255,61,154,.06);"><b style="color:var(--pink);">What stays:</b> Boards are still there for saving and sharing ideas. Only the feed changes.</div>
+            </div>
+            <div>
+              <div class="fy-phone" aria-hidden="true">
+                <div class="fy-tabs" data-lt="tabs"><span class="on">For You</span><span>Following</span></div>
+                <div class="fy-tuned">Tuned to: <i>Creative shots</i><i>Guides</i><u>Edit</u></div>
+                <div class="fy-feed">
+                  <div class="fy-post"><span class="fy-av g2"></span><div>
+                    <div class="fy-who" data-lt="post"><b>pixelframe</b> <span>@pixelframe &middot; 2h</span></div>
+                    <div class="fy-txt" data-lt="post">Photo mode at sunset. No filters, just waited for the light.</div>
+                    <div class="fy-img g2"></div>
+                    <div class="fy-acts" data-lt="acts"><span>&#8617; 14</span><span>&#8635; 32</span><span>&#9825; 210</span><span>Save</span></div>
+                    <div class="fy-why">Because you like: Creative shots</div></div></div>
+                  <div class="fy-post"><span class="fy-av g1"></span><div>
+                    <div class="fy-who" data-lt="post"><b>questnotes</b> <span>@questnotes &middot; 5h</span></div>
+                    <div class="fy-txt" data-lt="post thread">Every hidden shrine in the first area, in order. Thread 1/6</div>
+                    <div class="fy-img g6" style="height:44px;"></div>
+                    <div class="fy-acts" data-lt="acts"><span>&#8617; 41</span><span>&#8635; 88</span><span>&#9825; 530</span><span>Save</span></div>
+                    <div class="fy-why">Because you like: Guides</div></div></div>
+                </div>
+              </div>
+              <p class="fy-cap">Concept for the next version. The Figma prototype doesn't have this yet.</p>
+            </div>
           </div>
-        </div>
-        <p class="fy-cap">Concept for the next version. The Figma prototype doesn't have this yet.</p>
-      </div>
+    </div>
+
+    <div class="sv-panel" id="fb-again" role="tabpanel" aria-labelledby="fb-tab-again" hidden>
+      <h2 class="chrome-text" style="font-size:30px; max-width:680px; font-weight:400;">Does it feel like yours now?</h2>
+          <p class="lead" style="max-width:640px; margin-top:10px;">I'm showing the new version to the same three people. I want to check that the changes worked and find any new problems.</p>
+          <div class="two-col top" style="margin-top:26px; gap:40px;">
+            <div class="col">
+              <div class="meta-label" style="margin-bottom:12px;">What I'm asking</div>
+              <ol class="ask-list">
+                <li><span>Scroll For You for a minute. Is there anything in it you'd never look at?</span></li>
+                <li><span>Hide a topic you don't care about. Was Not for me easy to find?</span></li>
+                <li><span>Does the feed feel more like a timeline or a pinboard now? Which do you want?</span></li>
+                <li><span>Would you follow people on Reboot, or only scroll For You?</span></li>
+                <li><span>Is there anything new that feels off?</span></li>
+              </ol>
+            </div>
+            <div class="col">
+              <div class="rb-queue" role="status">
+                <div class="rb-q-top"><span>ROUND 02</span><span>PLAYTEST</span></div>
+                <div class="rb-q-title">WAITING FOR PLAYERS<span class="term-caret">_</span></div>
+                <div class="rb-q-bar"><i></i></div>
+                <p class="rb-q-note">Their answers load in here once they've played the new version. No results yet, so none are shown.</p>
+                <div class="rb-q-press">PRESS&nbsp;START</div>
+              </div>
+            </div>
+          </div>
     </div>
   </section></div>
-
-  <!-- ASKING AGAIN -->
-  <div class="slide-shell panel"><section class="slide panel" data-title="Asking Again">
-    <div class="eyebrow">Next &middot; Asking the Same People Again</div>
-    <h2 class="chrome-text" style="font-size:30px; max-width:680px; font-weight:400;">Does it feel like yours now?</h2>
-    <p class="lead" style="max-width:640px; margin-top:10px;">I'm showing the new version to the same three people. I want to check that the changes worked and find any new problems.</p>
-    <div class="two-col top" style="margin-top:26px; gap:40px;">
-      <div class="col">
-        <div class="meta-label" style="margin-bottom:12px;">What I'm asking</div>
-        <ol class="ask-list">
-          <li><span>Scroll For You for a minute. Is there anything in it you'd never look at?</span></li>
-          <li><span>Hide a topic you don't care about. Was Not for me easy to find?</span></li>
-          <li><span>Does the feed feel more like a timeline or a pinboard now? Which do you want?</span></li>
-          <li><span>Would you follow people on Reboot, or only scroll For You?</span></li>
-          <li><span>Is there anything new that feels off?</span></li>
-        </ol>
-      </div>
-      <div class="col">
-        <div class="rb-queue" role="status">
-          <div class="rb-q-top"><span>ROUND 02</span><span>PLAYTEST</span></div>
-          <div class="rb-q-title">WAITING FOR PLAYERS<span class="term-caret">_</span></div>
-          <div class="rb-q-bar"><i></i></div>
-          <p class="rb-q-note">Their answers load in here once they've played the new version. No results yet, so none are shown.</p>
-          <div class="rb-q-press">PRESS&nbsp;START</div>
-        </div>
-      </div>
-    </div>
-  </section></div>
-
-  <div class="slide-shell panel"><section class="slide panel" data-title="Prototype 01">
-    <div class="eyebrow">Prototype &middot; Explore</div>
-    <div class="two-col">
-      <div class="col" style="max-width:420px;">
-        <h2 style="font-size:38px; line-height:1.15;">Explore what you like.</h2>
-        <p class="lead" style="margin-top:16px;">Mod pack showcases, gameplay highlights, and console tutorials, all in one feed.</p>
-        <a href="https://www.figma.com/proto/HQadzgQPnOnY0y8I1S6nNK/reboot?node-id=467-1643" class="proto-btn" target="_blank" rel="noopener">View Prototype &rarr;</a>
-      </div>
-      <div class="col" style="display:flex; justify-content:center;">
-        <div class="rb-screen" style="position:relative; width:100%; max-width:480px; aspect-ratio:800/450; border-radius:6px; overflow:hidden; box-shadow:0 30px 60px rgba(0,0,0,.35);">
-          <iframe loading="lazy" title="Reboot interactive prototype: Explore flow" style="width:100%; height:100%; border:none;" src="https://embed.figma.com/proto/HQadzgQPnOnY0y8I1S6nNK/reboot?node-id=467-1643&p=f&scaling=scale-down&content-scaling=fixed&page-id=467%3A769&starting-point-node-id=467%3A1643&show-proto-sidebar=1&embed-host=share" allowfullscreen></iframe>
-          <div style="position:absolute; bottom:10px; right:10px; pointer-events:none; background:rgba(10,10,14,.72); backdrop-filter:blur(6px); color:#fff; font-size:10px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; padding:6px 10px; border-radius:100px; display:flex; align-items:center; gap:5px;">&#8595; Scroll inside to see more</div>
-        </div>
-      </div>
-    </div>
-  </section></div>
-
-  <div class="slide-shell"><section class="slide" data-title="Prototype 02">
-    <div class="eyebrow">Prototype &middot; Boards</div>
-    <div class="two-col">
-      <div class="col" style="max-width:420px;">
-        <h2 style="font-size:38px; line-height:1.15;">Boards that stay&nbsp;organized.</h2>
-        <p class="lead" style="margin-top:16px;">Sub-boards for every project keep builds, outfits, and inspiration sorted.</p>
-        <a href="https://www.figma.com/proto/HQadzgQPnOnY0y8I1S6nNK/reboot?node-id=467-1409" class="proto-btn" target="_blank" rel="noopener">View Prototype &rarr;</a>
-      </div>
-      <div class="col" style="display:flex; justify-content:center;">
-        <div class="rb-screen" style="position:relative; width:100%; max-width:480px; aspect-ratio:800/450; border-radius:6px; overflow:hidden; box-shadow:0 30px 60px rgba(0,0,0,.35);">
-          <iframe loading="lazy" title="Reboot interactive prototype: Boards flow" style="width:100%; height:100%; border:none;" src="https://embed.figma.com/proto/HQadzgQPnOnY0y8I1S6nNK/reboot?node-id=467-1409&p=f&scaling=scale-down&content-scaling=fixed&page-id=467%3A769&starting-point-node-id=467%3A1409&show-proto-sidebar=1&embed-host=share" allowfullscreen></iframe>
-          <div style="position:absolute; bottom:10px; right:10px; pointer-events:none; background:rgba(10,10,14,.72); backdrop-filter:blur(6px); color:#fff; font-size:10px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; padding:6px 10px; border-radius:100px; display:flex; align-items:center; gap:5px;">&#8595; Scroll inside to see more</div>
-        </div>
-      </div>
-    </div>
-  </section></div>
-
-  <div class="slide-shell panel"><section class="slide panel" data-title="Prototype 03">
-    <div class="eyebrow">Prototype &middot; Guides</div>
-    <div class="two-col">
-      <div class="col" style="max-width:420px;">
-        <h2 style="font-size:38px; line-height:1.15;">Help when you're stuck.</h2>
-        <p class="lead" style="margin-top:16px;">Step-by-step guides for puzzles and bosses, right in the&nbsp;app.</p>
-        <a href="https://www.figma.com/proto/HQadzgQPnOnY0y8I1S6nNK/reboot?node-id=467-1536" class="proto-btn" target="_blank" rel="noopener">View Prototype &rarr;</a>
-      </div>
-      <div class="col" style="display:flex; justify-content:center;">
-        <div class="rb-screen" style="position:relative; width:100%; max-width:480px; aspect-ratio:800/450; border-radius:6px; overflow:hidden; box-shadow:0 30px 60px rgba(0,0,0,.35);">
-          <iframe loading="lazy" title="Reboot interactive prototype: Guided Walkthroughs flow" style="width:100%; height:100%; border:none;" src="https://embed.figma.com/proto/HQadzgQPnOnY0y8I1S6nNK/reboot?node-id=467-1536&p=f&scaling=scale-down&content-scaling=fixed&page-id=467%3A769&starting-point-node-id=467%3A1536&show-proto-sidebar=1&embed-host=share" allowfullscreen></iframe>
-          <div style="position:absolute; bottom:10px; right:10px; pointer-events:none; background:rgba(10,10,14,.72); backdrop-filter:blur(6px); color:#fff; font-size:10px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; padding:6px 10px; border-radius:100px; display:flex; align-items:center; gap:5px;">&#8595; Scroll inside to see more</div>
-        </div>
-      </div>
-    </div>
-  </section></div>
-
-  <!-- 13b. MOTION GRAPHIC -->
-  <div class="slide-shell"><section class="slide" data-title="Motion Graphic" style="align-items:center;">
-    <div class="eyebrow" style="text-align:center;">The Companion Walkthrough</div>
-    <h2 style="font-size:30px; max-width:640px; margin-bottom:26px; text-align:center; margin-left:auto; margin-right:auto;">The walkthrough video.</h2>
-    <div class="rb-screen" style="width:100%; max-width:820px; aspect-ratio:16/9; border-radius:6px; overflow:hidden; box-shadow:0 30px 60px rgba(0,0,0,.35); margin:0 auto;">
-      <iframe loading="lazy" style="width:100%; height:100%; border:none;" src="https://player.vimeo.com/video/1183231700" title="Reboot motion graphic" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
-    </div>
-  </section></div>
-
-  <!-- 14. BRANDING -->
-  <div class="slide-shell"><section class="slide" data-title="Branding Guidelines">
+<div class="slide-shell"><section class="slide" data-title="Branding Guidelines">
     <div class="eyebrow">Branding Guidelines</div>
     <div class="hud-frame rb-brand" style="margin-top:16px; border-radius:8px; overflow:hidden;">
       <div class="hud-corner-tl"></div><div class="hud-corner-br"></div>
@@ -1527,7 +1526,7 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
     </div>
   </section></div>
 
-  <!-- 15. WRAP UP -->
+  <!-- 15. wrap up -->
   <div class="slide-shell panel"><section class="slide panel" data-title="Wrap Up" style="align-items:center;">
     <div class="rb-wrap" style="max-width:600px; margin:0 auto; text-align:left;">
       <div class="eyebrow">Conclusions</div>
@@ -1538,14 +1537,14 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
     </div>
   </section></div>
 
-  <!-- SOURCES -->
+  <!-- sources -->
   <div class="slide-shell panel"><section class="slide panel" data-title="Sources">
     <div class="eyebrow">Sources</div>
     <h2 style="font-family:'Outfit',sans-serif; font-weight:700; font-size:clamp(24px,3vw,34px); line-height:1.2; margin:6px 0 22px;">Sources.</h2>
     <div class="sv-grid"><div class="sv-group"><div class="sv-label">Competitors</div><ul><li><span class="sv-dot"></span><span><a href="https://help.pinterest.com/en/article/create-a-board-section" target="_blank" rel="noopener">Pinterest Help, Create a board section</a></span></li><li><span class="sv-dot"></span><span><a href="https://github.com/framedsc/HallOfFramed" target="_blank" rel="noopener">HallOfFramed, community screenshot gallery (GitHub)</a></span></li><li><span class="sv-dot"></span><span><a href="https://support.reddithelp.com/hc/en-us/articles/360043043412-What-is-a-custom-feed-and-how-do-I-make-one" target="_blank" rel="noopener">Reddit Help, What is a custom feed?</a></span></li><li><span class="sv-dot"></span><span><a href="https://steamcommunity.com/guides/" target="_blank" rel="noopener">Steam Community Guides</a></span></li></ul></div><div class="sv-group"><div class="sv-label">Books</div><ul><li><span class="sv-dot"></span><span>Jenifer Tidwell et al., Designing Interfaces (O'Reilly)</span></li></ul></div><div class="sv-group"><div class="sv-label">My own research</div><ul><li><span class="sv-dot"></span><span>Focus group with 3 gamers, March 2026</span></li><li><span class="sv-dot"></span><span>Second round with the same 3 people, in progress</span></li><li><span class="sv-dot"></span><span>Published app reviews of the apps above</span></li></ul></div></div>
   </section></div>
 
-  <!-- 16. THANK YOU -->
+  <!-- 16. thank you -->
   <div class="slide-shell"><section class="slide" data-title="Thank You">
     <div class="scan-sweep"></div>
     <div class="blob" style="width:440px;height:440px; background:radial-gradient(circle, var(--purple), transparent 70%); top:-150px; left:-90px;"></div>
@@ -1624,6 +1623,28 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
       group.querySelector('[data-panel="'+target+'"]').classList.add('active');
     });
   });
+
+  /* each of these panels is as tall as the tallest in its group, so the name
+     buttons above them stay in one place instead of sliding up and down */
+  function sizeTabPanels(){
+    document.querySelectorAll('.tab-row').forEach(row=>{
+      const slide = row.closest('.slide');
+      if (!slide) return;
+      const panels = [].slice.call(slide.querySelectorAll('.tab-panel'));
+      if (panels.length < 2) return;
+      const was = panels.map(p=>p.classList.contains('active'));
+      panels.forEach(p=>{ p.style.minHeight=''; });
+      let tall = 0;
+      panels.forEach((p,i)=>{
+        panels.forEach((q,j)=>q.classList.toggle('active', j===i));
+        tall = Math.max(tall, p.offsetHeight);
+      });
+      panels.forEach((p,i)=>{ p.classList.toggle('active', was[i]); p.style.minHeight = tall+'px'; });
+    });
+  }
+  sizeTabPanels();
+  window.addEventListener('load', sizeTabPanels);
+  let tpRsz; window.addEventListener('resize', ()=>{ clearTimeout(tpRsz); tpRsz=setTimeout(sizeTabPanels,150); });
 
   window.addEventListener('scroll', updateProgress, { passive:true });
   window.addEventListener('resize', updateProgress);
@@ -2042,5 +2063,69 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
 })();
 </script>
 
+<script>
+[].forEach.call(document.querySelectorAll('.sv-tabs'), function (group) {
+  var tabs = [].slice.call(group.querySelectorAll('.sv-tab'));
+  if (!tabs.length) return;
+  /* every panel is as tall as the tallest, so the tabs stay put instead of
+     jumping up and down as you click between them */
+  var panels = tabs.map(function (t) { return document.getElementById(t.getAttribute('aria-controls')); }).filter(Boolean);
+  /* an embedded prototype that boots inside a hidden panel has no size yet and
+     comes up blank, so hold its src back until its tab is opened. It also means
+     only the prototype you are looking at is running. */
+  panels.forEach(function (p) {
+    if (!p.hidden) return;
+    [].forEach.call(p.querySelectorAll('iframe[src]'), function (f) {
+      f.setAttribute('data-src', f.getAttribute('src'));
+      f.removeAttribute('src');
+    });
+  });
+  function load(p) {
+    [].forEach.call(p.querySelectorAll('iframe[data-src]'), function (f) {
+      f.setAttribute('src', f.getAttribute('data-src'));
+      f.removeAttribute('data-src');
+    });
+    if (window.ksFit) requestAnimationFrame(window.ksFit);
+  }
+  function size() {
+    var was = panels.map(function (p) { return p.hidden; });
+    panels.forEach(function (p) { p.style.minHeight = ''; });
+    var tall = 0;
+    panels.forEach(function (p, i) {
+      panels.forEach(function (q, j) { q.hidden = j !== i; });
+      tall = Math.max(tall, p.offsetHeight);
+    });
+    panels.forEach(function (p, i) { p.hidden = was[i]; p.style.minHeight = tall + 'px'; });
+  }
+  function show(id) {
+    tabs.forEach(function (t) {
+      var on = t.getAttribute('aria-controls') === id;
+      t.classList.toggle('on', on);
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      var panel = document.getElementById(t.getAttribute('aria-controls'));
+      if (panel) { panel.hidden = !on; if (on) load(panel); }
+    });
+  }
+  tabs.forEach(function (t, i) {
+    t.addEventListener('click', function () { show(t.getAttribute('aria-controls')); });
+    t.addEventListener('keydown', function (e) {
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+      e.preventDefault();
+      var next = tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length];
+      next.focus(); show(next.getAttribute('aria-controls'));
+    });
+  });
+  var pend; function resize() { clearTimeout(pend); pend = setTimeout(size, 60); }
+  size();
+  addEventListener('load', resize);
+  panels.forEach(function (p) {
+    [].forEach.call(p.querySelectorAll('img'), function (im) {
+      if (im.loading === 'lazy') im.loading = 'eager';
+      if (!im.complete) im.addEventListener('load', resize, { once: true });
+    });
+  });
+  var rsz; addEventListener('resize', function () { clearTimeout(rsz); rsz = setTimeout(size, 150); });
+});
+</script>
 </body>
 </html>

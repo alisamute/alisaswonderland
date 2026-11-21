@@ -42,6 +42,16 @@
     scroll-snap-align:start; border-top:1px solid var(--line); background:var(--paper); overflow:clip; }
   .slide-shell:first-child{ border-top:none; }
   .slide-shell.alt{ background:var(--paper-3); }
+  /* tab group: several pages of one section folded onto a single slide */
+  .sv-tabs{ display:flex; gap:8px; flex-wrap:wrap; margin:0 0 24px; }
+  .sv-tab{ appearance:none; -webkit-appearance:none; background:transparent; color:inherit;
+    border:1px solid var(--line); opacity:.75; padding:0 16px; min-height:38px; border-radius:100px;
+    font:inherit; font-size:11px; font-weight:700; letter-spacing:.07em; text-transform:uppercase;
+    cursor:pointer; transition:opacity .2s, background .2s, color .2s, border-color .2s; }
+  .sv-tab:hover{ opacity:1; border-color:var(--rule-red); }
+  .sv-tab.on{ opacity:1; background:var(--red); border-color:var(--red); color:var(--paper); }
+  .sv-tab:focus-visible{ outline:2px solid var(--red); outline-offset:2px; }
+  .sv-panel[hidden]{ display:none; }
   .slide-shell.white{ background:var(--paper-2); }
 
   .slide{ position:relative; max-width:1180px; width:100%; margin:0 auto;
@@ -288,7 +298,6 @@
   .stat .n small{ font-size:.42em; letter-spacing:0; margin-left:2px; opacity:.55; }
   .stat .bar{ height:4px; background:var(--paper-3); margin:14px 0 14px; position:relative; }
   .stat .bar i{ position:absolute; left:0; top:0; bottom:0; background:var(--ink); }
-  .stat.key .n{ color:var(--red); } .stat.key .bar i{ background:var(--red); }
   .stat p{ font-size:13px; line-height:1.55; color:var(--muted); margin:0; }
   .stat p b{ color:var(--ink); font-weight:600; }
   .src{ font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--muted); margin-top:12px; line-height:1.5; }
@@ -621,10 +630,7 @@
   @media(max-width:700px){ .slide{ padding:82px 7vw; } .grid-2,.grid-3{ grid-template-columns:1fr; }
     .counter{ top:22px; right:22px; } .brandmark{ bottom:22px; left:22px; } }
 
-  /* =====================================================================
-     THE DOCKET FILE: one set of paper objects used everywhere, instead of
-     generic white cards. Every slide is a page in a hiring file.
-     ===================================================================== */
+  /* paper objects: folder tab, index cards, forms, stamps */
   :root{ --manila:#E6D6A8; --manila-ink:#5E4B17; --card:#FFFDF6; --rule-red:rgba(176,64,47,.5); }
 
   /* 1. the eyebrow becomes a file-folder tab sitting on the top edge of the page */
@@ -687,7 +693,7 @@
   @media (prefers-reduced-motion: reduce){ .pr, .theme{ transform:none !important; } }
   @media(max-width:900px){ .pr, .theme{ transform:none !important; } }
 
-  /* ================= motion + hover layer (after Brett's case study feedback) ================= */
+  /* motion + hover */
   /* key screens: all three pin to the top so the heading and screen sit in the same spot on each page */
   .slide-shell.ks-shell{ align-items:flex-start; }
 
@@ -723,7 +729,6 @@
   .ba > div{ transition:opacity .3s ease; }
   .ba:hover > div:not(:hover){ opacity:.5; }
   .ba .ks-frame{ transition:transform .3s ease, box-shadow .3s ease; }
-  /* hover motion removed */
 
   /* cards: hover picks them up */
   .shift > div{ transition:background-color .2s ease, box-shadow .2s ease; }
@@ -732,17 +737,14 @@
   .impl > div{ position:relative; }
   .impl > div::before{ content:""; position:absolute; left:-12px; top:12px; bottom:12px; width:3px; background:var(--red);
     transform:scaleY(0); transform-origin:top; transition:transform .25s ease; }
-  /* hover motion removed */
   .impl > div:hover h4{ color:var(--red); }
   .impl h4{ transition:color .2s ease; }
-  @media (hover:hover) and (min-width:901px){ /* hover motion removed */ }
-  .sb-panel{ transition:background-color .2s ease; }
+    .sb-panel{ transition:background-color .2s ease; }
   .sb-panel:hover{ background:var(--paper-3); }
   .sb-panel:hover .num{ color:var(--red); }
   .steps > div{ transition:background-color .2s ease; }
   .steps > div:hover{ background:#FFFBEA; }
   .jot{ transition:scale .25s ease, box-shadow .25s ease; }
-  /* hover motion removed */
 
   /* tables: the row lights up and so does the column's header (who said it) */
   .deck table td{ transition:background-color .15s ease; }
@@ -778,7 +780,6 @@
   .mock-redact.tip:hover{ background:var(--red); }
   .mock-screen{ overflow:visible; }
   .swatch.tip .sw{ transition:transform .2s ease; }
-  /* hover motion removed */
   .swatch.tip:last-child::after{ left:auto; right:0; translate:0 4px; }
   .swatch.tip:last-child:hover::after{ translate:0 0; }
 
@@ -795,7 +796,6 @@
 
   /* evidence: cards lift, scattered chips straighten out */
   .ev{ transition:transform .25s ease, box-shadow .25s ease; }
-  /* hover motion removed */
   .scatter span{ transition:transform .2s ease, background-color .2s ease; }
   .scatter span:hover{ background:#FFFBEA; }
   .ev-nums div{ transition:background-color .2s ease; }
@@ -810,7 +810,6 @@
   .persona-photo{ transition:filter .4s ease; }
   .user:hover .persona-photo, .persona-full:hover .persona-photo{ filter:none; }
   .user{ transition:transform .25s ease, box-shadow .25s ease; }
-  /* hover motion removed */
   .does li{ transition:color .2s ease; }
   .does li:hover{ color:var(--red); }
 
@@ -819,7 +818,6 @@
   .flow-step:hover{ border-color:var(--ink); }
   .flow-step:hover .flow-num{ color:var(--red); }
   .flow-handoff .stamp{ transition:rotate .25s ease, scale .25s ease; }
-  /* hover motion removed */
 
   /* design system: rows tint on hover */
   .ds-row{ transition:background-color .2s ease; }
@@ -828,20 +826,16 @@
   /* cover, reflection, sources */
   @media (hover:hover) and (min-width:901px){
     .clip-shot{ transition:transform .35s ease, box-shadow .35s ease; }
-    /* hover motion removed */
   }
   .pad-list li{ transition:translate .2s ease; }
-  /* hover motion removed */
   .refl > div{ transition:background-color .2s ease; }
   .refl > div:hover{ background:#FFFBEA; }
   .srclog li{ transition:translate .2s ease; }
-  /* hover motion removed */
   .srclog li:hover a{ color:var(--red); }
   @media (hover:none){ .ba:hover > div:not(:hover){ opacity:1; } }
   @media (prefers-reduced-motion: reduce){
     .deck .slide-shell .slide > *, .deck .slide:not(.seen) .stag{ opacity:1 !important; translate:none !important; transition:none !important; }
     .ks-frame.zoomed .ks-zoom{ transform:none; } .ks-frame.zoomed .mk{ opacity:1; }
-    /* hover motion removed */
   }
 
   .src-more{margin-top:22px; max-width:760px;}
@@ -973,13 +967,13 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
 
 <nav class="chapters" aria-label="Case study sections">
   <a href="#" data-slide="1">Overview</a>
-  <a href="#" data-slide="2">Research</a>
+  <a href="#" data-slide="2">Prototype</a>
+  <a href="#" data-slide="4">Research</a>
   <a href="#" data-slide="5">Concept</a>
-  <a href="#" data-slide="7">Users</a>
-  <a href="#" data-slide="9">Design</a>
-  <a href="#" data-slide="13">Prototype</a>
-  <a href="#" data-slide="14">Iteration</a>
-  <a href="#" data-slide="17">Wrap Up</a>
+  <a href="#" data-slide="6">Users</a>
+  <a href="#" data-slide="8">Design</a>
+  <a href="#" data-slide="9">Testing</a>
+  <a href="#" data-slide="10">Wrap Up</a>
 </nav>
 
 <div class="progress-line" id="progressLine"></div>
@@ -992,7 +986,7 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
 
 <div class="deck" id="deck">
 
-  <!-- 0. COVER -->
+  <!-- 0. cover -->
   <div class="slide-shell"><section class="slide cover" data-title="Cover">
     <div class="cover-grid">
       <div class="pad">
@@ -1023,7 +1017,7 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
     </div>
   </div>
 
-  <!-- OVERVIEW -->
+  <!-- overview -->
   <div class="slide-shell alt"><section class="slide" data-title="Overview">
     <div class="eyebrow">Why I Built This &middot; The Problem</div>
     <h2 style="font-size:clamp(22px,4.2vw,36px); max-width:700px;">Recruiters and hiring managers often work with <em>different information</em>.</h2>
@@ -1039,131 +1033,183 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
     </div>
   </section></div>
 
-  <!-- RESEARCH -->
+  <!-- research -->
+  <div class="slide-shell ks-shell"><section class="slide" data-title="Key Screens">
+    <div class="eyebrow">Key Screens</div>
+
+    <div class="sv-tabs" role="tablist" aria-label="Key Screens">
+      <button class="sv-tab on" type="button" role="tab" id="ks-tab-cand" aria-controls="ks-cand" aria-selected="true">Candidates</button>
+      <button class="sv-tab" type="button" role="tab" id="ks-tab-rec" aria-controls="ks-rec" aria-selected="false">Record</button>
+      <button class="sv-tab" type="button" role="tab" id="ks-tab-comp" aria-controls="ks-comp" aria-selected="false">Compare</button>
+    </div>
+
+    <div class="sv-panel" id="ks-cand" role="tabpanel" aria-labelledby="ks-tab-cand">
+      <h2 style="font-size:clamp(26px,3.2vw,34px); margin-bottom:22px;">See who is waiting on you.</h2>
+          <div class="ks">
+            <div class="ks-frame" aria-hidden="true"><iframe src="docket-prototype.html?clean#/" tabindex="-1" loading="lazy" title=""></iframe><span class="mk" style="left:15.2%; top:12.8%;">1</span><span class="mk" style="left:48.8%; top:50.9%;">2</span><span class="mk" style="left:65.4%; top:51.1%;">3</span><span class="mk" style="left:69.5%; top:17.9%;">4</span><span class="mk" style="left:25.1%; top:29.6%;">5</span><span class="mk" style="left:61.7%; top:35.5%;">6</span></div>
+            <div><ol class="ks-notes"><li><span>One real tab. Requisitions and Reports are grayed out to show where it could grow.</span></li><li><span>Yellow means it is ready for your review. No other status uses yellow.</span></li><li><span>Interview progress without opening anything: filled is done, dashed is booked, empty is not booked. The overall score sits next to it.</span></li><li><span>Filters with a count on each, plus a sort. After testing, the list opens with whatever is late or due first.</span></li><li><span>Each row has one checkbox. Check any rows and a bar appears at the bottom to Compare or Archive the selection.</span></li><li><span>Added after the research: whose turn it is and for how long. Past the team's 2-day goal it gets a red Late tag, the same one used in the bar at the top.</span></li></ol><a class="ks-open" href="docket-prototype.html#/" target="_blank" rel="noopener">Open this screen &rarr;</a></div>
+          </div>
+    </div>
+
+    <div class="sv-panel" id="ks-rec" role="tabpanel" aria-labelledby="ks-tab-rec" hidden>
+      <h2 style="font-size:clamp(26px,3.2vw,34px); margin-bottom:22px;">Everything about one person, on one page.</h2>
+          <div class="ks">
+            <div class="ks-frame" aria-hidden="true"><iframe src="docket-prototype.html?clean#/c/CAND-0412" tabindex="-1" loading="lazy" title=""></iframe><span class="mk" style="left:68.4%; top:39.2%;">1</span><span class="mk" style="left:41.3%; top:46.9%;">2</span><span class="mk" style="left:35.5%; top:58.8%;">3</span><span class="mk" style="left:37%; top:61.4%;">4</span><span class="mk" style="left:59.2%; top:66.6%;">5</span><span class="mk" style="left:16.9%; top:29.9%;">6</span></div>
+            <div><ol class="ks-notes"><li><span>A "Your decision" box names the next step on a button. Afterward it says what moved, with Undo, and the recruiter sees it right away.</span></li><li><span>Next step is plain text the recruiter types after booking. Docket does not schedule.</span></li><li><span>Interviews and notes, documents, and activity are tabs inside the candidate.</span></li><li><span>What interviewers said comes first: every pro and concern, with the recommendations. The overall score and full notes sit below.</span></li><li><span>Concerns are in bold, since a tester only found them at the bottom of each interview.</span></li><li><span>Added after the research: who the candidate is waiting on, for how long, and the team goal, in plain words.</span></li></ol><a class="ks-open" href="docket-prototype.html#/c/CAND-0412" target="_blank" rel="noopener">Open this screen &rarr;</a></div>
+          </div>
+    </div>
+
+    <div class="sv-panel" id="ks-comp" role="tabpanel" aria-labelledby="ks-tab-comp" hidden>
+      <h2 style="font-size:clamp(26px,3.2vw,34px); margin-bottom:22px;">Finalists side by side.</h2>
+          <div class="ks">
+            <div class="ks-frame" aria-hidden="true"><iframe src="docket-prototype.html?clean#/compare/CAND-0412,CAND-0398,CAND-0405" tabindex="-1" loading="lazy" title=""></iframe><span class="mk" style="left:58.1%; top:58.3%;">1</span><span class="mk" style="left:18.5%; top:47.7%;">2</span><span class="mk" style="left:27.0%; top:81.2%;">3</span><span class="mk" style="left:58.1%; top:88.5%;">4</span><span class="mk" style="left:17.2%; top:31.4%;">5</span></div>
+            <div><ol class="ks-notes"><li><span>Grouped bars instead of a radar chart. Bar heights are easier to compare.</span></li><li><span>Each person keeps the same color, even if someone is removed from the comparison.</span></li><li><span>The same numbers as a table, for anyone who cannot read the chart.</span></li><li><span>Each person's own words, recommendations and notes side by side, with a button to move them forward right here.</span></li><li><span>Added after testing: one overall score per person, since a tester wanted a single number to compare by.</span></li></ol><a class="ks-open" href="docket-prototype.html#/compare/CAND-0412,CAND-0398,CAND-0405" target="_blank" rel="noopener">Open this screen &rarr;</a></div>
+          </div>
+    </div>
+  </section></div>
+<div class="slide-shell alt"><section class="slide" data-title="Prototype">
+    <div class="eyebrow">Prototype</div>
+    <h2 style="font-size:30px; margin-bottom:8px;">Clickable prototype.</h2>
+    <p class="lead" style="margin-bottom:24px;">A working version of the three main screens: the candidate list, a candidate's record
+      and the compare view. The candidates are made up. The reasons behind each decision are on the Key Screens pages.</p>
+    <a class="proto-live" href="docket-prototype.html" target="_blank" rel="noopener" aria-label="Open the clickable Docket prototype">
+      <iframe src="docket-prototype.html?clean" title="Docket prototype preview" tabindex="-1" loading="lazy"></iframe>
+      <span class="open">Open prototype &rarr;</span>
+    </a>
+    <div style="margin-top:14px; display:flex; flex-wrap:wrap; gap:0 28px;"><a class="ks-open" href="docket-prototype.html" target="_blank" rel="noopener">Open the clickable prototype &rarr;</a><a class="ks-open" href="https://www.figma.com/proto/qJU9Q3aXhqH1N3NSiAkZaW/Docket?node-id=27-1311&amp;p=f&amp;t=vNnb1InqCniyRpNH-1&amp;scaling=scale-down&amp;content-scaling=fixed&amp;page-id=0%3A1&amp;starting-point-node-id=27%3A1311&amp;show-proto-sidebar=1" target="_blank" rel="noopener">Open the Figma prototype &rarr;</a><a class="ks-open" href="https://www.figma.com/design/qJU9Q3aXhqH1N3NSiAkZaW/Docket" target="_blank" rel="noopener">View the Figma file &rarr;</a></div>
+    <div class="proto-meta"><span><b>3</b> screens</span><span><b>9</b> sample candidates</span><span>Interactive HTML version</span><span>Figma prototype, 4 flows</span><span>Tested with 6 people, 7 sessions</span></div>
+  </section></div>
+
+  <!-- what the research changed -->
   <div class="slide-shell"><section class="slide" data-title="Research">
-    <div class="rs-head">
-      <div>
-        <div class="eyebrow">Research &middot; What the Data Says</div>
-        <h2 style="font-size:clamp(28px,3.6vw,38px); max-width:720px;">The delay is <em>real</em>. The cause was not clear.</h2>
-        <p class="lead" style="margin-top:14px;">I did not have access to hiring managers, so I worked from published research, 15 public
-          accounts from recruiters, interviewers and candidates, and four competing tools. I did not interview anyone, and every quote
-          links to where I found it. One survey of more than 250 recruiters found:</p>
-      </div>
-      <span class="stamp">Secondary data</span>
+    <div class="eyebrow">Research</div>
+
+    <div class="sv-tabs" role="tablist" aria-label="Research">
+      <button class="sv-tab on" type="button" role="tab" id="rs-tab-data" aria-controls="rs-data" aria-selected="true">What the data says</button>
+      <button class="sv-tab" type="button" role="tab" id="rs-tab-comp" aria-controls="rs-comp" aria-selected="false">Competitors</button>
+      <button class="sv-tab" type="button" role="tab" id="rs-tab-synth" aria-controls="rs-synth" aria-selected="false">What I found</button>
     </div>
 
-    <div class="stat-sheet">
-      <div class="stat key"><svg class="mcircle" viewBox="0 0 140 80" aria-hidden="true"><path d="M14 44C8 18 96 4 126 26c18 14 2 42-50 46C30 76 6 62 12 40 16 26 44 12 78 10"/></svg><div class="n">67<small>%</small></div><div class="bar"><i style="width:67%"></i></div>
-        <p>say hiring managers take <b>2+ working days</b> to give feedback on a resume</p><span class="mnote block">and that is only the resume</span></div>
-      <div class="stat key"><div class="n">59<small>%</small></div><div class="bar"><i style="width:59%"></i></div>
-        <p>say it takes <b>2+ working days</b> to debrief after an interview</p></div>
-      <div class="stat"><div class="n">46<small>%</small></div><div class="bar"><i style="width:46%"></i></div>
-        <p>struggle to get hiring managers to separate <b>must-have</b> skills from nice-to-have ones</p></div>
-      <div class="stat"><div class="n">45<small>%</small></div><div class="bar"><i style="width:45%"></i></div>
-        <p>rely only on <b>basic email and messaging</b> to communicate with hiring managers</p></div>
+    <div class="sv-panel" id="rs-data" role="tabpanel" aria-labelledby="rs-tab-data">
+      <div class="rs-head">
+            <div>
+              <h2 style="font-size:clamp(28px,3.6vw,38px); max-width:720px;">The delay is <em>real</em>. The cause was not clear.</h2>
+              <p class="lead" style="margin-top:14px;">I could not get time with hiring managers, so I ran this as a secondary-research study: published
+                survey data, 15 first-hand public accounts from recruiters, interviewers and candidates, and a teardown of four competing
+                tools. No interviews, and every quote links to its source. One survey of more than 250 recruiters found:</p>
+            </div>
+            <span class="stamp">Secondary data</span>
+          </div>
+      
+          <div class="stat-sheet">
+            <div class="stat key"><svg class="mcircle" viewBox="0 0 140 80" aria-hidden="true"><path d="M14 44C8 18 96 4 126 26c18 14 2 42-50 46C30 76 6 62 12 40 16 26 44 12 78 10"/></svg><div class="n">67<small>%</small></div><div class="bar"><i style="width:67%"></i></div>
+              <p>say hiring managers take <b>2+ working days</b> to give feedback on a resume</p><span class="mnote block">and that is only the resume</span></div>
+            <div class="stat key"><div class="n">59<small>%</small></div><div class="bar"><i style="width:59%"></i></div>
+              <p>say it takes <b>2+ working days</b> to debrief after an interview</p></div>
+            <div class="stat"><div class="n">46<small>%</small></div><div class="bar"><i style="width:46%"></i></div>
+              <p>struggle to get hiring managers to separate <b>must-have</b> skills from nice-to-have ones</p></div>
+            <div class="stat"><div class="n">45<small>%</small></div><div class="bar"><i style="width:45%"></i></div>
+              <p>rely only on <b>basic email and messaging</b> to communicate with hiring managers</p></div>
+          </div>
+          <div class="src">Source: <a href="https://www.phenom.com/blog/hiring-manager-report-key-takeaways" target="_blank" rel="noopener">Phenom &amp; Talent Board, 2021 Recruiter &amp; Manager Report</a>. The survey only asked recruiters, so this is their side of the story.</div>
+      
+          <div class="takeaway">
+            <span class="k">So what</span>
+            <p>I started out assuming information gets <em>lost</em> in the handoff. This data does not say that.
+            It says hiring managers are <b>slow</b> to respond. Those two problems need different solutions, so finding
+            out which one is true became the main question for the rest of my research.</p>
+          </div>
+          <div class="limits"><b>Limits:</b> most of the posts come from people at big tech companies, and most software reviews
+            are written by recruiters rather than hiring managers. The findings lean that way.</div>
+          <aside class="jot l" style="bottom:54px; right:18px;"><b>Main question</b>Slow or lost? They need different fixes. The next pages try to answer it.</aside>
     </div>
-    <div class="src">Source: <a href="https://www.phenom.com/blog/hiring-manager-report-key-takeaways" target="_blank" rel="noopener">Phenom &amp; Talent Board, 2021 Recruiter &amp; Manager Report</a>. The survey only asked recruiters, so this is their side of the story.</div>
-
-    <div class="takeaway">
-      <span class="k">So what</span>
-      <p>I started out assuming information gets <em>lost</em> in the handoff. This data does not say that.
-      It says hiring managers are <b>slow</b> to respond. Those two problems need different solutions, so finding
-      out which one is true became the main question for the rest of my research.</p>
+    <div class="sv-panel" id="rs-comp" role="tabpanel" aria-labelledby="rs-tab-comp" hidden>
+      <h2 style="font-size:clamp(26px,3.2vw,34px); margin-bottom:10px;">What is already out there.</h2>
+          <p class="lead" style="margin-bottom:24px;">Checked against each tool's own help pages and product updates. Where I could not
+            confirm something, the table says so.</p>
+          <table class="cmp-tbl">
+            <tr><th>Tool</th><th>What it is</th><th>Hides others' feedback until you submit yours</th><th>Built for hiring managers</th></tr>
+            <tr><td>Greenhouse</td><td class="nw" data-label="What it is">Hiring software (ATS)</td><td data-label="Hides others' feedback until you submit yours">Yes, on by default</td><td data-label="Built for hiring managers">No separate app. Hiring managers get an "Applications to Review" panel on the main dashboard.</td></tr>
+            <tr><td>Lever</td><td class="nw" data-label="What it is">Hiring software (ATS)</td><td data-label="Hides others' feedback until you submit yours">Yes, as a team setting</td><td data-label="Built for hiring managers">No separate app found</td></tr>
+            <tr><td>Ashby</td><td class="nw" data-label="What it is">Hiring software (ATS)</td><td data-label="Hides others' feedback until you submit yours">Yes, as a setting (added 2021)</td><td data-label="Built for hiring managers">No separate app. Ready-made dashboards for recruiters and hiring managers (2023).</td></tr>
+            <tr><td>Phenom</td><td data-label="What it is">Talent platform</td><td data-label="Hides others' feedback until you submit yours"><span class="tc">not stated</span></td><td data-label="Built for hiring managers">Yes, sold as a separate Hiring Manager app</td></tr>
+            <tr class="us"><td>Docket</td><td data-label="What it is">Concept</td><td data-label="Hides others' feedback until you submit yours">Planned</td><td data-label="Built for hiring managers">Yes, it is the whole product</td></tr>
+          </table>
+          <div class="src">Sources: <a href="https://www.greenhouse.com/guidance/how-scorecard-peeking-can-create-bias-in-hiring" target="_blank" rel="noopener">Greenhouse, scorecard peeking</a>, <a href="https://support.greenhouse.io/hc/en-us/articles/360016572311-Hiring-team-role-Hiring-manager" target="_blank" rel="noopener">Greenhouse, hiring manager role</a>, <a href="https://help.lever.co/hc/en-us/articles/204502665-Why-can-t-I-see-a-candidate-s-feedback-" target="_blank" rel="noopener">Lever Help Center</a>, <a href="https://www.ashbyhq.com/product-updates/more-feedback-visibility-options" target="_blank" rel="noopener">Ashby, feedback visibility</a>, <a href="https://www.ashbyhq.com/blog/product/new-feature-default-job-dashboard" target="_blank" rel="noopener">Ashby, job dashboards</a>, <a href="https://www.phenom.com/hiring-manager" target="_blank" rel="noopener">Phenom Hiring Manager</a>.</div>
+          <div class="takeaway" style="margin-top:20px;"><span class="k">What this means</span>
+            <p>Hiding feedback until you submit your own is already standard, so every tool needs it. Phenom already sells an app for hiring managers, so I am not the first to see this gap. Docket can stand out on speed by showing late feedback.</p></div>
     </div>
-    <div class="limits"><b>Limits:</b> most of the posts come from people at big tech companies, and most software reviews
-      are written by recruiters rather than hiring managers. The findings lean that way.</div>
-    <aside class="jot l" style="bottom:54px; right:18px;"><b>Main question</b>Slow or lost? They need different fixes. The next pages try to answer it.</aside>
-  </section></div>
-
-  <!-- COMPETITORS -->
-  <div class="slide-shell alt"><section class="slide" data-title="Competitors">
-    <div class="eyebrow">Research &middot; Competitors</div>
-    <h2 style="font-size:clamp(26px,3.2vw,34px); margin-bottom:10px;">What is already out there.</h2>
-    <p class="lead" style="margin-bottom:24px;">Checked against each tool's own help pages and product updates. Where I could not
-      confirm something, the table says so.</p>
-    <table class="cmp-tbl">
-      <tr><th>Tool</th><th>What it is</th><th>Hides others' feedback until you submit yours</th><th>Built for hiring managers</th></tr>
-      <tr><td>Greenhouse</td><td class="nw" data-label="What it is">Hiring software (ATS)</td><td data-label="Hides others' feedback until you submit yours">Yes, on by default</td><td data-label="Built for hiring managers">No separate app. Hiring managers get an "Applications to Review" panel on the main dashboard.</td></tr>
-      <tr><td>Lever</td><td class="nw" data-label="What it is">Hiring software (ATS)</td><td data-label="Hides others' feedback until you submit yours">Yes, as a team setting</td><td data-label="Built for hiring managers">No separate app found</td></tr>
-      <tr><td>Ashby</td><td class="nw" data-label="What it is">Hiring software (ATS)</td><td data-label="Hides others' feedback until you submit yours">Yes, as a setting (added 2021)</td><td data-label="Built for hiring managers">No separate app. Ready-made dashboards for recruiters and hiring managers (2023).</td></tr>
-      <tr><td>Phenom</td><td data-label="What it is">Talent platform</td><td data-label="Hides others' feedback until you submit yours"><span class="tc">not stated</span></td><td data-label="Built for hiring managers">Yes, sold as a separate Hiring Manager app</td></tr>
-      <tr class="us"><td>Docket</td><td data-label="What it is">Concept</td><td data-label="Hides others' feedback until you submit yours">Planned</td><td data-label="Built for hiring managers">Yes, it is the whole product</td></tr>
-    </table>
-    <div class="src">Sources: <a href="https://www.greenhouse.com/guidance/how-scorecard-peeking-can-create-bias-in-hiring" target="_blank" rel="noopener">Greenhouse, scorecard peeking</a>, <a href="https://support.greenhouse.io/hc/en-us/articles/360016572311-Hiring-team-role-Hiring-manager" target="_blank" rel="noopener">Greenhouse, hiring manager role</a>, <a href="https://help.lever.co/hc/en-us/articles/204502665-Why-can-t-I-see-a-candidate-s-feedback-" target="_blank" rel="noopener">Lever Help Center</a>, <a href="https://www.ashbyhq.com/product-updates/more-feedback-visibility-options" target="_blank" rel="noopener">Ashby, feedback visibility</a>, <a href="https://www.ashbyhq.com/blog/product/new-feature-default-job-dashboard" target="_blank" rel="noopener">Ashby, job dashboards</a>, <a href="https://www.phenom.com/hiring-manager" target="_blank" rel="noopener">Phenom Hiring Manager</a>.</div>
-    <div class="takeaway" style="margin-top:20px;"><span class="k">What this means</span>
-      <p>Hiding feedback until you submit your own is already standard, so every tool needs it. Phenom already sells an app for hiring managers, so I am not the first to see this gap. Docket can stand out on speed by showing late feedback.</p></div>
-  </section></div>
-
-  <!-- WHAT I FOUND -->
-  <div class="slide-shell"><section class="slide" data-title="Research: Synthesis">
-    <div class="eyebrow">Research &middot; What I Found</div>
-    <h2 style="font-size:clamp(26px,3.2vw,34px); margin-bottom:12px;">Three patterns across 15 accounts.</h2>
-    <p class="lead" style="margin-bottom:24px;">I tagged each post, review and quote by what it was about, then counted. Three accounts
-      did not fit any theme.</p>
-    <div class="themes">
-      <div class="theme"><span class="n">01</span><h3>Feedback is extra work, so it runs late.</h3>
-        <div class="cnt"><span style="position:relative;">7 of 15<svg class="mcircle sm" viewBox="0 0 140 80" preserveAspectRatio="none" aria-hidden="true"><path d="M30 12C70 2 128 10 134 36c6 28-54 40-92 36C12 70 2 50 8 32 12 18 26 12 44 10"/></svg></span><span class="bar"><i style="width:46.7%"></i></span></div>
-        <span class="mnote block" style="margin:-4px 0 10px;">the big one. almost half</span>
-        <blockquote>"Interviewers being late to give feedback is very common especially in big companies."</blockquote>
-        <div class="who"><a href="https://www.teamblind.com/post/delays-while-waiting-for-onsite-feedbackoffer-good-or-bad-sign-cbvxcylu" target="_blank" rel="noopener">Google employee, Blind</a></div>
-        <p>Greenhouse's own guide lists the reasons people give: <a href="https://www.greenhouse.com/guidance/tips-for-improving-interview-scorecard-submission-rate" target="_blank" rel="noopener">"I am busy" and "It is not my job."</a></p></div>
-      <div class="theme"><span class="n">02</span><h3>The tools mostly work.</h3>
-        <div class="cnt"><span>4 of 15</span><span class="bar"><i style="width:26.7%"></i></span></div>
-        <blockquote>"Having a single system made collaboration between recruiters and hiring managers much smoother, w/o constant back-and-forth or status updates."</blockquote>
-        <div class="who"><a href="https://www.capterra.com/p/142452/Lever/reviews?page=2" target="_blank" rel="noopener">Samanta J., Head of Talent Acquisition, Lever review on Capterra</a></div>
-        <p>These reviews are written by recruiters. Hiring managers rarely review hiring software.</p></div>
-      <div class="theme"><span class="n">03</span><h3>Hiring managers read candidates in their inbox.</h3>
-        <div class="cnt"><span>1 of 15</span><span class="bar"><i style="width:6.7%"></i></span></div>
-        <blockquote>"My favorite aspect about Lever is being able to send candidates profiles and notes to one of our hiring managers and it goes straight to their email."</blockquote>
-        <div class="who"><a href="https://www.capterra.com/p/142452/Lever/reviews/" target="_blank" rel="noopener">Payton H., Talent Acquisition Specialist, Lever review on Capterra</a></div>
-        <p>Only one review, but it matches the survey: 45% of recruiters rely only on email and messaging.</p></div>
-    </div>
-  </section></div>
-
-  <!-- HOW MIGHT WE -->
-  <div class="slide-shell alt"><section class="slide" data-title="How Might We">
-    <div class="eyebrow">How Might We</div>
-    <h2 style="font-size:clamp(30px,4.4vw,46px); max-width:860px; line-height:1.25;">
-      How might we make feedback and decisions <span class="pop tip" tabindex="0" data-tip="67% of recruiters say hiring managers take 2+ working days to give feedback on a resume.">quick enough</span> that interviewers and hiring managers do not
-      <span class="pop tip" tabindex="0" data-tip="Feedback is extra work, so it gets pushed back. 7 of 15 public accounts said so.">put them off</span>?
-    </h2>
-    <p class="lead" style="margin-top:22px; margin-bottom:22px;">My first version was about giving hiring managers more information. After the research, it is about
-      time: feedback is extra work, so it gets pushed back.</p>
-    <div class="shift">
-      <div><b>I thought</b><p>Information gets lost between the recruiter and the hiring manager, so they need a better screen.</p></div>
-      <div><b>I found</b><p>The screens mostly work. Feedback is late because it is extra work, and hiring managers often read candidates in email.</p></div>
-      <div><b>So Docket changes</b><p>Docket now focuses on fast feedback and showing delays.</p></div>
-    </div>
-    <div class="impl">
-      <div><h4>Show who is late <span class="in">In prototype</span></h4><p>Each candidate shows whose feedback is missing and for how long, next to an agreed turnaround. <a href="https://www.shrm.org/topics-tools/news/talent-acquisition/recruiting-101-5-tips-better-communication-hiring-managers" target="_blank" rel="noopener">SHRM</a> suggests hiring managers review resumes within 48 hours.</p></div>
-      <div><h4>Make feedback quick <span class="in">In prototype</span></h4><p>Four ratings and two short notes, meant to take minutes instead of a long write-up.</p></div>
-      <div><h4>Meet hiring managers in their inbox <span class="in">In prototype</span></h4><p>A morning email listing who is waiting on them, with one click into the candidate's record. Shown in the prototype as a preview.</p></div>
-      <div><h4>Rate before you read <span>Planned</span></h4><p>Interviewers submit their own rating before seeing others', based on Greenhouse's research on peeking.</p></div>
+    <div class="sv-panel" id="rs-synth" role="tabpanel" aria-labelledby="rs-tab-synth" hidden>
+      <h2 style="font-size:clamp(26px,3.2vw,34px); margin-bottom:12px;">Three patterns across 15 accounts.</h2>
+          <p class="lead" style="margin-bottom:24px;">I tagged each post, review and quote by what it was about, then counted. Three accounts
+            did not fit any theme.</p>
+          <div class="themes">
+            <div class="theme"><span class="n">01</span><h3>Feedback is extra work, so it runs late.</h3>
+              <div class="cnt"><span style="position:relative;">7 of 15<svg class="mcircle sm" viewBox="0 0 140 80" preserveAspectRatio="none" aria-hidden="true"><path d="M30 12C70 2 128 10 134 36c6 28-54 40-92 36C12 70 2 50 8 32 12 18 26 12 44 10"/></svg></span><span class="bar"><i style="width:46.7%"></i></span></div>
+              <span class="mnote block" style="margin:-4px 0 10px;">the big one. almost half</span>
+              <blockquote>"Interviewers being late to give feedback is very common especially in big companies."</blockquote>
+              <div class="who"><a href="https://www.teamblind.com/post/delays-while-waiting-for-onsite-feedbackoffer-good-or-bad-sign-cbvxcylu" target="_blank" rel="noopener">Google employee, Blind</a></div>
+              <p>Greenhouse's own guide lists the reasons people give: <a href="https://www.greenhouse.com/guidance/tips-for-improving-interview-scorecard-submission-rate" target="_blank" rel="noopener">"I am busy" and "It is not my job."</a></p></div>
+            <div class="theme"><span class="n">02</span><h3>The tools mostly work.</h3>
+              <div class="cnt"><span>4 of 15</span><span class="bar"><i style="width:26.7%"></i></span></div>
+              <blockquote>"Having a single system made collaboration between recruiters and hiring managers much smoother, w/o constant back-and-forth or status updates."</blockquote>
+              <div class="who"><a href="https://www.capterra.com/p/142452/Lever/reviews?page=2" target="_blank" rel="noopener">Samanta J., Head of Talent Acquisition, Lever review on Capterra</a></div>
+              <p>These reviews are written by recruiters. Hiring managers rarely review hiring software.</p></div>
+            <div class="theme"><span class="n">03</span><h3>Hiring managers read candidates in their inbox.</h3>
+              <div class="cnt"><span>1 of 15</span><span class="bar"><i style="width:6.7%"></i></span></div>
+              <blockquote>"My favorite aspect about Lever is being able to send candidates profiles and notes to one of our hiring managers and it goes straight to their email."</blockquote>
+              <div class="who"><a href="https://www.capterra.com/p/142452/Lever/reviews/" target="_blank" rel="noopener">Payton H., Talent Acquisition Specialist, Lever review on Capterra</a></div>
+              <p>Only one review, but it matches the survey: 45% of recruiters rely only on email and messaging.</p></div>
+          </div>
     </div>
   </section></div>
+<div class="slide-shell alt"><section class="slide" data-title="Concept">
+    <div class="eyebrow">Concept</div>
 
-  <!-- THE BIG IDEA -->
-  <div class="slide-shell"><section class="slide" data-title="The Big Idea">
-    <div class="eyebrow">The Big Idea</div>
-    <h2 style="font-size:clamp(28px,3.8vw,40px); max-width:800px; margin-bottom:14px;">One screen for the person who makes the decision.</h2>
-    <p class="lead" style="margin-bottom:26px;">Most hiring software is built for recruiters, who work in it all day. Hiring managers open it a
-      few times a week around their normal work, and the research says they are the slow step. Docket gives them
-      one place to review a candidate and decide in the few minutes they have.</p>
-    <div class="vs">
-      <div class="k"></div><div class="hd">Most hiring tools</div><div class="hd us">Docket</div>
-      <div class="k">Built for</div><div>Recruiters</div><div class="us">Hiring managers</div>
-      <div class="k">Opened</div><div>All day</div><div class="us">A few times a week</div>
-      <div class="k">First screen</div><div>Every open role and stage</div><div class="us">Who is waiting on you <span class="mnote inline">the whole idea</span></div>
-      <div class="k">Job</div><div>Move many candidates along</div><div class="us">Make one decision quickly</div>
+    <div class="sv-tabs" role="tablist" aria-label="Concept">
+      <button class="sv-tab on" type="button" role="tab" id="cn-tab-hmw" aria-controls="cn-hmw" aria-selected="true">How might we</button>
+      <button class="sv-tab" type="button" role="tab" id="cn-tab-idea" aria-controls="cn-idea" aria-selected="false">The big idea</button>
     </div>
-    <div class="means" style="margin-top:20px;">
-      <div><h4 class="test">! What the reviews said</h4><p>Several recruiters say today's tools already work fine for hiring managers. So Docket has to make feedback faster.</p></div>
-      <div><h4 class="keep">&#10003; Why not replace the ATS</h4><p>Companies already pay for hiring software. Docket works alongside it instead of asking anyone to switch.</p></div>
+
+    <div class="sv-panel" id="cn-hmw" role="tabpanel" aria-labelledby="cn-tab-hmw">
+      <h2 style="font-size:clamp(30px,4.4vw,46px); max-width:860px; line-height:1.25;">
+            How might we make feedback and decisions <span class="pop tip" tabindex="0" data-tip="67% of recruiters say hiring managers take 2+ working days to give feedback on a resume.">quick enough</span> that interviewers and hiring managers do not
+            <span class="pop tip" tabindex="0" data-tip="Feedback is extra work, so it gets pushed back. 7 of 15 public accounts said so.">put them off</span>?
+          </h2>
+          <p class="lead" style="margin-top:22px; margin-bottom:22px;">My first version was about giving hiring managers more information. After the research, it is about
+            time: feedback is extra work, so it gets pushed back.</p>
+          <div class="shift">
+            <div><b>I thought</b><p>Information gets lost between the recruiter and the hiring manager, so they need a better screen.</p></div>
+            <div><b>I found</b><p>The screens mostly work. Feedback is late because it is extra work, and hiring managers often read candidates in email.</p></div>
+            <div><b>So Docket changes</b><p>Docket now focuses on fast feedback and showing delays.</p></div>
+          </div>
+          <div class="impl">
+            <div><h4>Show who is late <span class="in">In prototype</span></h4><p>Each candidate shows whose feedback is missing and for how long, next to an agreed turnaround. <a href="https://www.shrm.org/topics-tools/news/talent-acquisition/recruiting-101-5-tips-better-communication-hiring-managers" target="_blank" rel="noopener">SHRM</a> suggests hiring managers review resumes within 48 hours.</p></div>
+            <div><h4>Make feedback quick <span class="in">In prototype</span></h4><p>Four ratings and two short notes, meant to take minutes instead of a long write-up.</p></div>
+            <div><h4>Meet hiring managers in their inbox <span class="in">In prototype</span></h4><p>A morning email listing who is waiting on them, with one click into the candidate's record. Shown in the prototype as a preview.</p></div>
+            <div><h4>Rate before you read <span>Planned</span></h4><p>Interviewers submit their own rating before seeing others', based on Greenhouse's research on peeking.</p></div>
+          </div>
+    </div>
+
+    <div class="sv-panel" id="cn-idea" role="tabpanel" aria-labelledby="cn-tab-idea" hidden>
+      <h2 style="font-size:clamp(28px,3.8vw,40px); max-width:800px; margin-bottom:14px;">One screen for the person who makes the decision.</h2>
+          <p class="lead" style="margin-bottom:26px;">Most hiring software is built for recruiters, who work in it all day. Hiring managers open it a
+            few times a week around their normal work, and the research says they are the slow step. Docket gives them
+            one place to review a candidate and decide in the few minutes they have.</p>
+          <div class="vs">
+            <div class="k"></div><div class="hd">Most hiring tools</div><div class="hd us">Docket</div>
+            <div class="k">Built for</div><div>Recruiters</div><div class="us">Hiring managers</div>
+            <div class="k">Opened</div><div>All day</div><div class="us">A few times a week</div>
+            <div class="k">First screen</div><div>Every open role and stage</div><div class="us">Who is waiting on you <span class="mnote inline">the whole idea</span></div>
+            <div class="k">Job</div><div>Move many candidates along</div><div class="us">Make one decision quickly</div>
+          </div>
+          <div class="means" style="margin-top:20px;">
+            <div><h4 class="test">! What the reviews said</h4><p>Several recruiters say today's tools already work fine for hiring managers. So Docket has to make feedback faster.</p></div>
+            <div><h4 class="keep">&#10003; Why not replace the ATS</h4><p>Companies already pay for hiring software. Docket works alongside it instead of asking anyone to switch.</p></div>
+          </div>
     </div>
   </section></div>
-
-  <!-- PERSONAS -->
-  <div class="slide-shell alt"><section class="slide" data-title="Personas">
+<div class="slide-shell alt"><section class="slide" data-title="Personas">
     <div class="eyebrow">Who Uses It &middot; Composite Personas</div>
     <h2 style="font-size:30px; margin-bottom:8px;">Two roles, one hire.</h2>
     <p class="lead" style="margin-bottom:26px;">If you have applied for a job, you have met both. The recruiter usually contacts you first.
@@ -1224,7 +1270,7 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
     </div>
   </section></div>
 
-  <!-- TASK FLOW -->
+  <!-- task flow -->
   <div class="slide-shell"><section class="slide" data-title="Task Flow">
     <div class="eyebrow">Task Flow &middot; Hypothesized</div>
     <h2 style="font-size:30px; margin-bottom:8px;">Where I think the handoff happens.</h2>
@@ -1278,7 +1324,7 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
     <aside class="jot l" style="top:124px; right:40px;"><b>On purpose</b>No calendar. Interviews still get booked in the tools people already use. Docket picks up after.</aside>
   </section></div>
 
-  <!-- DESIGN -->
+  <!-- design -->
   <div class="slide-shell alt"><section class="slide" data-title="Design">
     <div class="eyebrow">Design</div>
     <h2 style="font-size:30px; margin-bottom:8px;">Like a work tool.</h2>
@@ -1323,123 +1369,82 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
     </div>
   </section></div>
 
-  <!-- KEY SCREEN: CANDIDATES -->
-  <div class="slide-shell ks-shell"><section class="slide" data-title="Key Screen: Candidates">
-    <div class="eyebrow">Key Screens &middot; 01 of 03</div>
-    <h2 style="font-size:clamp(26px,3.2vw,34px); margin-bottom:22px;">See who is waiting on you.</h2>
-    <div class="ks">
-      <div class="ks-frame" aria-hidden="true"><iframe src="docket-prototype.html?clean#/" tabindex="-1" loading="lazy" title=""></iframe><span class="mk" style="left:15.2%; top:12.8%;">1</span><span class="mk" style="left:48.8%; top:50.9%;">2</span><span class="mk" style="left:65.4%; top:51.1%;">3</span><span class="mk" style="left:69.5%; top:17.9%;">4</span><span class="mk" style="left:25.1%; top:29.6%;">5</span><span class="mk" style="left:61.7%; top:35.5%;">6</span></div>
-      <div><ol class="ks-notes"><li><span>One real tab. Requisitions and Reports are grayed out to show where it could grow.</span></li><li><span>Yellow means it is ready for your review. No other status uses yellow.</span></li><li><span>Interview progress without opening anything: filled is done, dashed is booked, empty is not booked. The overall score sits next to it.</span></li><li><span>Filters with a count on each, plus a sort. After testing, the list opens with whatever is late or due first.</span></li><li><span>Each row has one checkbox. Check any rows and a bar appears at the bottom to Compare or Archive the selection.</span></li><li><span>Added after the research: whose turn it is and for how long. Past the team's 2-day goal it gets a red Late tag, the same one used in the bar at the top.</span></li></ol><a class="ks-open" href="docket-prototype.html#/" target="_blank" rel="noopener">Open this screen &rarr;</a></div>
+  <!-- key screen: candidates -->
+  <div class="slide-shell alt"><section class="slide" data-title="Testing &amp; Iteration">
+    <div class="eyebrow">Testing</div>
+
+    <div class="sv-tabs" role="tablist" aria-label="Testing &amp; Iteration">
+      <button class="sv-tab on" type="button" role="tab" id="ti-tab-research" aria-controls="ti-research" aria-selected="true">What research changed</button>
+      <button class="sv-tab" type="button" role="tab" id="ti-tab-sessions" aria-controls="ti-sessions" aria-selected="false">Usability testing</button>
+      <button class="sv-tab" type="button" role="tab" id="ti-tab-changed" aria-controls="ti-changed" aria-selected="false">What testing changed</button>
+    </div>
+
+    <div class="sv-panel" id="ti-research" role="tabpanel" aria-labelledby="ti-tab-research">
+      <h2 style="font-size:clamp(26px,3.2vw,34px); margin-bottom:10px;">Making late feedback visible.</h2>
+          <p class="lead" style="margin-bottom:16px;">I built the first prototype before the research. The research said the problem is slow feedback, and
+            the first version had nothing that showed it. So I added it.</p>
+          <div class="ba">
+            <div><div class="ba-k">Before</div>
+              <div class="ks-frame" aria-hidden="true"><iframe src="docket-prototype.html?clean&amp;before#/" tabindex="-1" loading="lazy" title=""></iframe></div>
+              <p>The status says whose turn it is, but not for how long. A candidate who has been stuck for days looks the same as one who arrived an hour ago.</p></div>
+            <div><div class="ba-k after">After <span class="mnote inline">new: who is late, and for how long</span></div>
+              <div class="ks-frame" aria-hidden="true"><iframe src="docket-prototype.html?clean#/" tabindex="-1" loading="lazy" title=""></iframe><span class="mk" style="left:18%; top:23.2%;">1</span><span class="mk" style="left:61.7%; top:35.5%;">2</span></div>
+              <p><b>1</b> A bar at the top lists anyone past the team's goal. <b>2</b> A new Waiting on column shows whose turn it is and for how long, and turns red when it is late. <a href="docket-prototype.html#/c/CAND-0417" target="_blank" rel="noopener" style="color:var(--ink);">Try it on Hannah Okafor's record &rarr;</a></p></div>
+          </div>
+          <div class="shift" style="margin-top:16px; margin-bottom:0;">
+            <div><b>What the research said</b><p>Feedback runs late because it is extra work (7 of 15 accounts), and SHRM suggests hiring managers review resumes within 48 hours.</p></div>
+            <div data-mk="all"><b>What I changed</b><p>A 2-day team goal, a Waiting on column, a late bar, and a Send reminder button inside the candidate's record.</p></div>
+            <div><b>What testing said</b><p>Mazzy could not tell whose side the hold-up was on. After I reworded it, Leo, Conner and Johnny all got it right away, 5/5 sure. Ash, Mazzy and Leo all said seeing "Late" helps.</p></div>
+          </div>
+    </div>
+
+    <div class="sv-panel" id="ti-sessions" role="tabpanel" aria-labelledby="ti-tab-sessions" hidden>
+      <div class="ph-head">
+            <div>        <h2 style="font-size:30px; margin-bottom:10px;">Same five tasks, every round.</h2>
+              <p class="lead" style="margin-bottom:22px;">I ran each session and wrote down what the tester did and said. Ash tried two versions,
+                Mazzy and Leo each tried a fixed one, and then Conner, Johnny and Brett saw Docket for the first time, to check the fixes hold up
+                for fresh eyes. I fixed what came up after every round.</p></div>
+            <span class="stamp">Done</span>
+          </div>
+          <table class="persp test-tbl">
+            <tr><th>Task</th><th>Ash &middot; R1, R2</th><th>Mazzy &middot; R2</th><th>Leo &middot; R3</th><th>Conner &middot; new</th><th>Johnny &middot; new</th><th>Brett &middot; new</th></tr>
+            <tr><td>Find who is waiting on you</td><td><span class="res mid">R1 &middot; Confused</span><span class="res ok r2">R2 &middot; Found it</span></td><td><span class="res ok">Found it</span></td><td><span class="res ok">Found it</span></td><td><span class="res ok">Found it</span></td><td><span class="res ok">Found it</span></td><td><span class="res ok">Found it</span></td></tr>
+            <tr><td>Remind whoever is holding up Hannah</td><td><span class="res ok">Done</span></td><td><span class="res bad">Stuck</span></td><td><span class="res ok">Done</span></td><td><span class="res ok">Done</span></td><td><span class="res ok">Done</span></td><td><span class="res ok">Done</span></td></tr>
+            <tr><td>Move Maya to the next step</td><td><span class="res bad">R1 &middot; Stuck</span><span class="res ok r2">R2 &middot; Done</span></td><td><span class="res bad">Stuck</span></td><td><span class="res ok">Done</span></td><td><span class="res ok">Done</span></td><td><span class="res ok">Done</span></td><td><span class="res ok">Done</span></td></tr>
+            <tr><td>Compare the finalists and pick one</td><td><span class="res bad">R1 &middot; Stuck</span><span class="res ok r2">R2 &middot; Done</span></td><td><span class="res mid">Needed a hint</span></td><td><span class="res mid">Needed a hint</span></td><td><span class="res mid">Missed the checkboxes</span></td><td><span class="res bad">Stuck</span></td><td><span class="res mid">Read checkboxes as delete</span></td></tr>
+            <tr><td>Act on the morning email</td><td><span class="res na">R1 &middot; Not tested</span><span class="res ok r2">R2 &middot; Done</span></td><td><span class="res ok">Done</span></td><td><span class="res ok">Done</span></td><td><span class="res ok">Done</span></td><td><span class="res na">Not asked</span></td><td><span class="res na">Not asked</span></td></tr>
+          </table>
+          <div class="takeaway" style="margin-top:20px;"><span class="k">What stood out</span>
+            <p>Once fixed, finding, reminding and moving a candidate worked for every new tester, 5/5 sure. <b>Comparing</b> was the hard one:
+            in five of seven sessions someone needed help, mostly because the checkboxes read as move or delete. Brett summed up the rest:
+            "Pretty easy, 5 out of 5."</p></div>
+    </div>
+
+    <div class="sv-panel" id="ti-changed" role="tabpanel" aria-labelledby="ti-tab-changed" hidden>
+      <h2 style="font-size:clamp(26px,3.2vw,34px); margin-bottom:10px;">Fixing where people got stuck.</h2>
+          <p class="lead" style="margin-bottom:16px;">Every change here came from something a tester did or said. The biggest one: Mazzy could not tell
+            whose side the hold-up was on, which is the exact problem the research pointed to.</p>
+          <div class="ba">
+            <div><div class="ba-k">Before &middot; round 2</div>
+              <div class="ks-frame" aria-hidden="true"><img loading="lazy" decoding="async" src="img/docket_r2_before_record.png" alt=""></div>
+              <p>"Waiting on Rae Lindqvist" and a Send reminder button. Mazzy could not tell if the problem was the team's or Hannah's, or what the button would do.</p></div>
+            <div><div class="ba-k after">After</div>
+              <div class="ks-frame" aria-hidden="true"><iframe src="docket-prototype.html?clean#/c/CAND-0417" tabindex="-1" loading="lazy" title=""></iframe><span class="mk" style="left:18.1%; top:29.9%;">1</span><span class="mk" style="left:86.6%; top:30.6%;">2</span><span class="mk" style="left:54.2%; top:42.1%;">3</span></div>
+              <p><b>1</b> It says in plain words that the hold-up is on the team, not Hannah. <b>2</b> The button says who the reminder goes to and how. <b>3</b> A "Your decision" box says whether you need to do anything. Leo and every new tester after him got it right away, 5/5 sure. <a href="docket-prototype.html#/c/CAND-0417" target="_blank" rel="noopener" style="color:var(--ink);">Try it &rarr;</a></p></div>
+          </div>
+          <table class="persp test-tbl chg" style="margin-top:20px;">
+            <colgroup><col style="width:32%"><col style="width:44%"><col style="width:24%"></colgroup>
+            <tr><th>What testers hit</th><th>What I changed</th><th>Result</th></tr>
+            <tr><td>"Awaiting you" and "Waiting on: You" read as the same thing (Ash)</td><td>Renamed the status Ready for review, and added one Waiting on you filter.</td><td><span class="res ok">Everyone after found it</span></td></tr>
+            <tr><td>Did not know how to move Maya forward (Ash, Mazzy)</td><td>A "Your decision" box with a button that names the next step. Afterward it says what moved, with Undo.</td><td><span class="res ok">5/5 from round 3 on</span></td></tr>
+            <tr><td>Could not tell whose side Hannah's hold-up was on (Mazzy)</td><td>It says in plain words that the hold-up is on the team, and the button reads "Remind Rae."</td><td><span class="res ok">5/5 from round 3 on</span></td></tr>
+            <tr><td>Found the concerns only at the bottom (Mazzy)</td><td>Every interviewer's pros and concerns come first, concerns in bold.</td><td><span class="res ok">Built</span></td></tr>
+            <tr><td>Wanted one number and a way to sort (Ash, Mazzy, Leo)</td><td>An overall score out of 20 in the list. Every column title sorts, and the list opens with what is late or due.</td><td><span class="res ok">Built</span></td></tr>
+            <tr><td>Checkboxes read as move or delete, and there were two Compare buttons (5 of 7 sessions)</td><td>One checkbox selects a row, and a bar at the bottom lets you Compare or Archive. One Compare button, highest score first.</td><td><span class="res mid">Rebuilt. Testing next</span></td></tr>
+          </table>
     </div>
   </section></div>
-
-  <!-- KEY SCREEN: RECORD -->
-  <div class="slide-shell alt ks-shell"><section class="slide" data-title="Key Screen: Record">
-    <div class="eyebrow">Key Screens &middot; 02 of 03</div>
-    <h2 style="font-size:clamp(26px,3.2vw,34px); margin-bottom:22px;">Everything about one person, on one page.</h2>
-    <div class="ks">
-      <div class="ks-frame" aria-hidden="true"><iframe src="docket-prototype.html?clean#/c/CAND-0412" tabindex="-1" loading="lazy" title=""></iframe><span class="mk" style="left:68.4%; top:39.2%;">1</span><span class="mk" style="left:41.3%; top:46.9%;">2</span><span class="mk" style="left:35.5%; top:58.8%;">3</span><span class="mk" style="left:37%; top:61.4%;">4</span><span class="mk" style="left:59.2%; top:66.6%;">5</span><span class="mk" style="left:16.9%; top:29.9%;">6</span></div>
-      <div><ol class="ks-notes"><li><span>A "Your decision" box names the next step on a button. Afterward it says what moved, with Undo, and the recruiter sees it right away.</span></li><li><span>Next step is plain text the recruiter types after booking. Docket does not schedule.</span></li><li><span>Interviews and notes, documents, and activity are tabs inside the candidate.</span></li><li><span>What interviewers said comes first: every pro and concern, with the recommendations. The overall score and full notes sit below.</span></li><li><span>Concerns are in bold, since a tester only found them at the bottom of each interview.</span></li><li><span>Added after the research: who the candidate is waiting on, for how long, and the team goal, in plain words.</span></li></ol><a class="ks-open" href="docket-prototype.html#/c/CAND-0412" target="_blank" rel="noopener">Open this screen &rarr;</a></div>
-    </div>
-  </section></div>
-
-  <!-- KEY SCREEN: COMPARE -->
-  <div class="slide-shell ks-shell"><section class="slide" data-title="Key Screen: Compare">
-    <div class="eyebrow">Key Screens &middot; 03 of 03</div>
-    <h2 style="font-size:clamp(26px,3.2vw,34px); margin-bottom:22px;">Finalists side by side.</h2>
-    <div class="ks">
-      <div class="ks-frame" aria-hidden="true"><iframe src="docket-prototype.html?clean#/compare/CAND-0412,CAND-0398,CAND-0405" tabindex="-1" loading="lazy" title=""></iframe><span class="mk" style="left:58.1%; top:58.3%;">1</span><span class="mk" style="left:18.5%; top:47.7%;">2</span><span class="mk" style="left:27.0%; top:81.2%;">3</span><span class="mk" style="left:58.1%; top:88.5%;">4</span><span class="mk" style="left:17.2%; top:31.4%;">5</span></div>
-      <div><ol class="ks-notes"><li><span>Grouped bars instead of a radar chart. Bar heights are easier to compare.</span></li><li><span>Each person keeps the same color, even if someone is removed from the comparison.</span></li><li><span>The same numbers as a table, for anyone who cannot read the chart.</span></li><li><span>Each person's own words, recommendations and notes side by side, with a button to move them forward right here.</span></li><li><span>Added after testing: one overall score per person, since a tester wanted a single number to compare by.</span></li></ol><a class="ks-open" href="docket-prototype.html#/compare/CAND-0412,CAND-0398,CAND-0405" target="_blank" rel="noopener">Open this screen &rarr;</a></div>
-    </div>
-  </section></div>
-
-  <!-- PROTOTYPE -->
-  <div class="slide-shell alt"><section class="slide" data-title="Prototype">
-    <div class="eyebrow">Prototype</div>
-    <h2 style="font-size:30px; margin-bottom:8px;">Clickable prototype.</h2>
-    <p class="lead" style="margin-bottom:24px;">A working version of the three main screens: the candidate list, a candidate's record
-      and the compare view. The candidates are made up. The reasons behind each decision are on the Key Screens pages.</p>
-    <a class="proto-live" href="docket-prototype.html" target="_blank" rel="noopener" aria-label="Open the clickable Docket prototype">
-      <iframe src="docket-prototype.html?clean" title="Docket prototype preview" tabindex="-1" loading="lazy"></iframe>
-      <span class="open">Open prototype &rarr;</span>
-    </a>
-    <div style="margin-top:14px; display:flex; flex-wrap:wrap; gap:0 28px;"><a class="ks-open" href="docket-prototype.html" target="_blank" rel="noopener">Open the clickable prototype &rarr;</a><a class="ks-open" href="https://www.figma.com/proto/qJU9Q3aXhqH1N3NSiAkZaW/Docket?node-id=27-1311&amp;p=f&amp;t=vNnb1InqCniyRpNH-1&amp;scaling=scale-down&amp;content-scaling=fixed&amp;page-id=0%3A1&amp;starting-point-node-id=27%3A1311&amp;show-proto-sidebar=1" target="_blank" rel="noopener">Open the Figma prototype &rarr;</a><a class="ks-open" href="https://www.figma.com/design/qJU9Q3aXhqH1N3NSiAkZaW/Docket" target="_blank" rel="noopener">View the Figma file &rarr;</a></div>
-    <div class="proto-meta"><span><b>3</b> screens</span><span><b>9</b> sample candidates</span><span>Interactive HTML version</span><span>Figma prototype, 4 flows</span><span>Tested with 6 people, 7 sessions</span></div>
-  </section></div>
-
-  <!-- WHAT THE RESEARCH CHANGED -->
-  <div class="slide-shell"><section class="slide" data-title="What the Research Changed">
-    <div class="eyebrow">Iteration &middot; What the Research Changed</div>
-    <h2 style="font-size:clamp(26px,3.2vw,34px); margin-bottom:10px;">Making late feedback visible.</h2>
-    <p class="lead" style="margin-bottom:16px;">I built the first prototype before the research. The research said the problem is slow feedback, and
-      the first version had nothing that showed it. So I added it.</p>
-    <div class="ba">
-      <div><div class="ba-k">Before</div>
-        <div class="ks-frame" aria-hidden="true"><iframe src="docket-prototype.html?clean&amp;before#/" tabindex="-1" loading="lazy" title=""></iframe></div>
-        <p>The status says whose turn it is, but not for how long. A candidate who has been stuck for days looks the same as one who arrived an hour ago.</p></div>
-      <div><div class="ba-k after">After <span class="mnote inline">new: who is late, and for how long</span></div>
-        <div class="ks-frame" aria-hidden="true"><iframe src="docket-prototype.html?clean#/" tabindex="-1" loading="lazy" title=""></iframe><span class="mk" style="left:18%; top:23.2%;">1</span><span class="mk" style="left:61.7%; top:35.5%;">2</span></div>
-        <p><b>1</b> A bar at the top lists anyone past the team's goal. <b>2</b> A new Waiting on column shows whose turn it is and for how long, and turns red when it is late. <a href="docket-prototype.html#/c/CAND-0417" target="_blank" rel="noopener" style="color:var(--ink);">Try it on Hannah Okafor's record &rarr;</a></p></div>
-    </div>
-    <div class="shift" style="margin-top:16px; margin-bottom:0;">
-      <div><b>What the research said</b><p>Feedback runs late because it is extra work (7 of 15 accounts), and SHRM suggests hiring managers review resumes within 48 hours.</p></div>
-      <div data-mk="all"><b>What I changed</b><p>A 2-day team goal, a Waiting on column, a late bar, and a Send reminder button inside the candidate's record.</p></div>
-      <div><b>What testing said</b><p>Mazzy could not tell whose side the hold-up was on. After I reworded it, Leo, Conner and Johnny all got it right away, 5/5 sure. Ash, Mazzy and Leo all said seeing "Late" helps.</p></div>
-    </div>
-  </section></div>
-
-  <!-- USABILITY TESTING -->
-  <div class="slide-shell alt"><section class="slide" data-title="Usability Testing">
-    <div class="ph-head">
-      <div><div class="eyebrow">Usability Testing &middot; 6 testers, 7 sessions</div>
-        <h2 style="font-size:30px; margin-bottom:10px;">Same five tasks, every round.</h2>
-        <p class="lead" style="margin-bottom:22px;">I ran each session and wrote down what the tester did and said. Ash tried two versions,
-          Mazzy and Leo each tried a fixed one, and then Conner, Johnny and Brett saw Docket for the first time, to check the fixes hold up
-          for fresh eyes. I fixed what came up after every round.</p></div>
-      <span class="stamp">Done</span>
-    </div>
-    <table class="persp test-tbl">
-      <tr><th>Task</th><th>Ash &middot; R1, R2</th><th>Mazzy &middot; R2</th><th>Leo &middot; R3</th><th>Conner &middot; new</th><th>Johnny &middot; new</th><th>Brett &middot; new</th></tr>
-      <tr><td>Find who is waiting on you</td><td><span class="res mid">R1 &middot; Confused</span><span class="res ok r2">R2 &middot; Found it</span></td><td><span class="res ok">Found it</span></td><td><span class="res ok">Found it</span></td><td><span class="res ok">Found it</span></td><td><span class="res ok">Found it</span></td><td><span class="res ok">Found it</span></td></tr>
-      <tr><td>Remind whoever is holding up Hannah</td><td><span class="res ok">Done</span></td><td><span class="res bad">Stuck</span></td><td><span class="res ok">Done</span></td><td><span class="res ok">Done</span></td><td><span class="res ok">Done</span></td><td><span class="res ok">Done</span></td></tr>
-      <tr><td>Move Maya to the next step</td><td><span class="res bad">R1 &middot; Stuck</span><span class="res ok r2">R2 &middot; Done</span></td><td><span class="res bad">Stuck</span></td><td><span class="res ok">Done</span></td><td><span class="res ok">Done</span></td><td><span class="res ok">Done</span></td><td><span class="res ok">Done</span></td></tr>
-      <tr><td>Compare the finalists and pick one</td><td><span class="res bad">R1 &middot; Stuck</span><span class="res ok r2">R2 &middot; Done</span></td><td><span class="res mid">Needed a hint</span></td><td><span class="res mid">Needed a hint</span></td><td><span class="res mid">Missed the checkboxes</span></td><td><span class="res bad">Stuck</span></td><td><span class="res mid">Read checkboxes as delete</span></td></tr>
-      <tr><td>Act on the morning email</td><td><span class="res na">R1 &middot; Not tested</span><span class="res ok r2">R2 &middot; Done</span></td><td><span class="res ok">Done</span></td><td><span class="res ok">Done</span></td><td><span class="res ok">Done</span></td><td><span class="res na">Not asked</span></td><td><span class="res na">Not asked</span></td></tr>
-    </table>
-    <div class="takeaway" style="margin-top:20px;"><span class="k">What stood out</span>
-      <p>Once fixed, finding, reminding and moving a candidate worked for every new tester, 5/5 sure. <b>Comparing</b> was the hard one:
-      in five of seven sessions someone needed help, mostly because the checkboxes read as move or delete. Brett summed up the rest:
-      "Pretty easy, 5 out of 5."</p></div>
-  </section></div>
-
-  <!-- WHAT TESTING CHANGED -->
-  <div class="slide-shell"><section class="slide" data-title="What Testing Changed">
-    <div class="eyebrow">Iteration &middot; What Testing Changed</div>
-    <h2 style="font-size:clamp(26px,3.2vw,34px); margin-bottom:10px;">Fixing where people got stuck.</h2>
-    <p class="lead" style="margin-bottom:16px;">Every change here came from something a tester did or said. The biggest one: Mazzy could not tell
-      whose side the hold-up was on, which is the exact problem the research pointed to.</p>
-    <div class="ba">
-      <div><div class="ba-k">Before &middot; round 2</div>
-        <div class="ks-frame" aria-hidden="true"><img loading="lazy" decoding="async" src="img/docket_r2_before_record.png" alt=""></div>
-        <p>"Waiting on Rae Lindqvist" and a Send reminder button. Mazzy could not tell if the problem was the team's or Hannah's, or what the button would do.</p></div>
-      <div><div class="ba-k after">After</div>
-        <div class="ks-frame" aria-hidden="true"><iframe src="docket-prototype.html?clean#/c/CAND-0417" tabindex="-1" loading="lazy" title=""></iframe><span class="mk" style="left:18.1%; top:29.9%;">1</span><span class="mk" style="left:86.6%; top:30.6%;">2</span><span class="mk" style="left:54.2%; top:42.1%;">3</span></div>
-        <p><b>1</b> It says in plain words that the hold-up is on the team, not Hannah. <b>2</b> The button says who the reminder goes to and how. <b>3</b> A "Your decision" box says whether you need to do anything. Leo and every new tester after him got it right away, 5/5 sure. <a href="docket-prototype.html#/c/CAND-0417" target="_blank" rel="noopener" style="color:var(--ink);">Try it &rarr;</a></p></div>
-    </div>
-    <table class="persp test-tbl chg" style="margin-top:20px;">
-      <colgroup><col style="width:32%"><col style="width:44%"><col style="width:24%"></colgroup>
-      <tr><th>What testers hit</th><th>What I changed</th><th>Result</th></tr>
-      <tr><td>"Awaiting you" and "Waiting on: You" read as the same thing (Ash)</td><td>Renamed the status Ready for review, and added one Waiting on you filter.</td><td><span class="res ok">Everyone after found it</span></td></tr>
-      <tr><td>Did not know how to move Maya forward (Ash, Mazzy)</td><td>A "Your decision" box with a button that names the next step. Afterward it says what moved, with Undo.</td><td><span class="res ok">5/5 from round 3 on</span></td></tr>
-      <tr><td>Could not tell whose side Hannah's hold-up was on (Mazzy)</td><td>It says in plain words that the hold-up is on the team, and the button reads "Remind Rae."</td><td><span class="res ok">5/5 from round 3 on</span></td></tr>
-      <tr><td>Found the concerns only at the bottom (Mazzy)</td><td>Every interviewer's pros and concerns come first, concerns in bold.</td><td><span class="res ok">Built</span></td></tr>
-      <tr><td>Wanted one number and a way to sort (Ash, Mazzy, Leo)</td><td>An overall score out of 20 in the list. Every column title sorts, and the list opens with what is late or due.</td><td><span class="res ok">Built</span></td></tr>
-      <tr><td>Checkboxes read as move or delete, and there were two Compare buttons (5 of 7 sessions)</td><td>One checkbox selects a row, and a bar at the bottom lets you Compare or Archive. One Compare button, highest score first.</td><td><span class="res mid">Rebuilt. Testing next</span></td></tr>
-    </table>
-  </section></div>
-
-  <!-- WRAP UP -->
-  <div class="slide-shell alt"><section class="slide" data-title="Wrap Up">
+<div class="slide-shell alt"><section class="slide" data-title="Wrap Up">
     <div class="ph-head">
       <div><div class="eyebrow">Wrap Up</div>
         <h2 style="font-size:30px; margin-bottom:10px;">How I would know it works, and what I learned.</h2>
@@ -1465,7 +1470,7 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
     </div>
   </section></div>
 
-  <!-- STATUS -->
+  <!-- status -->
   <div class="slide-shell"><section class="slide" data-title="Status" style="min-height:calc(100vh - 1px); display:flex; flex-direction:column; justify-content:center;">
     <div class="eyebrow">Project Status</div>
     <h2 style="font-size:36px; max-width:720px; margin-bottom:24px;">Where it stands, and what is next.</h2>
@@ -1518,7 +1523,7 @@ body .portfolio-nav:not(.nav-hidden) .nav-home,body .portfolio-nav.nav-peek .nav
     </details>
     <div class="cs-end">
       <a href="index.html#work">&larr; All case studies</a>
-      <a class="next" href="reboot.html">Next &middot; Reboot &rarr;</a>
+      <a class="next" href="nuance.html">Next &middot; Nuance &rarr;</a>
     </div>
   </section></div>
 
@@ -1772,6 +1777,7 @@ if (scrollCue){
   // scale the live prototype preview to fit its frame
   var frames = [].slice.call(document.querySelectorAll('.proto-live, .ks-frame'));
   function fit(){ frames.forEach(function(f){ var ifr = f.querySelector('iframe'); if (ifr) ifr.style.transform = 'scale(' + (f.clientWidth / 1440) + ')'; }); }
+  window.ksFit = fit;   /* a panel that was hidden has no width yet, so its frame needs re-fitting when it opens */
   fit(); window.addEventListener('resize', fit);
 
   // no widows: glue the last two words of each text block together
@@ -1814,8 +1820,11 @@ if (scrollCue){
       partners.forEach(function(p, j){ p.classList.toggle('hot', i === 'all' || j === i); });
       f.classList.add('linked');
       if (zoom && !reduce && i !== 'all'){
-        z.style.setProperty('--ox', mks[i].style.left);
-        z.style.setProperty('--oy', mks[i].style.top);
+        /* zoom about the middle of the dot, not its top-left corner, so the
+           thing it is pointing at stays under it */
+        var fr = f.getBoundingClientRect(), mr = mks[i].getBoundingClientRect();
+        z.style.setProperty('--ox', ((mr.left + mr.width / 2 - fr.left) / fr.width * 100) + '%');
+        z.style.setProperty('--oy', ((mr.top + mr.height / 2 - fr.top) / fr.height * 100) + '%');
         f.classList.add('zoomed');
       }
     }
@@ -1872,6 +1881,70 @@ if (scrollCue){
     t.addEventListener('mouseleave', clear);
   });
 })();
+</script>
+<script>
+[].forEach.call(document.querySelectorAll('.sv-tabs'), function (group) {
+  var tabs = [].slice.call(group.querySelectorAll('.sv-tab'));
+  if (!tabs.length) return;
+  /* every panel is as tall as the tallest, so the tabs stay put instead of
+     jumping up and down as you click between them */
+  var panels = tabs.map(function (t) { return document.getElementById(t.getAttribute('aria-controls')); }).filter(Boolean);
+  /* an embedded prototype that boots inside a hidden panel has no size yet and
+     comes up blank, so hold its src back until its tab is opened. It also means
+     only the prototype you are looking at is running. */
+  panels.forEach(function (p) {
+    if (!p.hidden) return;
+    [].forEach.call(p.querySelectorAll('iframe[src]'), function (f) {
+      f.setAttribute('data-src', f.getAttribute('src'));
+      f.removeAttribute('src');
+    });
+  });
+  function load(p) {
+    [].forEach.call(p.querySelectorAll('iframe[data-src]'), function (f) {
+      f.setAttribute('src', f.getAttribute('data-src'));
+      f.removeAttribute('data-src');
+    });
+    if (window.ksFit) requestAnimationFrame(window.ksFit);
+  }
+  function size() {
+    var was = panels.map(function (p) { return p.hidden; });
+    panels.forEach(function (p) { p.style.minHeight = ''; });
+    var tall = 0;
+    panels.forEach(function (p, i) {
+      panels.forEach(function (q, j) { q.hidden = j !== i; });
+      tall = Math.max(tall, p.offsetHeight);
+    });
+    panels.forEach(function (p, i) { p.hidden = was[i]; p.style.minHeight = tall + 'px'; });
+  }
+  function show(id) {
+    tabs.forEach(function (t) {
+      var on = t.getAttribute('aria-controls') === id;
+      t.classList.toggle('on', on);
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      var panel = document.getElementById(t.getAttribute('aria-controls'));
+      if (panel) { panel.hidden = !on; if (on) load(panel); }
+    });
+  }
+  tabs.forEach(function (t, i) {
+    t.addEventListener('click', function () { show(t.getAttribute('aria-controls')); });
+    t.addEventListener('keydown', function (e) {
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+      e.preventDefault();
+      var next = tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length];
+      next.focus(); show(next.getAttribute('aria-controls'));
+    });
+  });
+  var pend; function resize() { clearTimeout(pend); pend = setTimeout(size, 60); }
+  size();
+  addEventListener('load', resize);
+  panels.forEach(function (p) {
+    [].forEach.call(p.querySelectorAll('img'), function (im) {
+      if (im.loading === 'lazy') im.loading = 'eager';
+      if (!im.complete) im.addEventListener('load', resize, { once: true });
+    });
+  });
+  var rsz; addEventListener('resize', function () { clearTimeout(rsz); rsz = setTimeout(size, 150); });
+});
 </script>
 </body>
 </html>

@@ -302,8 +302,21 @@
   .frame .toast{ position:absolute; right:28px; bottom:28px; transform:none; opacity:1; visibility:visible; }
   .frame .dn{ display:none !important; }
 </style>
+<style>
+/* this page opens in a tab of its own, so it needs its own way back */
+.cs-back{position:fixed;top:14px;right:14px;z-index:99999;display:inline-flex;align-items:center;gap:8px;
+  min-height:38px;padding:0 16px;border-radius:100px;text-decoration:none;font:600 13px/1 system-ui,-apple-system,"Segoe UI",sans-serif;
+  color:#1c1c1c;background:rgba(255,255,255,.92);border:1px solid rgba(0,0,0,.14);
+  box-shadow:0 2px 10px rgba(0,0,0,.16);backdrop-filter:saturate(1.6) blur(6px);}
+.cs-back:hover,.cs-back:focus-visible{background:#fff;border-color:rgba(0,0,0,.3);}
+@media (max-width:640px){.cs-back{top:10px;right:10px;padding:0 12px;font-size:12px;min-height:34px;}
+  .cs-back .cs-back-long{display:none;}}
+@media print{.cs-back{display:none;}}
+</style>
 </head>
 <body>
+<a class="cs-back" href="docket.html">← <span>Back<span class="cs-back-long"> to the Docket case study</span></span></a>
+
 <div class="board">
   <div class="board-title"><b>docket. Prototype screens</b><span>6 screens, 1440px wide. Static copy of docket-prototype.html for importing into Figma.</span></div>
 
